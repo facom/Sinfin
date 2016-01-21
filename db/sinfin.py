@@ -3,13 +3,14 @@ import csv
 from sys import exit,argv
 from os import system
 from datetime import date
+import re
 
 ###################################################
 #CONFIGURACION
 ###################################################
-BASENAME="Comisiones"
-DATABASE="Comisiones"
-USER="comisiones"
+BASENAME="Sinfin"
+DATABASE="Sinfin"
+USER="sinfin"
 PASSWORD="123"
 
 ###################################################
@@ -68,12 +69,16 @@ def updateDatabase(dbdict,con):
         for table in dbdict.keys():
             print "Actualizando tabla ",table
             for row in dbdict[table]['rows'].keys():
-                sql="update %s set "%table;
+                sql="insert ignore into %s set "%table;
                 for field in dbdict[table]['fields']:
-                    if field==dbdict[table]['primary']:
-                        suffix="where %s='%s'"%(field,dbdict[table]['rows'][row][field])
-                        continue
                     sql+="%s = '%s',"%(field,dbdict[table]['rows'][row][field])
-                sql=sql.strip(",")+" %s;"%suffix
+                sql=sql.strip(",")
                 db.execute(sql);
-    con.commit()
+                con.commit()
+
+def notNull(value,default):
+    if value=='':
+        nvalue=default
+    else:
+        nvalue=value
+    return nvalue

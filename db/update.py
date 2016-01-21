@@ -1,8 +1,9 @@
 #-*-coding:utf-8-*-
-from comisiones import *
+from sinfin import *
 comisiones,connection=loadDatabase()
 db=connection.cursor()
 
+"""
 # ############################################################
 # LOAD SQL FILE INSTITUTOS
 # ############################################################
@@ -58,3 +59,4 @@ for cedula in profesores.keys():
     db.execute(sql)
 
 connection.commit()
+"""

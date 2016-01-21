@@ -1,24 +1,25 @@
-create user 'sinfin'@'localhost' identified by '123';
+-- create user 'sinfin'@'localhost' identified by '123';
+-- grant all privileges on Sinfin.* to 'sinfin'@'localhost';
+-- flush privileges;
 create database Sinfin;
-grant all privileges on Sinfin.* to 'sinfin'@'localhost';
-flush privileges;
-use sinfin;
-
-drop table if exists Pensums,Cursos;
+use Sinfin;
+drop table if exists Programas,Planes,Cursos,Estudiantes;
 
 create table Programas (
-       /*Basic*/
-       /* e.g. 210, 211, 204, etc.*/
+       -- Basic
+       --  e.g. 210, 211, 204, etc.
        programaid varchar(5),
 
-       programa varchar(50);
+       codigo varchar(5),
+       programa varchar(50),
        instituto varchar(50),
        registro varchar(50),
        fecharegistro varchar(50),
-       fechavence varchar(50),
-       acreditado varchar(2),
+       fechavenceregistro varchar(50),
+       fechaacreditacion varchar(50),
+       fechavenceacreditacion varchar(50),
 
-       /*Extras*/
+       -- Extras
        extra1 varchar(255),
        extra2 varchar(255),
        extra3 varchar(255),
@@ -26,19 +27,20 @@ create table Programas (
 );
 
 create table Planes (
-       /*Basic*/
-       /* e.g. 210-v1-c1 */
+       -- Basic
+
+       --  e.g. 210-v1-m1 
        planid varchar(10),
 
        version varchar(5),
-       correccion varchar(5),
-       acuerdos varchar(255),
-       fechaacuerdos varchar(255),
+       modificacion varchar(5),
+       acuerdo varchar(255),
+       fechaacuerdo varchar(255),
 
-       /*Relation*/
-       programaid varchar(5),
+       -- Relation
+       Programas_programaid varchar(5),
        
-       /*Extras*/
+       -- Extras
        extra1 varchar(255),
        extra2 varchar(255),
        extra3 varchar(255),
@@ -48,14 +50,15 @@ create table Planes (
 
 create table Cursos (
 
-       /*Basic*/
-       /* e.g. 0302120c1 */
+       -- Basic
+       --  e.g. 0302120c1 
        cursoid varchar(15),
 
        codigo varchar(10),
        correccion varchar(5),
        nombre varchar(255),
        creditos varchar(2),
+       semanas varchar(3),
        ht varchar(2),
        hp varchar(2),
        htp varchar(2),
@@ -66,17 +69,24 @@ create table Cursos (
        faltas varchar(2),
        tipo varchar(20),
        acuerdo varchar(255),
+       fechaacuerdo varchar(255),
        banco varchar(10),
 
-       /*Relation*/
-       planids varchar(255),
-       consecutivos varchar(255),
-       semestres varchar(2),
-       areas varchar(255),
-       prerrequisitos varchar(1000),
-       correquisitos varchar(1000),
+       -- Relation
+       -- e.g. 210-v1-m1;211-v2-m2;
+       Planes_planid_s varchar(255),
+       -- e.g. 210-v1-m1:45;211-v2-m2:24;
+       consecutivo_s varchar(255),
+       -- e.g. 210-v1-m1:1;211-v2-m2:3;
+       semestre_s varchar(255),
+       -- e.g. 210-v1-m1:Fisica;211-v2-m2:Fisica;
+       area_s varchar(255),
+       -- e.g. 210-v1-m1:0302120c1;211-v2-m2:0303124c2,0303125c1;
+       prerrequisito_s varchar(1000),
+       -- e.g. 210-v1-m1:0302120c1;211-v2-m2:0303124c2;
+       correquisito_s varchar(1000),
 
-       /*Extra*/
+       -- Extra
        extra1 varchar(255),
        extra2 varchar(255),
        extra3 varchar(255),
@@ -86,24 +96,29 @@ create table Cursos (
 
 create table Estudiantes (
 
-       /*Basic*/
-       /* e.g. 71755174 */
+       -- Basic
+       --  e.g. 71755174 
        documento varchar(20),
 
        nombre varchar(100),
        email varchar(100),
        password varchar(50),
 
-       /*Relation*/
-       /*Estudiante puede haber estado matriculado en 3 programas*/
-       planids_1 varchar(10),
-       planids_2 varchar(10),
-       planids_3 varchar(10),
-       cursoids_1 varchar(1000),
-       cursoids_2 varchar(1000),
-       cursoids_3 varchar(1000),
+       -- Relation
+       -- Estudiante puede haber estado matriculado en 3 programas
 
-       /*Extra*/
+       -- e.g. 211-v1-m1;211-v1-m2;
+       Planes_planid_1_s varchar(10),
+       -- e.g. 210-v1-m1;
+       Planes_planid_2_s varchar(10),
+       Planes_planid_3_s varchar(10),
+
+       -- e.g. 211-v1-m1:0302120c1,0304130c2,0304560c1;211-v1-m2:0311304c1;
+       Cursos_cursoid_1_s varchar(1000),
+       Cursos_cursoid_2_s varchar(1000),
+       Cursos_cursoid_3_s varchar(1000),
+
+       -- Extra
        extra1 varchar(255),
        extra2 varchar(255),
        extra3 varchar(255),
