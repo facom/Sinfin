@@ -1,0 +1,52 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,301111,Fundamentos en Biología,Biología,16,6,0,0,6,4,-,H,19,si,-,-
+2,1,305115,Fundamentación en Ciencias,Ciencias,16,6,0,0,6,4,-,-,19,si,-,-
+3,1,304556,Fundamentos de Qca Analítica,Química,16,4,3,0,5,4,-,H,22,si,-,-
+4,1,303118,Matemética Básicas,Matemáticas,16,6,0,0,6,4,-,HVC,19,si,-,-
+5,1,305127,Inglés I,Idiomas,16,4,0,0,2,2,-,VC,13,-,-,si
+6,2,301551,Biología Celular y Molecular I,Biología,16,4,3,0,5,4,(PR) 0301111,H,22,si,-,-
+7,2,304557,Química Orgánica,Química,16,4,3,0,5,4,(PR) 0304556,H,22,si,-,-
+8,2,303204,Matemáticas I,Matemáticas,16,6,0,0,9,5,(PR) 0303118,HV,19,si,-,-
+9,2,305120,Cátedra Universitaria I,Sociohumanística,16,4,0,0,2,2,-,-,13,-,-,si
+10,2,305128,Ingés II,Idiomas,16,4,0,0,2,2,(PR) 0305127,VC,13,-,-,si
+11,3,301552,Biología Celular y Molecular II,Biología,16,4,3,0,5,4,(PR) 0301151 (CO) 0301563,H,22,si,-,-
+12,3,301563,Bioqímica,Química,16,4,3,0,5,4,(PR) 0304557 (CO) 0301552,H,22,si,-,-
+13,3,302148,Biofísica I,Física,16,4,2,0,6,4,(PR) 0303204,H,19,si,-,-
+14,3,303314,Matemáticas II,Matemáticas,16,6,0,0,9,5,(PR) 0303204,HV,19,si,-,-
+15,4,301553,Genética,Biología,16,4,3,0,5,4,(PR) 0301552,H,22,si,-,-
+16,4,301559,Botánica,Biología,16,4,3,0,5,4,(PR) 0301552,H,22,si,-,-
+17,4,301564,Microbiología,Biología,16,4,3,0,5,4,(PR) 0301552    (PR) 0301563,H,22,si,-,-
+18,4,302149,Biofísica II,Física,16,6,0,0,6,4,(PR) 0302148,H,19,si,-,-
+19,4,305129,Inglés III,Idiomas,16,4,0,0,2,2,(PR) 0305128,VC,13,-,-,si
+20,5,301554,Mecanismos Biol. Evolución,Biología,16,4,0,0,5,3,(PR) 0301553,H,13,si,-,-
+21,5,301560,Ecología,Biología,16,4,3,0,5,4,(PR) 0301559,H,22,si,-,-
+22,5,301565,Biología Animal I,Biología,16,4,3,0,5,4,(PR) 0301552,H,22,si,-,-
+23,5,304558,Fisico Química,Química,16,4,3,0,5,4,(PR) 0301563    (PR) 0302149,H,22,si,-,-
+24,5,305121,Cátedra Universitaria II,Sociohumanística,16,2,0,0,1,1,(PR) 0305120,-,6,-,-,si
+25,5,305130,Inglés IV,Idiomas,16,4,0,0,2,2,(PR) 0305129,VC,13,-,-,si
+26,6,301556,Biología del Desarrollo,Biología,16,4,0,0,5,3,(PR) 0301554,H,13,-,si,-
+27,6,301561,Cons. y Manejo de la Diversidad,Biología,16,4,0,0,5,3,(PR) 0301560,H,13,-,si,-
+28,6,301566,Biología Animal II,Biología,16,4,3,0,5,4,(PR) 0301565,H,22,si,-,-
+29,6,301568,Fisiología,Biología,16,4,3,0,5,4,(PR) 0304558,H,22,-,si,-
+30,6,305122,Cátedra Universitaria III,Sociohumanística,16,2,0,0,1,1,(PR) 0305121,-,6,-,-,si
+31,7,301557,Sistemática Filogenética,Biología,16,4,0,0,5,3,(PR) 0301556    (PR) 0301568,H,13,-,si,-
+32,7,301562,Biotecnología,Biología,16,4,3,0,5,4,(PR) 0301566,H,22,-,si,-
+,7,9001,Electiva Biológica,Biología,16,4,3,0,5,4,-,H,22,-,si,
+33,7,301114,Bioestadística I,Matemáticas,16,4,0,0,,3,(PR) 0303314,H,13,-,si,-
+34,7,305123,Cátedra Universitaria IV,Sociohumanística,16,4,0,0,2,2,(PR) 0305122,-,13,-,-,si
+35,8,301558,Fundamentos de Investigación,Biología,16,4,0,0,5,3,(PR) 0301557,H,13,-,si,-
+36,8,301115,Biestadística II,Matemáticas,16,4,0,0,5,3,(PR) 0301114,H,13,-,si,-
+37,8,305124,Cátedra Universitaria V,Sociohumanística,16,4,0,0,2,2,(PR) 0305123,-,13,-,-,si
+9001,8,9001,Electiva Biológica,Biología,16,4,3,0,5,4,-,H,22,-,si,-
+9001,8,9001,Electiva Biológica,Biología,16,4,3,0,5,4,-,H,22,-,si,-
+9002,8,9002,Electiva Seminario,Biología,16,2,0,0,4,2,-,H,6,-,si,-
+38,9,301579,Seminario Trabajo de Grado,Biología,16,5,0,0,10,5,,-,16,-,si,-
+39,9,305125,Cátedra Universitaria VI,Sociohumanística,16,2,0,0,1,1,-,-,6,-,si,-
+9001,9,9001,Electiva Biológica,Biología,16,4,3,0,5,4,-,HV,12,-,si,-
+9001,9,9001,Electiva Biológica,Biología,16,4,3,0,5,4,,,,,,
+9002,9,9002,Electiva Seminario,Biología,16,2,0,0,4,2,,,,,,
+40,10,301580,Trabajo de Grado,Biología,16,0,5,0,10,5,(PR) 0301579,-,16,-,si,-
+41,10,301159,Cátedra Univ. VII: Bioética,Sociohumanística,16,2,0,0,1,1,(PR) 0305125,H,6,-,-,si
+9001,10,9001,Electiva Biológica,Biología,16,4,3,0,5,4,-,H,22,-,si,-
+9002,10,9002,Electiva Seminario,Biología,16,2,0,0,4,2,-,H,6,-,si,-
+9002,10,9002,Electiva Seminario,Biología,16,2,0,0,4,2,-,H,6,-,si,-

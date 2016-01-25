@@ -1,0 +1,49 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+2,1,303118,Matemáticas Basicas,Matematicas ,16,6,0,0,6,4,__,HCV,19,si,__,__
+1,1,304559,Química  I,Qimica ,16,0,0,10,5,5,__,HV,32,si,__,__
+3,1,305115,Fundamentacion en Ciencias,Ciencias,16,6,0,0,6,4,__,__,19,si,__,__
+4,1,305120,Catedra Universitaria I,Sociohumanistica ,16,4,0,0,2,2,__,__,13,si,__,__
+5,1,305127,Ingles I,Idiomas ,16,4,0,0,2,2,__,VC,13,si,__,__
+6,2,303151,Matemáticas I,Matematicas ,16,10,0,0,5,5,(PR) 0303118,H,32,si,__,__
+7,2,302168,Física I,Fisica ,16,6,0,0,3,3,(PR) 0303118,H,19,si,__,__
+8,2,304560,Química II,Quimica,16,0,0,12,6,6,(PR) 0304559,HV,38,si,__,__
+9,2,305121,Catedra Universitaria II,Sociohumanistica,16,2,0,0,1,1,(PR) 0305120,__,6,si,__,__
+10,2,305128,Ingles II,Idiomas,16,4,0,0,2,2,(PR) 0305127,VC,13,si,__,__
+11,3,303211,Matemáticas II,Matematicas,16,10,0,0,5,5,(PR) 0303151,HV,32,si,__,__
+12,3,302153,Física II,Fisica ,16,6,0,0,3,3,(PR) 0302168                        (CO) 0303211,H,19,si,__,__
+13,3,304561,Química III,Quimica,16,0,0,12,6,6,(PR) 0304560                         (CO) 0303211,HV,38,si,__,__
+14,3,305129,Ingles III,Ingles,16,4,0,0,2,2,(PR) 0305128,VC,13,si,__,__
+15,3,305122,Catedra Universitaria III,Sociohumanistica,16,2,0,0,1,1,(PR) 0305121,__,6,si,__,__
+16,4,303251,Matemáticas III,Matematicas,16,6,0,0,3,3,(PR) 0303211,HV,19,si,__,__
+17,4,302154,Física III,Fisica,16,6,0,0,3,3,(PR) 0302153,HV,19,si,__,__
+18,4,304573,Fisicoquímica,Quimica,16,0,0,6,6,4,(PR) 0304561                        (CO) 0303251,HV,19,si,__,__
+19,4,304574,Cuántica,Fisica,16,6,0,0,6,4,(PR) 0304561                       (CO) 0303251,HV,19,__,si,__
+20,4,304575,Analítica I,Quimica,16,0,0,6,6,4,(PR) 0304561                          (CO) 0303251,HV,19,__,si,__
+21,5,304576,Inorgánica I,Quimica ,16,6,0,0,3,3,(PR) 0304573,HV,19,__,si,__
+22,5,304168,Laboratorio de física,Fisica ,16,0,6,0,0,2,(PR) 0302154,__,19,si,__,__
+23,5,304577,Orgánica I,Quimica ,16,0,0,6,6,4,(PR) 0304573,HV,19,__,si,__
+24,5,304578,Estructura Molecular,Quimica,16,6,0,0,6,4,(PR) 0304574,HV,19,__,si,__
+25,5,304579,Analìtica II,Quimica,16,0,0,6,6,4,(PR) 0304575,HV,19,__,si,__
+26,6,304580,Inorgánica II,Quimica ,16,5,0,0,4,3,(PR) 0304576 (PR) 0304578 ,HV,16,__,si,__
+27,6,304581,Biología,Biologia,16,4,0,0,2,2,(PR) 0304577,HV,13,si,__,__
+28,6,304582,Orgánica II,Quimica ,16,0,0,6,6,4,(PR) 0304577,HV,19,__,si,__
+29,6,304583,Administración y Gestión Empresarial,Quimica ,16,4,0,0,2,2,(PR) 0303251                                 ,HV,13,__,si,__
+30,6,304584,Analítica III,Quimica,16,0,0,6,6,4,(PR) 0304579,HV,19,__,si,__
+31,6,305130,Inglés IV,Idiomas,16,4,0,0,2,2,(PR) 0305129,VC,13,si,__,__
+32,7,304684,Inorgánica III,Quimica ,16,0,3,0,6,3,(PR) 0304580,__,10,__,si,__
+33,7,304586,Bioquímica,Biologia ,16,0,0,6,6,4,(PR) 0304581                             (PR) 0304582,HV,19,__,si,__
+34,7,304587,Síntesis Química,Quimica ,16,0,0,8,7,5,(CO) 0304589                             (CO) 0304588,__,26,__,si,__
+35,7,304588,Orgánica III,Quimica ,16,0,0,6,6,4,(PR) 0304582,HV,19,__,si,__
+36,7,305123,Cátedra Universitaria IV,Sociohumanistica,16,4,0,0,2,2,(PR) 0305122,VC,13,si,,__
+9001,8,9001,Electiva del Área de Química Analítica,Electiva,16,0,0,4,8,4,(CR) 120,__,13,__,__,si
+9001,8,9001,Electiva del Área de Química Orgánica y Bioquímica,Electiva,16,0,0,4,8,4,(CR) 120,__,13,__,__,si
+9001,8,9001,Electiva del Área de Química Inorgánica,Electiva,16,0,0,4,8,4,(CR) 120,__,13,__,__,si
+9001,8,9001,Electiva del Área de Fisicoquímica,Electiva,16,0,0,4,8,4,(CR) 120,__,13,__,__,si
+37,8,305124,Cátedra Universitaria V,Sociohumanistica,16,4,0,0,2,2,(PR) 0305123,__,13,si,__,__
+38,9,304647,Seminario de Trabajo de Grado,Quimica,16,0,0,12,-6,2,(CR) 135,__,6,__,__,si
+9002,9,9002,Electivas en énfasis industrial,Electiva,16,4,8,0,0,4,(CR) 135,__,13,__,si,__
+9002,9,9002,Electivas en énfasis investigación,Electiva,16,4,8,0,0,4,(CR) 135,__,13,__,si,__
+9002,9,9002,Electivas en énfasis docencia,Electiva,16,4,8,0,0,4,(CR) 135,__,13,__,si,__
+39,9,305125,Cátedra Universitaria VI,Sociohumanistica,16,2,0,0,1,1,(PR) 0305124,__,6,si,,__
+40,10,304649,Trabajo de Grado,Quimica,16,0,0,5,40,15,(PR) 0304647,__,16,__,si,__
+41,10,305126,Cátedra Universitaria VII,Sociohumanistica,16,2,0,0,1,1,(PR) 0305125,__,6,si,__,__
