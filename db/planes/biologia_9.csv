@@ -1,0 +1,42 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,301101,Biología General y Lab,Biología,15,4,3,0,8,5,__,H,21,si,-,-
+2,1,303104,Matemáticas Generales,Matemáticas,15,4,0,0,8,4,__,HVC,12,si,-,-
+3,1,304105,Fund. Química General y Lab,Química,15,4,3,0,8,5,__,H,21,si,-,-
+4,1,305164,Lengua Materna I,Humanidades,15,4,0,0,8,4,__,HV,12,si,-,-
+9003,1,9003,Electiva No Biológica,Humanidades,15,4,0,4,4,4,__,-,24,si,-,-
+6,2,301103,Botánica General y Lab,Biología,15,4,3,0,8,5,(PR) 0301101,H,21,si,-,-
+8,2,302107,Biofísica I y Lab,Física,15,4,3,0,8,5,(PR) 0303104,H,21,si,-,-
+9,2,303105,Elementos de Cálculo,Matemáticas,15,4,0,0,8,4,(PR) 0303104,HV,12,si,-,-
+14,2,304220,Fund. Química Analítica y Lab,Química,15,4,3,0,8,5,(PR) 0304105,H,21,si,-,-
+7,3,301105,Zoología General y Lab,Biología,15,4,3,0,8,5,(PR) 0301103,H,21,si,-,-
+11,3,304106,Fund. Química Oegánica y Lab,Química,15,4,3,0,8,5,(PR) 0304220,H,21,si,-,-
+12,3,302207,Biofísica II y Lab,Física,15,4,3,0,8,5,(PR) 0303107,H,21,si,-,-
+10,3,303106,Estadística General,Matemáticas,15,4,0,0,8,4,(PR) 0304105,HV,12,si,,
+15,3,305590,Formación Ciudadana y Const.,Humanidades,15,2,0,0,-2,0,(CR) 40,C,6,si,-,-
+16,4,304210,Bioquímica Biológica y Lab,Química,15,4,3,0,8,5,(PR) 0304106,H,21,si,-,-
+18,4,301120,Biología Celular y Lab,Biología,15,4,3,0,8,5,(PR) 0301105 (CO) 0304210,H,21,si,-,-
+19,4,301160,Microbiología General y Lab,Biología,15,4,3,0,8,5,(PR) 0301105 (CO) 0304210,H,21,si,-,-
+13,4,303206,Diseño experimental,Matemáticas,15,4,0,0,8,4,(PR) 0304106,HV,12,si,-,-
+17,5,301140,Ecología General y Lab,Biología,15,4,3,0,8,5,(PR) 0301120     (PR) 0301160        (PR) 0303106,H,21,si,-,-
+20,5,301180,Genética General y Lab,Biología,15,4,3,0,8,5,(PR) 0301120     (PR) 0301160        (PR) 0303106,H,21,si,-,-
+22,5,304305,Fund. de Fisicoquímica y Lab,Química,15,4,3,0,8,5,(PR) 0302207    (PR) 0304210,H,21,si,-,-
+23,5,305110,Climatología,,15,4,0,0,8,4,(CO) 0301140,HVC,12,si,-,-
+21,6,301181,Fundamentos de Investigación,Biología,15,4,0,0,8,4,(PR) 0301140     (PR) 0301180        (PR) 0303206,H,12,-,si,-
+24,6,301223,Mecnismos Biológicos Evolución,Biología,15,4,0,0,11,5,(PR) 0301140     (PR) 0301180 ,HV,12,-,si,-
+25,6,301182,Bioética,Humanidades,15,2,0,0,4,2,(PR) 0301140     (PR) 0301180 ,HV,6,-,si,-
+9001,6,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,6,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,7,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,7,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,7,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,
+5,7,305191,Antropología General,Humanidades,15,4,0,0,8,4,(PR) 0301223,HV,12,-,si,-
+9001,8,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,8,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9001,8,9001,Electiva Biológica,Biología,16,4,3,0,8,5,(PR) 0301140     (PR) 0301180 ,H,21,-,si,-
+9003,8,9003,Electiva No Biológica,Humanidades,16,4,0,0,8,4,-,HV,12,-,si,-
+26,9,301398,Investigación Iniciación,Biología,15,0,0,10,20,10,-,-,30,-,si,-
+9002,9,9002,Seminario de Biología,Biología,16,2,0,0,4,2,-,-,6,-,si,-
+9003,9,9003,Electiva No Biológica,Humanidades,16,4,0,0,8,4,-,HV,12,-,si,-
+27,10,301399,Investigación Finalización,Biología,15,0,0,10,20,10,(PR) 0301398,-,30,-,si,-
+9002,10,9002,Seminario de Biología,Biología,16,2,0,0,4,2,-,-,6,-,si,-
+9003,10,9003,Electiva No Biológica,Humanidades,16,4,0,0,8,4,-,HV,12,-,si,-

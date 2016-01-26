@@ -1,0 +1,69 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,0303108,Álgebra y Trigonometría,Química,15,4,0,0,8,4,__,HVC,12,si,__,__
+2,1,0304100,Química y Sociedad,Ciencias,15,2,0,0,-2,0,__,H,6,__,__,si
+3,1,0304130,Soluciones y Estequiometría,Ciencias,15,4,0,0,8,4,__,HVC,12,si,__,__
+4,1,0304131,Técnicas de Laboratorio Químico,química,15,0,6,0,0,2,(PR) 0304130,__,18,si,__,__
+5,1,0305164,Lengua Materna,Sociohumanística,15,4,0,0,8,4,__,HV,12,si,__,si
+6,1,303107,Introducción al Cálculo,Idiomas,15,4,0,0,8,4,__,HVC,12,si,__,__
+7,2,0303171,Geometría Vectorial,Matematicas ,15,4,0,0,8,4,(PR) 0303108,HV,12,si,__,__
+8,2,0303303,Estadística General,Matematicas ,15,4,0,0,8,4,(PR) 0303108,HV,12,si,__,__
+9,2,0304190,Estructura y Enlace Químico,Quimica,15,4,0,0,8,4,(PR) 0304130,HV,12,si,__,__
+10,2,0304180,Cinética y Equilibrio,Sociohumanística,15,4,0,0,8,4,(PR) 0304130,HV,12,si,__,__
+11,2,0304181,Laboratorio de Cinética y Equilibrio,,15,0,3,0,0,1,(PR) 0304131 (CO) 0304180,__,9,si,__,__
+12,2,303157,Cálculo I,Matematicas,15,6,0,0,6,4,(PR) 0303107,HV,12,si,__,__
+13,3,0302260,Física I Nivel A -C.C-,Matematicas,15,4,__,__,8,4,(PR) 0303171 (CO) 0303195,HV,12,si,__,__
+14,3,0302251,Laboratorio de Física I -C.C-,Fisica ,15,__,3,__,0,1,(CO) 0302260,__,9,si,__,__
+15,3,0304238,Química Inorgánica I,Quimica,15,4,__,__,8,4,(PR) 0304190,HV,12,__,si,__
+16,3,0304239,Laboratorio de Química Inorgánica I,Quimica,15,__,4,__,-1,1,(PR) 0304181 (CO) 0304238,__,12,__,si,__
+17,3,0304185,Separaciones Químicas,Quimica,15,2,4,__,3,3,(PR) 0304180,__,18,si,__,__
+19,3,0304282,Química Analítica I,Quimica,15,4,__,__,8,4,(PR) 0304180 ,HV,12,__,si,__
+20,3,0304283,Laboratorio de Química Analítica I,Quimica,15,__,3,__,0,1,(PR) 0304181 (CO) 0304282,__,9,__,si,__
+21,3,0303205,Cálculo II,Matematicas,15,4,__,__,8,4,(PR) 0303195,HV,12,si,__,__
+18,4,0304286,Manejo de la Literatura Química,Sociohumanistica ,15,2,__,__,4,2,(CO) 0304246,__,6,si,__,__
+22,4,0302265,Física II Nivel A -C.C-,Fisica,15,4,__,__,8,4,(PR) 0302260 (PR) 0303205,HV,12,si,__,__
+23,4,0302252,Laboratorio de Física II,Fisica,15,__,3,__,0,1,(PR) 0302251 (CO) 0302265,__,9,si,__,__
+24,4,0304348,Fisicoquímica I,Química,15,4,__,__,8,4,(PR) 0302260 (PR) 0303205,HV,12,__,si,__
+25,4,0304349,Laboratorio de Fisicoquímica I,Fisica,15,__,3,__,0,1,(CO) 0304348,__,9,__,si,__
+26,4,0304246,Química Orgánica I,Química,15,4,__,__,8,4,(PR) 0304190,HV,12,__,si,__
+27,4,0304247,Laboratorio de Química Orgánica I,Química,15,__,4,__,-1,1,(PR) 0304185 (CO) 0304246,__,12,__,si,__
+28,4,0304332,Química Analítica II,Química,15,4,__,__,8,4,(PR) 0304282 (CO) 0304348,HV,12,__,si,__
+29,4,0304333,Laboratorio de Química Analítica II,Química,15,__,3,__,0,1,(PR) 0304283 (CO) 0304332,,9,__,si,__
+30,4,0305590,Formación Ciudadana y Constitucional,Sociohumanistica ,15,2,__,__,-2,0,(CR)40,C,6,__,__,si
+33,5,0304398,Fisicoquímica II,Química,15,4,__,__,8,4,(PR) 0304348,HV,12,__,si,__
+34,5,0304399,Laboratorio de Fisiquímica II,Química,15,__,3,__,0,1,(PR) 0304349 (CO) 0304398,__,9,__,si,__
+35,5,0304284,Química Orgánica II,Química,15,4,__,__,8,4,(PR) 0304246,HV,12,__,si,__
+36,5,0304285,Laboratorio de Química Orgánica II,Química,15,__,4,__,-1,1,(PR) 0304247 (CO) 0304284,__,12,__,si,__
+37,5,0304432,Análisis Instrumental I,Química,15,4,__,__,8,4,(PR) 0302265 (PR) 0304348 (PR) 0304332,HV,12,__,si,__
+38,5,0304433,Laboratorio de Análisis Instrumental I,Química,15,__,6,__,0,2,(PR) 0304333 (CO) 0304432,__,18,__,si,__
+39,5,0304386,Administración y Control de la Calidad,Química,15,4,__,__,8,4,(PR) 0304332,HV,12,__,si,__
+40,5,0303285,Cálculo III,Matematicas,15,4,__,__,8,4,(PR) 0303205,HV,12,si,__,__
+31,6,0304532,Cromatografía Liquida y Gaseosa,Química,15,4,__,__,8,4,(CO) 0304482,HV,13,__,si,__
+32,6,0304533,Laboratorio de Cromatografía Liquida y Gaseosa,Química,15,__,3,__,0,1,(CO) 0304532,__,10,__,si,__
+41,6,0302310,Física III Nivel A- C.C,Idiomas,15,4,__,__,8,4,(PR) 0302265,HV,13,si,__,__
+42,6,0302301,Laboratorio de Física III,Fisica,15,__,3,__,0,1,(PR) 0302252  (CO) 0302310                               ,__,10,si,__,__
+43,6,0304437,Química Industrial y Laboratorio,Quimica,15,3,3,__,6,4,(PR) 0304399 (PR) 0304285 (PR) 0304433,__,19,__,si,__
+44,6,0304334,Química Orgánica III,Quimica,15,4,__,__,8,4,(PR) 0304284 (PR) 0304285,HV,13,__,si,__
+46,6,0304482,Análisis Instrumental II,Quimica,15,4,__,__,8,4,(PR) 0304432,HV,13,__,si,__
+47,6,0304483,Laboratorio de Análisis Instrumental II,Quimica,15,__,3,__,0,1,(PR) 0304433 (CO) 0304482 ,__,10,__,si,__
+45,7,0304547,Análisis Industrial,Quimica,15,1,4,__,1,2,(PR) 0304432 (PR) 0304333,__,15,__,si,__
+48,7,0304340,Métodos Numéricos en Química,Quimica,15,4,__,__,8,4,(PR) 0303295,__,12,__,si,__
+49,7,0301102,Biología General,Biologia,15,4,__,__,8,4,(CR)60,HV,12,si,__,__
+50,7,0301112,Laboratorio de Biología General ,Biologia,15,__,3,__,0,1,(CO) 0301102,__,9,si,__,__
+51,7,0304545,Productos Naturales,Ciencias ,15,2,4,__,3,3,(PR) 0304334 (PR) 0304482 (PR) 0304483,__,18,__,si,__
+52,7,0304380,Ecología,Ciencias ,15,4,__,__,8,4,(PR) 0304238                             (PR) 0304246 (CO) 0301102,HV,12,__,si,__
+53,7,0304381,Laboratorio de Contaminación Ambiental,Ciencias ,15,__,3,__,0,1,(CO) 0304380                             ,__,9,__,si,__
+66,7,0304488,Química Inorgánica II,Quimica,15,4,__,__,8,4,(PR) 0304238                             (PR) 0304398 (PR) 0302310,HV,12,__,si,__
+67,7,0304489,Laboratorio de Química Inorgánica II,Quimica,15,__,3,__,0,1,(CO) 0304488,__,9,__,si,__
+55,8,0304388,Química Cuántica I,Quimica,15,4,0,0,8,4,(PR)0304432 (PR)0303295   (CO) 0302310 ,HV,12,__,si,__
+56,8,0304444,Bioquímica I,Quimica,15,4,0,0,8,4,(PR) 0304334 (PR) 0301102,HV,12,__,si,__
+57,8,0304445,Laboratorio de Bioquímica I,Quimica,15,0,4,0,-1,1,(PR) 0301112 (CO) 0304444,__,12,__,si,__
+58,8,0304490,Metodología de la Investigación,Sociohumanistica,15,3,0,0,6,3,(CR)130,__,9,__,si,__
+59,8,0304495,Análisis Orgánico ,Quimica,15,2,6,0,4,4,(PR) 0304334 (PR) 0304482,__,24,__,si,__
+9001,8,9001,Electivo I,Sociohumanistica,15,0,0,0,0,0,__,__,__,__,__,__
+61,8,0304536,Introducción a la Administración,Sociohumanistica,15,4,0,0,8,4,(PR) 0304386,HV,12,__,si,__
+62,9,0304438,Química Cuántica II,,15,4,0,0,8,4,,HV,12,__,si,__
+63,9,0304540,Investigación I,,15,0,15,0,0,5, (PR) 0304388,HV,45,__,si,__
+64,9,0304585,Síntesis Orgánica ,,15,2,6,0,4,4, (PR) 0304482 (PR) 0304490,__,21,__,si,__
+65,9,0305580,Ética Profesional,,15,2,0,0,4,2,(PR) 0304334,H,6,__,si,__
+9001,9,9001,Electivo II,,15,2,0,0,4,2,(CR)100,H,6,__,__,si
+68,10,0304590,Investigación II,,15,0,15,0,0,5,(PR) 0304540,__,48,__,si,__

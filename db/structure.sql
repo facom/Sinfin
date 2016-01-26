@@ -10,7 +10,6 @@ create table Programas (
        --  e.g. 210, 211, 204, etc.
        programaid varchar(5),
 
-       codigo varchar(5),
        programa varchar(50),
        instituto varchar(50),
        registro varchar(50),

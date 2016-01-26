@@ -1,5 +1,22 @@
 #-*-coding:utf-8-*-
 from sinfin import *
+"""
+Usage:
+  python csv2sql.py <file>.csv <codigo_plan>-<version>-m<modification>
+
+Example:
+  python csv2sql.py astronomia_2.csv 211-2-m1
+
+Codes for programs:
+  Biologia: 204
+  Astronomia: 211
+  Fisica: 210
+  Quimica: 216
+  Tec. Quimica: 222
+  Matematicas: 213
+  Estadistica: 207
+"""
+
 sinfin,connection=loadDatabase()
 db=connection.cursor()
 
@@ -10,6 +27,7 @@ filecsv=argv[1]
 planid=argv[2]
 csvfile=open("%s"%filecsv,"rU")
 content=csv.DictReader(csvfile,dialect="excel",delimiter=",")
+print "Inserting %s..."%planid
 
 # GET CODIGOS
 codigos=[]
@@ -23,14 +41,15 @@ start=1
 i=0
 bancos=dict()
 programa=planid.split('-')[0]
+
 for row in content:
     if start:
         fields=row.keys()
         start=0
 
     curso=dict()
-    codigo=row['codigo']
-
+    codigo=rmZero(row['codigo'])
+    
     if codigo not in codigos.keys():
         
         # IF COURSE HAS NOT BEEN ALREADY ADDED
@@ -55,11 +74,11 @@ for row in content:
 
         hvc=row['HVC']
         for x in hvc:
-            if x=='H':curso['habilitable']=1
-            if x=='V':curso['validable']=1
-            if x=='C':curso['clasificable']=1
+            if x=='H':curso['habilitable']='1'
+            if x=='V':curso['validable']='1'
+            if x=='C':curso['clasificable']='1'
         for x in 'habilitable','validable','clasificable':
-            if x not in curso.keys():curso[x]=0
+            if x not in curso.keys():curso[x]='0'
 
         tipos=dict(bas='basico',prof='profesional',compl='complementario')
         for x in 'bas','prof','compl':
@@ -77,15 +96,20 @@ for row in content:
 
         qnew=1
     else:
+        print "Course %s already in database..."%codigo
         cursoid=codigos[codigo]
         curso=cursos[cursoid]
+        if planid in curso['area_s']:
+            print "Skipping %s..."%cursoid
+            continue
+        curso['Planes_planid_s']+=planid+";"
         qnew=0
 
     # COMUNES
     curso['consecutivo_s']+=planid+":"+row['cons']+";"
     curso['semestre_s']+=planid+":"+row['semest']+";"
     curso['area_s']+=planid+":"+row['area']+";"
-    curso['semanas']+=row['sem']
+    curso['semanas']=row['sem']
 
     # PRE REQUISITES
     preyco=row['preyco']
@@ -96,24 +120,21 @@ for row in content:
         parts=preyco.split("(")
         if len(parts)>1:
             for part in parts[1:]:
+                requisite=part[3:]
+                if requisite[0]=='0':requisite=requisite[1:]
                 if part[0:2]=='PR':
-                    prerrequisites+=part[3:]+"-c1;"
+                    prerrequisites+=requisite+"-c1,"
                 elif part[0:2]=='CO':
-                    corequisites+=part[3:]+"-c1;"
+                    corequisites+=requisite+"-c1,"
                 elif part[0:2]=='CR':
-                    prerrequisites+='c'+part[3:]+";"
-    else:
-        curso['prerrequisito_s']+=planid+":;"
-        curso['correquisito_s']+=planid+":;"
-
+                    prerrequisites+='c'+requisite+","
     prerrequisites+=";"
     corequisites+=";"
-    
     curso['prerrequisito_s']+=prerrequisites
     curso['correquisito_s']+=corequisites
 
-    print curso
-    exit(0)
+    #print curso
+    #exit(0)
     
     #print curso
     #if i>10:break

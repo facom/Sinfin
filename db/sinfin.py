@@ -68,11 +68,23 @@ def updateDatabase(dbdict,con):
         db=con.cursor()
         for table in dbdict.keys():
             print "Actualizando tabla ",table
+            primary=dbdict[table]['primary']
+            fields="("
+            duplicate=""
+            for field in dbdict[table]['fields']:
+                fields+=field+","
+                if field!=primary:
+                    duplicate+=field+"=values("+field+"),"
+            fields=fields.strip(",")+")"
+            duplicate=duplicate.strip(",")
             for row in dbdict[table]['rows'].keys():
-                sql="insert ignore into %s set "%table;
+                values="("
                 for field in dbdict[table]['fields']:
-                    sql+="%s = '%s',"%(field,dbdict[table]['rows'][row][field])
-                sql=sql.strip(",")
+                    value=dbdict[table]['rows'][row][field]
+                    if value is None:value=''
+                    values+="'"+value+"',"
+                values=values.strip(",")+")"
+                sql="insert into %s %s values %s on duplicate key update %s"%(table,fields,values,duplicate);
                 db.execute(sql);
                 con.commit()
 
@@ -82,3 +94,8 @@ def notNull(value,default):
     else:
         nvalue=value
     return nvalue
+
+def rmZero(string):
+    nstring=string
+    if string[0]=='0':nstring=string[1:]
+    return nstring

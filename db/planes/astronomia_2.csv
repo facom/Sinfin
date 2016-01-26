@@ -1,0 +1,66 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,303117,Fundamentos de Matemáticas,Matemáticas,16,4,0,0,5,3,__,H,13,Si,__,__
+2,1,303118,Matemáticas Básicas,Matemáticas,16,6,0,0,6,4,__,HVC,19,Si,__,__
+3,1,305115,Fundamentación en Ciencias,Ciencias,16,6,0,0,6,4,__,__,19,Si,__,__
+4,1,311150,Fundamentación en Astronomía,Astronomía,16,4,0,0,5,3,__,HV,13,Si,__,__
+5,1,302150,Fundamentación en Computación,Computación,16,0,0,4,2,2,__,HV,13,Si,__,__
+6,1,305120,Cátedra Universitaria I,Socio Humanística,16,4,0,0,2,2,__,__,13,__,__,Si
+7,2,303157,Cálculo I,Matemáticas,16,6,0,0,9,5,(PR) 0303118,HV,99,Si,__,__
+8,2,303208,Algebra Lineal,Matemáticas,16,6,0,0,9,5,"(PR) 0303118 
+(PR) 0302150  
+(PR) 0303117",HV,99,Si,__,__
+9,2,302270,Física Básica I ,Física,16,8,0,0,4,4,"(PR) 0303118 
+(CO) 0303157",HV,99,Si,__,__
+10,2,302271,Física Experimental I,Fïsica,16,0,4,0,2,2,"(CO) 0302270 
+(PR) 0302150",__,13,Si,__,__
+11,2,311302,Astronomía Práctica I,Astronomía,16,0,4,0,2,2,"(PR) 0311150 
+(PR) 0302150  ",__,13,Si,__,__
+12,3,303207,Cálculo II,Matemáticas,16,6,0,0,9,5,(PR) 0303157,HV,99,Si,__,__
+13,3,302390,Métodos Computacionales,Computación,16,0,0,6,3,3,"(PR) 0303208 
+(PR) 0302150",HV,19,Si,__,__
+14,3,302391,Física Básica II ,Física,16,8,0,0,4,4,"(PR) 0303157 
+(PR) 0302270",HV,99,Si,__,__
+15,3,302392,Física Experimental II,Física,16,0,4,0,2,2,"(CO) 0302391 
+(PR) 0302271",__,13,Si,__,__
+16,3,311411,Astronomía de Posición,Astronomía,16,4,0,0,5,3,(PR) 0311302,HV,1,Si,__,__
+17,3,305121,Cátedra Universitaria II,Socio Humanística,16,2,0,0,1,1,(PR) 0305120,__,6,__,__,Si
+18,4,303267,Cálculo Avanzado,Matemáticas,16,4,0,0,8,4,(PR) 0303207,HV,99,Si,__,__
+19,4,303257,Ecuaciones Diferenciales Ordinarias ,Matemáticas,16,4,0,0,8,4,(PR) 0303207 (PR) 0303208,HV,99,Si,__,__
+20,4,302401,Física Básica III,Física,16,6,0,0,6,4,(CO) 0303257 (PR) 0302391,HV,99,Si,__,__
+21,4,302402,Física Experimental III,Física,16,0,4,0,2,2,(CO) 0302401 (PR) 0302391 (PR) 0302392,__,13,Si,__,__
+22,4,311610,Astronomía Práctica II,Astronomía,16,0,4,0,2,2,"(PR) 0311411
+(PR) 0311302
+(PR) 0302401",__,13,__,Si,__
+23,5,302576,Física Matemática I,Física,16,4,0,0,8,4,(PR) 0303267 (PR) 0303257,HV,99,__,Si,__
+24,5,311602,Mecánica Celeste,Astronomía,16,4,0,0,8,4,(PR) 0303257 (CR) 0302401,H,99,__,Si,__
+25,5,302571,"Física Básica IV
+",Física,16,4,0,0,8,4,(PR) 0302401 (CO) 0302576,HV,99,__,Si,__
+26,5,311502,Ciencias Planetarias,Astronomía,16,4,0,0,5,3,(PR) 0302401 (PR)0311411,HV,99,__,Si,__
+27,5,305122,Cátedra Universitaria III,Socio Humanística,16,2,0,0,1,1,(PR) 0305121,__,6,__,__,Si
+28,6,302670,Física Matemática II,Física,16,4,0,0,8,4,(PR) 0302576,HV,99,__,Si,__
+29,6,302570,Mecánica de Medios Continuos,Física,16,4,0,0,8,4,(PR) 0302576 (PR) 0302401 (PR) 0302390,HV,99,__,Si,__
+30,6,311603,Astrofísica Moderna,Astronomía,16,6,0,0,6,4,(PR) 0302571,HV,1,__,Si,__
+31,6,311710,Astronomía Práctica III,Astronomía,16,__,4,0,2,2,"(PR) 0311610 (PR) 0311603 
+(CO) 0311603",__,13,__,Si,__
+32,6,305127,Inglés I,Idiomas,16,4,0,0,2,2,(CR) 4,VC,13,__,__,Si
+33,7,302136,"
+Electrodinámica",Física,16,4,0,0,8,4,(PR) 0302670 (PR) 0311602,HV,99,__,Si,__
+34,7,311703,Relatividad y Gravitación,Astronomía,16,4,0,0,8,4,(CO) 0302136 (CR) 0311603,HV,99,__,Si,__
+35,7,311704,Astrofísica Estelar,Astronomía,16,4,0,0,8,4,(PR) 0311603 (PR)0302136,HV,99,__,Si,__
+36,7,305123,Cátedra Universitaria IV,Socio Humanística,16,4,0,0,2,2,(PR) 0305122,__,13,__,__,Si
+37,7,305128,Inglés II,Idiomas,16,4,0,0,2,2,"(PR) 0305127
+(CR) 36",VC,13,__,__,Si
+38,8,302138,"
+Mecánica Cuántica",Física,16,4,0,0,8,4,(PR) 0311603 (PR) 0302136,HV,99,__,Si,__
+39,8,311803,Galaxias y Cosmología,Astronomía,16,4,0,0,8,4,"(PR) 0311703
+(PR) 0302570 (CO) 0311803",HV,99,__,Si,__
+40,8,305124,Cátedra Universitaria V,Socio Humanística,16,4,0,0,2,2,"(PR) 0305123
+(CR) 115",__,13,__,__,Si
+41,8,305129,Inglés III,Idiomas,16,4,0,0,2,2,(PR) 0305128,VC,13,__,__,Si
+42,9,311804,Comunicación y Didáctica Ciencias,Socio Humanística,16,2,0,0.,4,2, (CR) 120,__,99,__,Si,__
+43,9,311903,Seminario de Trabajo de Grado,Astronomía,16,0,12,0,0,4, (CR) 130,__,99,__,Si,__
+44,9,305125,Cátedra Universitaria VI,Socio Humanística,16,2,0,0,1,1,(PR) 0305124,__,6,__,__,Si
+45,9,305130,Inglés IV,Idiomas,16,4,0,0,2,2,"(PR) 0305129
+(CR) 86",VC,13,__,__,Si
+46,10,305126,Cátedra Universitaria VII,Socio Humanística,16,2,0,0,1,1,(PR) 0305125,__,6,__,__,Si
+47,10,311902,Trabajo de Grado,Astronomía,16,0,18,0,0,6,(PR) 0311905,__,99,__,Si,__

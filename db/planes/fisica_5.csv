@@ -1,0 +1,60 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,303117,Fundamentos de Matemáticas,Matemáticas,16,4,__,__,5,3,__,H,13,Si,__,__
+2,1,303118,Matemáticas Básicas,Matemáticas,16,6,__,__,6,4,__,HVC,19,Si,__,__
+3,1,305115,Fundamentación en Ciencias,Ciencias,16,6,__,__,6,4,__,__,19,Si,__,__
+4,1,302133,Fundamentación en Física,Física,16,6,__,__,3,3,__,HV,19,Si,__,__
+5,1,302150,Fundamentación en Computación,Computación,16,__,__,4,2,2,__,HV,13,Si,__,__
+6,1,305120,Cátedra Universitaria I,Socio Humanística,16,4,__,__,2,2,__,__,13,__,__,Si
+7,2,303157,Cálculo I,Matemáticas,16,6,__,__,9,5,(PR) 0303118,HV,99,Si,__,__
+8,2,303208,Algebra Lineal,Matemáticas,16,6,__,__,9,5,"(PR) 0303118 
+(PR) 0302150  
+(PR) 0303117",HV,99,Si,__,__
+9,2,302270,Física Básica I ,Física,16,8,__,__,4,4,"(PR) 0303118
+(PR) 0302133 
+(CO) 0303157",HV,99,Si,__,__
+10,2,302271,Física Experimental I,Fïsica,16,__,4,__,2,2,"(CO) 0302270 
+(PR) 0302150",__,13,Si,__,__
+11,2,305127,Inglés I,Idiomas,16,4,__,__,2,2,(CR) 4,VC,13,__,__,Si
+12,3,303207,Cálculo II,Matemáticas,16,6,__,__,9,5,(PR) 0303157,HV,99,Si,__,__
+13,3,302390,Métodos Computacionales,Computación,16,__,__,6,3,3,"(PR) 0303208 
+(PR) 0302150",HV,19,Si,__,__
+14,3,302391,Física Básica II ,Física,16,8,__,__,4,4,"(PR) 0303157 
+(PR) 0302270",HV,99,Si,__,__
+15,3,302392,Física Experimental II,Física,16,__,4,__,2,2,"(CO) 0302391 
+(PR) 0302271",__,13,Si,__,__
+16,3,305121,Cátedra Universitaria II,Socio Humanística,16,2,__,__,1,1,(PR) 0305120,__,6,Si,__,__
+17,3,305128,Inglés II,Idiomas,16,4,__,__,2,2,"(PR) 0305127
+(CR) 36",VC,13,__,__,Si
+18,4,303267,Cálculo Avanzado,Matemáticas,16,4,__,__,8,4,(PR) 0303207,HV,99,Si,__,__
+19,4,303257,Ecuaciones Diferenciales Ordinarias ,Matemáticas,16,4,__,__,8,4,(PR) 0303207 (PR) 0303208,HV,99,Si,__,__
+20,4,302401,Física Básica III,Física,16,6,__,__,6,4,(CO) 0303257 (PR) 0302391,HV,99,Si,__,__
+21,4,302402,Física Experimental III,Física,16,__,4,__,2,2,(CO) 0302401 (PR) 0302391 (PR) 0302392,__,13,Si,__,__
+22,4,305122,Cátedra Universitaria III,Socio Humanística,16,2,__,__,1,1,(PR) 0305121,__,6,Si,__,__
+23,4,305129,Inglés III,Idiomas,16,4,__,__,2,2,(PR) 0305128,VC,13,__,__,Si
+24,5,302576,Física Matemática I,Física,16,4,__,__,8,4,(PR) 0303257,HV,99,__,Si,__
+25,5,302134,Física Teórica I,Física,16,4,__,__,8,4,"(PR) 0303257
+(PR) 0302401",HV,99,__,Si,__
+26,5,302571,Física Básica IV,Física,16,4,__,__,8,4,(PR) 0302401 (CO) 0302146,HV,99,__,Si,__
+27,5,302146,Física Experimental IV,Física,16,__,3,__,3,2,(PR) 0302402 (CO) 0302571,__,10,__,Si,__
+28,5,305123,Cátedra Universitaria IV,Socio Humanística,16,4,__,__,2,2,(PR) 0305122,__,13,__,__,Si
+29,6,302670,Física Matemática II,Física,16,4,__,__,8,4,(PR) 0302576,HV,99,__,Si,__
+30,6,302135,Física Teórica II,Física,16,4,__,__,8,4,(PR) 0302134,HV,99,__,Si,__
+31,6,302140,Física Básica V,Física,16,4,__,__,8,4,(PR) 0302576 (PR) 0302571,HV,99,__,Si,__
+32,6,302141,Laboratorio Avanzado I,Física,16,__,4,__,5,3,(PR) 0302146 (CO) 0302140,__,13,__,Si,__
+33,6,305130,Inglés IV,Idiomas,16,4,__,__,2,2,"(PR) 0305129
+(CR) 86",VC,13,__,__,Si
+34,7,314314,Prob. y Estadística,Física,16,4,__,__,5,3,(PR) 0302140 (PR) 0303257,HV,99,__,Si,__
+35,7,302136,Electrodinámica,Física,16,4,__,__,8,4,(PR) 0302135,HV,99,__,Si,__
+36,7,302151,Física Compuacional I,Computación,16,3,__,__,3,2,(PR) 0302150 (PR) 0302390,V,10,__,Si,__
+37,7,302142,Laboratorio Avanzado II,Física,16,__,3,__,6,3,(PR) 0302141 (CO) 0302151,__,10,__,Si,__
+38,8,302137,Física Teórica IV,Física,16,4,__,__,8,4,(PR) 0302136,HV,99,__,Si,__
+39,8,302138,Mecánica Cuántica,Física,16,4,__,__,8,4,(PR) 0302136 (PR) 0302140 (CO) 0302137,HV,99,__,Si,__
+40,8,302143,Laboratorio Avanzado III,Física,16,__,3,__,6,3,(PR) 0302142,__,10,__,Si,__
+42,8,305124,Cátedra Universitaria V,Socio Humanística,16,4,__,__,2,2,"(PR) 0305123
+(CR) 115",__,13,__,__,Si
+43,9,302139,Física Teórica VI,Física,16,4,__,__,8,4,(PR) 0302138,HV,99,__,Si,__
+44,9,302152,Física Computacional II,Computación,16,3,__,__,3,2,(PR) 0302151,__,10,__,Si,__
+45,9,302144,Seminario de Trabajo de Grado,Física,16,__,__,2,10,4,(CR) 135,__,99,__,Si,__
+46,9,305125,Cátedra Universitaria VI,Socio Humanística,16,2,__,__,1,1,(PR) 0305124,__,6,__,__,Si
+47,10,302145,Trabajo de Grado,Física,16,__,__,12,6,6,(PR) 0302144,__,99,__,Si,__
+48,10,305126,Cátedra Universitaria VII,Socio Humanística,16,2,__,__,1,1,(PR) 0305125,__,6,__,__,Si

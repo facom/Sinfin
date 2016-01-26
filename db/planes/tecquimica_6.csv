@@ -1,0 +1,29 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,304559,Química  I,Química,,0,0,10,5,5,__,HV,32,si,__,__
+2,1,303118,Matematicas Basicas,Matemáticas,,6,0,0,6,4,__,HCV,19,si,__,__
+3,1,305115,Fundamentacion en Ciencias,Ciencias,,6,0,0,6,4,__,__,19,si,__,__
+4,1,305120,Catedra Universitaria I,Sociohumanística,,4,0,0,2,2,__,__,13,si,__,__
+5,1,305127,Ingles I,Idiomas,,4,0,0,2,2,__,VC,13,si,__,__
+6,2,0303151,Matemáticas I,Matematicas ,,10,0,0,5,5,(PR) 0303118,HV,32,si,__,__
+7,2,0302168,Física I,Fisica ,,6,0,0,3,3,(PR) 0303118,H,19,si,__,__
+8,2,0304560,Química II,Quimica,,0,0,12,6,6,(PR) 0304559,HV,38,si,__,__
+9,2,305123,Catedra Universitaria IV ,Sociohumanística,,4,0,0,2,2,(PR) 305120,_,13,si,_,_
+10,2,0305128,Ingles II,Idiomas,,4,0,0,2,2,(PR) 0305127,VC,13,si,__,__
+11,3,0303211,Matemáticas II,Matematicas,,10,0,0,5,5,(PR) 0303151,HV,32,si,__,__
+12,3,0302153,Física II,Fisica ,,6,0,0,3,3,(PR) 0302168                        (CO) 0303211,H,19,si,__,__
+13,3,0304561,Química III,Quimica,,0,0,12,6,6,(PR) 0304560                         (CO) 0303211,HV,38,si,__,__
+14,3,314251,Estadistica,Sociohumanística,,6,0,0,3,3,(CO) 303212,H,13,si,_,_
+15,3,305125,Catedra Universitaria VI,Idiomas,,2,0,0,1,1,(PR) 305123,_,6,si,_,_
+16,4,304562,Aseguramiento de la calidad,Química,,5,0,0,4,3,(PR) 314251      (CO) 304563,H.V.C,19,_,si,_
+17,4,304563,Química analítica y Laboratorio,Química,,0,0,8,7,5,(PR) 304561                         (PR) 314251,H.V,26,_,si,_
+18,4,304564,Química Inorgánica y Laboratorio,Química,,0,0,6,6,4,(PR) 304561,H.V.,19,_,si,_
+19,4,304565,Química Orgánica y Laboratorio,Química,,0,0,6,6,4,(PR) 304561,_,19,_,si,_
+20,4,305129,Ingles III,Idiomas,,3,0,0,3,2,(PR) 305112,VC,13,si,,_
+21,5,304566,Validación de Métodos Analiticos,Química,,0,0,8,7,5,(PR) 304563      (CO) 304567,H.V,26,_,si,_
+22,5,304567,Análisis Instrumental Y Lab,Química,,0,0,8,7,5,(PR) 304563,H.V,26,_,si,_
+9001,5,9001,Electiva I,Química,,0,0,5,4,3,(CR)71,_,19,_,_,si
+9002,5,9002,Electiva II,Química,,0,0,5,4,3,(CR)71,_,19,_,_,si
+23,5,305130,Ingles IV,Idiomas,,4,0,0,2,2,(PR) 305113,V.C,13,si,_,
+24,6,304568,Introducción a la práctica tecnológica,Química,,2,0,0,1,1,(CR) 89,_,6,_,si,_
+25,6,304569,Practicas Tecnologicas,Química,,4,0,0,35,13,(CR) 89      (CO) 304568,_,13,_,si,_
+26,6,305126,Catedra Universitaria VII,Idiomas,,2,0,0,1,1,(PR) 305125,_,6,si,_,_

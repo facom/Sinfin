@@ -1,0 +1,52 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,303107,Introduccion al Calculo,Matemáticas,15,4,__,__,8,4,__,HVC,12,Si,__,__
+2,1,303108,Algebra y Trigonometria,Matemáticas,15,4,__,__,8,4,__,HVC,12,Si,__,__
+3,1,303109,Geometria Euclidiana,Matemáticas,15,4,__,__,8,4,__,HVC,12,Si,__,__
+4,1,302100,Introduccion a la Fisica,Física,15,4,__,__,8,4,__,HVC,12,Si,__,__
+6,1,305164,Lengua Materna I ,Socio Humanística,15,4,__,0,8,4,__,HV,12,__,__,SI
+7,2,303170,Geometria Vectorial,Matemáticas,15,4,__,__,8,4,(PR) 303109,HV,12,Si,__,__
+8,2,303195,Cálculo I,Matemáticas,15,4,__,__,8,4,(PR) 0303107 (PR) 0303108,HV,12,Si,__,__
+9,2,302261,Mecanica,Física,15,5,__,__,7,4,(PR) 0302100 (CO) 0303170 (CO) 0303195,HV,15,Si,__,__
+10,2,302251,Laboratorio de Física I,Física,15,__,3,__,0,1,(CO) 0302261,__,9,Si,__,__
+11,2,302164,Computadores en Física,Computación,15,4,__,__,8,4,(PR) 0303195 (PR) 0302261,HVC,12,Si,__,__
+13,3,303205,Cálculo II,Matemáticas,15,4,__,__,8,4,(PR) 0303195,HV,12,Si,__,__
+14,3,303235,Algebra Lineal ,Matemáticas,15,4,__,__,8,4,(PR) 0303170,HV,12,Si,__,__
+15,3,302262,Electricidad y Magnetismo,Física,15,5,__,__,7,4,(PR) 0302261 (PR) 0303205,HV,99,Si,__,__
+16,3,302252,Laboratorio de Física II,Física,15,__,3,__,0,1,(CO) 0302262 ,__,9,Si,__,__
+52,3,305590,Formación Ciudadana y Constitucional,Socio Humanística,15,2,__,__,-2,0,(CR) 40,C,6,__,__,Si
+18,4,303295,Cálculo III,Matemáticas,15,4,__,__,8,4,(PR) 0303205,HV,12,Si,__,__
+19,4,303305,Ecuaciones Diferenciales Ordinarias ,Matemáticas,15,4,__,__,8,4,(CO) 0303295,HV,12,Si,__,__
+20,4,302318,Oscilaciones y Ondas,Física,15,5,__,__,7,4,(CO) 0303295 (PR) 0302262,HV,15,Si,__,__
+21,4,302301,Laboratorio de Física III,Física,15,__,3,__,0,1,(CO) 0302318 (PR) 0302252,__,9,Si,__,__
+22,4,302275,Física Matemática I,Física,15,4,__,__,8,4,(PR) 0303235 (CO) 0303305,HVC,12,__,SI,__
+23,4,302331,Electrónica,Física,15,4,__,__,8,4,(PR) 0302164 (PR) 0302262,HV,12,__,SI,__
+24,4,302332,Laboratorio Electrónica,Física,15,__,3,__,0,1,(CO) 0302331,__,9,__,SI,__
+25,5,302314,Física Moderna,Física,15,4,__,__,8,4,(PR) 0303295 (PR) 0302318,HV,12,__,Si,__
+26,5,302313,Laboratorio Física Moderna,Física,15,__,3,__,0,1,"(CO) 0302314
+",__,9,__,Si,__
+27,5,302330,Mecánica Clásica ,Física,15,4,__,__,8,4,(PR) 0303305 (PR) 0302318,HV,12,__,Si,__
+28,5,302308,Termodinámica ,Física,15,__,__,6,6,4,(PR) 0303295 (PR) 0302318,HV,18,__,Si,__
+29,5,302375,Física Matemática II,Física,15,4,__,__,8,4,(PR) 0303235 (PR) 0303305 (PR) 0302318,HVC,12,__,SI,__
+30,6,303425,Análisis Numérico,Matemáticas,15,4,__,__,8,4,(CR) 60,HV,12,__,SI,__
+31,6,302411,Mecánica cuántica I,Física,15,4,__,__,8,4,(PR) 0302330 (PR) 0302314 (PR) 0302375,HV,12,__,SI,__
+32,6,302335,Electromagnetismo I,Física,15,4,__,__,8,4,(PR) 0302375 (PR) 0302262,HV,12,__,SI,__
+33,6,302470,Física Estadística ,Física,15,4,__,__,8,4,(PR) 0302411 (PR) 0302308,HV,12,__,SI,__
+34,6,302475,Física Matemática III,Física,15,4,__,__,8,4,"(PR) 0302275
+(PR) 0302330",HVC,12,__,SI,__
+35,7,302412,Mecánica cuántica II,Física,15,4,__,__,8,4,(PR) 0302411,HV,12,__,Si,__
+36,7,302435,Electromagnetismo II,Física,15,4,__,__,8,4,(PR) 0302335,HV,12,__,Si,__
+37,7,302408,Ralatividad,Física,15,4,__,__,8,4,(PR) 0302475,HVC,12,__,Si,__
+38,7,302422,Estado sólido,Física,15,4,__,__,8,4,(PR)0302480 (PR) 0302470,HV,12,__,Si,__
+39,7,302360,Seminario I,Física,15,3,__,__,6,3,(PR)0302261,HV,9,__,Si,__
+40,8,302361,Seminario II,Física,15,2,__,__,4,2,(CR) 100,HV,6,__,Si,__
+41,8,305580,Etica Profesional,Socio Humanística,15,2,__,__,4,2,(CR) 110,H,6,__,Si,__
+42,8,302420,Experimentación avanzada ,Física,15,__,9,__,0,3,(PR) 0302341,__,27,__,Si,__
+43,8,302340,Óptica ,Física,15,4,__,__,8,4,(PR) 0302375 (PR) 0302318,HVC,12,__,Si,__
+44,8,302341,Laboratorio de Óptica,Física,15,__,3,__,0,1,(CO) 0302340,__,9,__,SI,__
+45,8,302491,Didáctica para Físicos,Física,15,4,__,__,8,4,(PR) 0302314,V,12,__,SI,__
+46,9,302480,Física Atómica y Molecular,Física,15,4,__,__,8,4,(PR) 0302411,HV,12,__,Si,__
+47,9,302495,Teoría cuántica Radiación ,Física,15,4,__,__,8,4,(PR) 0302412 (PR) 0302470,HVC,12,__,Si,__
+48,9,302463,Seminario III,Física,15,3,__,__,6,3,(CR) 100,HV,9,__,Si,__
+49,9,302490,Instrumentación,Física,15,4,__,__,8,4,(PR) 0302331,HVC,12,__,Si,__
+50,10,302500,Trabajo de Grado,Física,15,__,15,__,0,5,(PR) 0302501,V,15,__,Si,__
+51,10,302501,Lectura Dirigida,Física,15,4,__,__,8,4,(CR) 167,HVC,12,__,Si,__

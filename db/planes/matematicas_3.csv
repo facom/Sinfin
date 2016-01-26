@@ -1,0 +1,52 @@
+cons,semest,codigo,nombre,area,sem,ht,hp,htp,hti,cr,preyco,HVC,fal,bas,prof,compl
+1,1,303117,Fundamentos de Matemáticas,Matemáticas,16,4,0,0,5,3,_,H,13,si,_,_
+2,1,303118,Matemáticas Básicas,Matemáticas,16,6,0,0,6,4,_,HCV,19,si,_,_
+3,1,305115,Fundamentación en Ciencias,Ciencias,16,6,0,0,6,4,_,_,19,si,_,_
+4,1,305120,Cátedra Universitaria I,Socio humanísticas,16,4,0,0,2,2,_,_,13,_,_,si
+5,2,305127,Ingles I,Idiomas,16,4,0,0,2,2,_,CV,13,_,_,si
+6,2,303157,Cálculo I,Matemáticas,16,6,0,0,9,5,(PR) 0303118 ,HV,99,si,_,_
+7,2,303158,Programación,Matemáticas,16,4,0,0,5,3,(PR) 0303118_,HV,13,si,_,_
+8,2,303159,Lógica y Conjuntos ,Matemáticas,16,6,0,0,9,5,(PR) 0303117 ,HV_,16,si,_,_
+9,2,305121,Cátedra Universitaria II,Socio humanísticas,16,2,0,0,1,1,(PR) 0305120 ,_,6,_,_,si
+10,3,305128,Ingles II,Idiomas,16,4,0,0,2,2,(PR)0305127,CV,13,_,_,si
+11,3,303207,Cálculo II,Matemáticas,16,6,0,0,9,5,(PR)0303157,HV,99,si,_,_
+12,3,303208,Álgebra lineal ,Matemáticas,16,6,0,0,9,5,(PR) 0303158                   (PR) 0303157,HV,99,si,_,_
+13,3,303209,Geometría I,Matemáticas,16,4,0,0,5,3,(PR) 0303117 ,HV,13,si,_,_
+14,3,305122,Cátedra Universitaria III,Socio humanísticas,16,2,0,0,1,1,(PR) 0305121,_,6,_,_,si
+15,4,305129,Ingles III,Idiomas,16,4,0,0,2,2,(PR)0305128,CV,13,_,_,si
+16,4,303252,Análisis I,Matemáticas,16,4,0,0,5,3,(PR) 0303159                   (PR) 0303207,HV,13,si,_,_
+17,4,303258,Teoría de Números y Combinatoria ,Matemáticas,16,4,0,0,5,3,(PR) 0303159                   ,HV,13,_,_,_
+18,4,303257,Ecuaciones Diferenciales Ordinarias,Matemáticas,15,4,0,0,8,4,(PR) 0303207                   (PR) 0303208,HV,99,si,_,_
+19,4,303259,Geometría II,Matemáticas,16,4,0,0,5,3,(PR)0303209,HV,13,SI,_,_
+20,4,305123,Cátedra Universitaria IV,Socio humanísticas,16,4,0,0,2,2,(PR) 0305122,_,13,_,_,Si
+21,5,303302,Analisis II,Matemáticas,16,4,0,0,5,3,(PR)0303252,HV,13,_,_,_
+22,5,303304,Álgebra I,Matemáticas,16,4,0,0,5,3,(PR) 0303258,HV,13,si,_,_
+23,5,303313,Probabilidad,Matemáticas,16,4,0,0,5,3,(PR) 0303159                   (PR) 0303207,HC,13,Si,_,_
+24,5,305130,Ingles IV,Idiomas,16,4,0,0,2,2,(PR) 0305129,VC,13,_,_,Si
+25,5,302124,Física Básica I,Física,15,8,0,0,4,4,(PR) 0303118                   (PR) 0302133                   (CO) 0303157,HV,12,Si,_,_
+26,5,305122,Cátedra Universitaria IV,Socio humanísticas,16,4,0,0,2,2,(PR) 0305122,_,,_,_,Si
+27,6,305124,Cátedra Universitaria V,Socio humanísticas,16,4,0,0,2,2,(PR)0305123,HV,6,_,_,sI
+28,6,303354,Älgebra II,Matemáticas,16,4,0,0,5,3,(PR) 0303208                      (PR) 0303304,HV,13,sI,_,_
+28,6,303352,Analisis III,Matemáticas,16,4,0,0,5,3,(PR) 0303302,HV,13,si,_,_
+29,6,303363,Inferencia Estadística ,Matemáticas,16,4,0,0,5,3,(PR) 0303313                   ,HV,13,sI,_,_
+30,6,302291,Física Básica II,Física,16,8,0,0,4,4,(PR) 0303157                   (PR) 0302270,HV,26,sI,_,_
+31,6,305131,Ingles V,Idiomas,16,4,0,0,2,2,(PR)305130,HV,13,sI,_,_
+31,7,303402,Variable Compleja ,Matemáticas,16,4,0,0,5,3,(PR) 0303302,HV,13,_,_,_
+32,7,303404,Álgebra Multilineal,Matemáticas,16,4,0,0,5,3,(PR) 0303354,HV,13,_,_,_
+33,7,303412,Topología,Matemáticas,16,4,0,0,5,3,(PR) 0303302,HV,13,_,_,_
+34,7,303411,Metodología e Historia de las Matemáticas ,Matemáticas,16,6,0,0,9,5,(PR) 0303259                   (PR) 0303302                   (PR) 0303313                   (PR) 0303354                   ,HV,19,_,_,_
+35,8,303452,Teoría de la Medida ,Matemáticas,16,4,0,0,5,3,(PR) 0303352,HV,13,_,_,_
+36,8,303459,Geometría Diferencial ,Matemáticas,16,4,0,0,5,3,(PR) 0303259                                     (PR) 0303352,HV,13,_,_,_
+37,8,303462,Análisis Numérico ,Matemáticas,16,4,0,0,8,4,(PR) 0303257                                             (PR) 0303302,HV,13,_,_,_
+9001,8,9001,Electiva I,Electiva,16,4,0,0,5,3,(CR) 70                     (PR) 0303252                   (PR) 0303354,H,,_,_,_
+38,8,303461,Seminario de Matemáticas ,Matemáticas,16,2,0,0,1,1,(PR) 0303411                                       (CR) 80 ,_,6,_,_,_
+39,9,305125,Cátedra Universitaria VI,Socio humanísticas,16,2,0,0,1,1,(PR) 0305124,_,6,_,_,_
+40,9,303527,Ecuaciones Diferenciales Parciales,Matemáticas,16,4,0,0,5,3,(PR) 0303257                      (PR) 0303352                    (PR) 0302291,H,13,_,_,_
+9001,9,9001,Electiva II ,Electiva,16,4,0,0,5,3,(CR) 70  (PR) 0303252      (PR)0303354,H,,_,_,_
+9001,9,9001,Electiva III,Electiva,16,4,0,0,5,3,(CR) 70                     (PR) 0303252                   (PR) 0303354,H,,_,_,_
+41,9,303521,Seminario de Trabajo de Grado ,Matemáticas,16,2,0,0,10,4,(PR) 0303461,_,6,_,_,_
+42,10,303552,Análisis Funcional ,Matemáticas,16,4,0,0,5,3,(PR) 0303412                      (PR) 0303452,HV,13,sI,_,_
+9001,10,9001,Electiva IV ,Electiva,16,4,0,0,5,3,(CR) 80      (PR)0303302                     (PR) 0303354,H,13,_,_,SI
+9001,10,9001,Electiva V,Electiva,16,4,0,0,5,3,(CR) 80       (PR)0303302                   (PR) 0303354,H,13,_,_,sI
+43,10,303521,Trabajo de Grado ,Matemáticas,16,2,0,0,10,4,(PR) 0303550,_,6,_,sI,_
+44,,305126,Cátedra Universitaria VII,Socio humanísticas,16,2,0,0,1,1,(PR) 0305125,_,6,_,si,_
