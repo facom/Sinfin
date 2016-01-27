@@ -1,5 +1,37 @@
 <?php
 ////////////////////////////////////////////////////////////////////////
+//EXTERNAL LIBRARIES
+////////////////////////////////////////////////////////////////////////
+require "lib/PHPMailer/PHPMailerAutoload.php";
+header("Content-Type: text/html;charset=UTF-8");
+
+////////////////////////////////////////////////////////////////////////
+//CONFIGURATION
+////////////////////////////////////////////////////////////////////////
+$USER="sinfin";
+$PASSWORD="123";
+$DATABASE="Sinfin";
+$EMAIL_USERNAME="pregradofisica@udea.edu.co";
+$EMAIL_PASSWORD="Gmunu-Tmunu=0";
+
+////////////////////////////////////////////////////////////////////////
+//COMMON GLOBAL VARIABLES
+////////////////////////////////////////////////////////////////////////
+foreach(array_keys($_GET) as $field){
+    $$field=$_GET[$field];
+}
+foreach(array_keys($_POST) as $field){
+    $$field=$_POST[$field];
+}
+
+////////////////////////////////////////////////////////////////////////
+//GLOBAL VARIABLES
+////////////////////////////////////////////////////////////////////////
+$TBORDER=0;
+$TWIDTH=800;
+$TCOLD=$TWIDTH/2;
+
+////////////////////////////////////////////////////////////////////////
 //ROUTINES
 ////////////////////////////////////////////////////////////////////////
 function isBlank($string)
@@ -26,7 +58,7 @@ E;
  return $error;
 }
 
-function generateSelection($values,$name,$value,$disabled="",$readonly=0)
+function generateSelection($values,$name,$value,$options="",$readonly=0)
 {
   $parts=$values;
   $selection="";
@@ -35,14 +67,12 @@ function generateSelection($values,$name,$value,$disabled="",$readonly=0)
     $selection.=$value;
     return $selection;
   }
-  $selection.="<select name='$name' style='' $disabled>";
   foreach(array_keys($parts) as $part){
     $show=$parts[$part];
     $selected="";
     if($part==$value){$selected="selected";}
     $selection.="<option value='$part' $selected>$show";
   }
-  $selection.="</select>";
   return $selection;
 }
 
@@ -148,4 +178,208 @@ function str2Array($string)
   return $list;
 }
 
+function parseParams($params)
+{
+  $parameters=array();
+  $parts=preg_split("/;/",$params);
+  foreach($parts as $part){
+    $comps=preg_split("/:/",$part);
+    $param=$comps[0];
+    $value=$comps[1];
+    $parameters["$param"]=$value;
+  }
+  return $parameters;
+}
+
+function updateCursos($planid)
+{
+  $results=mysqlCmd("select * from Cursos where Planes_planid_s like '%$planid;%' order by nombre",$qout=1);
+  $cursos=array("--"=>"--");
+  foreach($results as $curso){
+    $codigo=$curso["codigo"];
+    $creditos=$curso["creditos"];
+    $nombre=$curso["nombre"];
+    $cursos["$codigo:$creditos"]=$nombre;
+  }
+  return $cursos;
+}
+
+function generateReconocimientos()
+{
+  global $GLOBALS;
+  foreach(array_keys($GLOBALS) as $var){
+    $$var=$GLOBALS["$var"];
+  }
+
+  $numrecon=10;
+  $nummaterias=3;
+  $numasignaturas=3;
+  $chidden="hidden";
+
+  $reconocimientos="";
+  $hidden="";
+  for($ir=1;$ir<=$numrecon;$ir++){
+
+    $nqr="qreconocimiento_${ir}";
+    $vqr=$$nqr;
+
+    $hidden="class='$chidden'";
+$reconocimientos.=<<<RECON
+
+    <table id="ireconocimiento_$ir" border="${TBORDER}px" width="${TWIDTH}px" $hidden>
+    <tr><td  width=800px>
+
+	<div class="reconocimiento">Reconocimiento $ir</div>
+        <input type="hidden" name="qreconocimiento_${ir}" value="$vqr" class="confirm">
+
+	<table border="${TBORDER}px" width="${TWIDTH}px">
+
+	  <tr><td class="materias">Materia(s) vista(s)</td></tr>
+
+	  <tr class="materias_vistas">
+
+	    <td>
+	      <div id="materia_${ir}_0" class="agregar">
+		<a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar materia</a>
+	      </div>
+
+RECON;
+
+        for($im=1;$im<=$nummaterias;$im++){
+	  $nmateria="materia_${ir}_${im}";
+	  $vmateria=$$nmateria;
+	  $nuniv="univ_${ir}_${im}";
+	  $vuniv=$$nuniv;
+	  $nnota="nota_${ir}_${im}";
+	  $vnota=$$nnota;
+	  $nqm="qmateria_${ir}_${im}";
+	  $vqm=$$nqm;
+	  $nsel="selmateria_${ir}_${im}";
+	  $vsel=$$nsel;
+
+	  //SELECT TYPE OF MATERIA INPUT
+	  $input="";
+$input.=<<<I
+  <select id="materia_${ir}_${im}" name="smateria_${ir}_${im}" class="ccursos hidden">
+    $vsel
+  </select>
+I;
+$input.=<<<I
+  <input type="text" name="materia_${ir}_${im}" value="$vmateria" class="ccursos_input">
+I;
+
+$reconocimientos.=<<<RECON
+	      <table id="imateria_${ir}_${im}" class="materia $chidden" border="${TBORDER}px">
+		<tr><td class="field">Nombre de materia:</td><td class="input">
+		    <input type="hidden" name="qmateria_${ir}_${im}" value="$vqm" class="confirm">
+		    $input
+		</td></tr>
+		<tr><td class="field">Universidad:</td><td class="input"><input type="text" name="univ_${ir}_${im}" value="$vuniv" onchange="updateUniv(this,'${ir}')" readonly></td></tr>
+		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
+		<tr><td class="agregar" id="materia_${ir}_${im}" colspan=2>
+RECON;
+
+          if($im<$nummaterias){
+$reconocimientos.=<<<RECON
+		    <a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar materia</a> |
+RECON;
+	  }
+
+$reconocimientos.=<<<RECON
+		    <a href="JavaScript:void(null)" onclick="removeCourse(this)">Remover materia</a>
+		</td></tr>
+	      </table>	  
+RECON;
+	}
+
+$reconocimientos.=<<<RECON
+	  <tr><td class="materias">Reconocida por</td></tr>
+
+	  <tr class="materias_reconocidas">
+
+	    <td>
+
+	      <div id="asignatura_${ir}_0" class="agregar">
+		<a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar asignatura</a>
+	      </div>
+RECON;
+
+	for($ia=1;$ia<=$numasignaturas;$ia++){
+	  $ncreditos="creditos_${ir}_${ia}";
+	  $vcreditos=$$ncreditos;
+	  $ndef="definitiva_${ir}_${ia}";
+	  $vdef=$$ndef;
+	  $nsel="selasignatura_${ir}_${ia}";
+	  $vsel=$$nsel;
+
+	  $nqa="qasignatura_${ir}_${ia}";
+	  $vqa=$$nqa;
+
+$reconocimientos.=<<<RECON
+	      <table id="iasignatura_${ir}_${ia}" class="materia $chidden" border="${TBORDER}px" width="${TWIDTH}px">
+		<tr>
+		  <td class="field">Asignatura:</td>
+		  <td class="input">
+		    <input type="hidden" name="qasignatura_${ir}_${ia}" value="$vqa" class="confirm">
+		    <select id="asignatura_${ir}_${ia}" name="asignatura_${ir}_${ia}" class="cursos" onchange="updateCredits(this,'creditos_${ir}_${ia}')">
+		      $vsel
+		    </select>
+		  </td>
+		</tr>
+		<tr><td class="field">Créditos:</td><td class="input">
+		    <div id="creditos_${ir}_${ia}">$vcreditos</div>
+		    <input type="hidden" name="creditos_${ir}_${ia}" value="$vcreditos">
+		</td></tr>
+		<tr><td class="field">Definitiva:</td><td class="input"><input type="text" name="definitiva_${ir}_${ia}" value="$vdef"></td></tr>
+		<tr><td class="agregar" id="asignatura_${ir}_${ia}" colspan=2>
+
+RECON;
+
+ if($ia<$numasignaturas){
+$reconocimientos.=<<<RECON
+		    <a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar asignatura</a> | 
+RECON;
+ }
+
+$reconocimientos.=<<<RECON
+		    <a href="JavaScript:void(null)" onclick="removeCourse(this)">Remover asignatura</a>
+		</td></tr>
+	      </table>
+RECON;
+	}
+
+$reconocimientos.=<<<RECON
+	    </td>
+	  </tr>
+	</table>
+
+	<div class="agregar" id="reconocimiento_${ir}">
+RECON;
+
+ if($ir<$numrecon){
+$reconocimientos.=<<<RECON
+	  <a href="JavaScript:void(null)" onclick="addRecon(this)">Agregar reconocimiento</a> | 
+RECON;
+ }
+
+$reconocimientos.=<<<RECON
+	  <a href="JavaScript:void(null)" onclick="removeRecon(this)">Remover reconocimiento</a>
+	</div>
+
+    </td></tr>
+    </table>
+RECON;
+  }
+  return $reconocimientos;
+}
+
+////////////////////////////////////////////////////////////////////////
+//CONNECT TO DATABASE
+////////////////////////////////////////////////////////////////////////
+$DB=mysqli_connect("localhost",$USER,$PASSWORD,$DATABASE);
+mysqli_set_charset($DB,'utf8');
+mysql_query("set names 'utf8'");
+$result=mysqlCmd("select now();",$qout=0);
+$DATE=$result[0];
+$DATE_ARRAY=preg_split("/ /",$DATE);
 ?>

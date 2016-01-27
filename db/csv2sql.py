@@ -2,10 +2,10 @@
 from sinfin import *
 """
 Usage:
-  python csv2sql.py <file>.csv <codigo_plan>-<version>-m<modification>
+  python csv2sql.py <file>.csv <codigo_plan>-v<version>-m<modification>
 
 Example:
-  python csv2sql.py astronomia_2.csv 211-2-m1
+  python csv2sql.py astronomia_2.csv 211-v2-m1
 
 Codes for programs:
   Biologia: 204

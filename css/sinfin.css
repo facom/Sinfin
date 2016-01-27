@@ -1,0 +1,42 @@
+body{
+    font-family:Verdana;
+}
+tr.form-field{
+    background:white;
+}
+td.field{
+    border:solid blue 0px;
+}
+td.input{
+    border:solid green 0px;
+}
+td.section{
+    font-weight:bold;
+    background:lightgray;
+    text-align:center;
+    padding:10px;
+}
+tr.agregar,td.agregar,.agregar{
+    text-align:center;
+    font-size:0.8em;
+}
+.reconocimiento{
+    background:lightblue;
+    padding:5px;
+    font-weight:bold;
+}
+td.materias_vistas,td.materias_reconocidas{
+}
+td.materias{
+    text-align:center;
+}
+table.materia{
+    border:solid black 1px;
+    width:100%;
+}
+.hidden{
+    display:none;
+}
+.boton{
+    text-align:center;
+}
