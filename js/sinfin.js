@@ -174,7 +174,7 @@ function activateUniv(element){
     updateUniv('#universidad');
 }
 
-function addCourse(element)
+function addCourse(element,ctype)
 {
     var parent=element.parentElement;
     var id=parent['id'];
@@ -182,6 +182,7 @@ function addCourse(element)
     var type=parts[0];
     var section=parts[1];
     var nelem=parts[2];
+    if(typeof(ctype)!="undefined"){type=ctype;}
     if(nelem==0){
 	$('#'+type+'_'+section+'_0').css('display','none');
     }

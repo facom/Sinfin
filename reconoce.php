@@ -10,6 +10,30 @@ require("$ROOTDIR/etc/library.php");
 //echo "QUERY:<br/>".$_SERVER["QUERY_STRING"]."";
 
 ////////////////////////////////////////////////////////////////////////
+//LOAD
+////////////////////////////////////////////////////////////////////////
+if($action=="load"){
+  if(!isset($recfile)){
+    errorMsg("Debe proveer un archivo para cargar los datos");
+  }
+  if(strlen($ERROR)==0){
+    $fl=fopen($recfile,"r");
+    $object=fread($fl,filesize($recfile));
+    $_GET=unserialize($object);
+    fclose($fl);
+    $_GET["recfile"]=$recfile;
+    foreach(array_keys($_GET) as $field){
+      $$field=$_GET[$field];
+    }
+    foreach(array_keys($_POST) as $field){
+      $$field=$_POST[$field];
+    }
+
+    statusMsg("Datos cargados...");
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 //INITIALIZATION
 ////////////////////////////////////////////////////////////////////////
 $content="";
@@ -27,10 +51,6 @@ $content.=<<<C
 </head>
 <body>
 C;
-
-////////////////////////////////////////////////////////////////////////
-//ACTIONS
-////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 //LOAD FIELDS
@@ -72,14 +92,103 @@ C;
   }   
 }
 
+if($qchecked["materia_1_1"]){
+$content.=<<<C
+  $('#materia_1_0').hide();
+C;
+}
+if($qchecked["asignatura_1_1"]){
+$content.=<<<C
+  $('#asignatura_1_0').hide();
+C;
+}
+
 $content.=<<<C
 });
 </script>
 C;
 
 ////////////////////////////////////////////////////////////////////////
+//ACTIONS
+////////////////////////////////////////////////////////////////////////
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//SUBMIT
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+if(isset($submit)){
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //BASIC CHECKS
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if(!$qchecked["reconocimiento_1"]){
+    errorMsg("Debe proveer al menos un reconocimiento");
+  }
+  else if(!$qchecked["materia_1_1"]){
+    errorMsg("Debe proveer al menos una materia");
+  }
+  else if(!$qchecked["asignatura_1_1"]){
+    errorMsg("Debe proveer al menos una asignatura para reconocer");
+  } 
+  else if($nota_1_1+0==0){
+    errorMsg("Debe proveer una nota para la materia a reconocer");
+  }
+  if(isBlank($cedula)){
+    errorMsg("Debe proveer un documento de identificación");
+  }
+  if(isBlank($universidad)){
+    errorMsg("Debe proveer el nombre de una institución");
+  }
+  if($planid=="--"){
+    errorMsg("Debe escoger un plan de estudios al que llega");
+  }
+  if($cplanid=="--"){
+    errorMsg("Debe escoger un plan de estudios del que salió");
+  }
+  
+  if(strlen($ERRORS)==0){
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //STORING RESULTS
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if(!isset($recfile)){
+      $recid=generateRandomString();
+      $recdir="$ROOTDIR/data/recon/${cedula}_${planid}_${recid}";
+      $recfile="$recdir/recon.dat";
+      if(!is_dir($recdir)){shell_exec("mkdir -p $recdir");}
+    }
+
+    //UNSET VARIABLES
+    unset($_GET["submit"]);
+
+    //SAVE SERIALIZED ARRAY
+    $fl=fopen($recfile,"w");
+    fwrite($fl,serialize($_GET));
+    fclose($fl);
+
+    //SHOW STATUS
+    statusMsg("Reconocimiento almacenado en $recfile...");
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 //CONTENT
 ////////////////////////////////////////////////////////////////////////
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//ERRORS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if(strlen($ERRORS)>0){
+$content.=<<<C
+<div class="error">
+  $ERRORS
+</div>
+C;
+}
+if(strlen($STATUS)>0){
+$content.=<<<C
+<div class="status">
+  $STATUS
+</div>
+C;
+}
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //PROGRAMS
@@ -156,6 +265,25 @@ if($cplanid!="other" and
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//LISTA
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+exec("ls $RECONDIR",$dirs);
+foreach($dirs as $dir){
+  $qrecfile="$RECONDIR/$dir/recon.dat";
+  $urecfile=urlencode($qrecfile);
+  echo "<a href='?action=load&recfile=$urecfile'>$qrecfile</a><br/>";
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//RECFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if(isset($recfile)){
+  $inprecfile="<input type='hidden' name='recfile' value='$recfile'>";
+ }else{
+  $inprecfile="";
+ }
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //RECONOCIMIENTOS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $reconocimientos=generateReconocimientos();
@@ -166,12 +294,7 @@ $reconocimientos=generateReconocimientos();
 $content.=<<<C
 <h1><a href="reconoce.php">Reconocimientos</a></h1>
 <form>
-
-  <!--
-  <a href="JavaScript:void(null)" onclick="ajaxDo('test','saludo:hola')">Test</a>
-  <div id="test-result" style="border:solid 1px">Esperando</div>
-  -->
-
+  $inprecfile
   <table border="${TBORDER}px" width="${TWIDTH}px">
 
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
@@ -200,15 +323,6 @@ $content.=<<<C
     </tr>
 
     <tr class="form-field">
-      <td class="field">Programa al que ingresa:</td>
-      <td class="input">
-	<select name="planid" onchange="updateCourses(this)">
-	  $selprogramas
-	</select>
-      </td>
-    </tr>
-
-    <tr class="form-field">
       <td class="field">Programa en el que vio los cursos:</td>
       <td class="input">
 	<select name="cplanid" onchange="activateUniv(this);updatecCourses(this)">
@@ -221,6 +335,15 @@ $content.=<<<C
       <td class="field">Institución de la que proviene:</td>
       <td class="input">
 	<input type="text" id="universidad" name="universidad" value="$universidad" onchange="updateUniv(this)">
+      </td>
+    </tr>
+
+    <tr class="form-field">
+      <td class="field">Programa al que ingresa:</td>
+      <td class="input">
+	<select name="planid" onchange="updateCourses(this)">
+	  $selprogramas
+	</select>
       </td>
     </tr>
 
@@ -245,8 +368,8 @@ $content.=<<<C
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
     <tr class="boton">
       <td colspan=2>
-	<button type="submit">Enviar</button>
-	<button type="reset">Cancelar</button>
+	<input type="submit" name="submit" value="Enviar">
+	<input type="reset" value="Cancelar">
       </td>
     </tr>
 

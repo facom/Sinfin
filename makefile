@@ -3,6 +3,9 @@ clean:
 	rm -r *.pyc
 	find . -name "*~" -exec rm {} \;
 
+cleanrecon:
+	rm -rf data/recon/*
+
 cleandb:clean
 	mysql -u comisiones --password="123" < initialize.sql
 	python insert.py data/profesores-fcen.csv

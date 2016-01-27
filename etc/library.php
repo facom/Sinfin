@@ -15,7 +15,7 @@ $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
 ////////////////////////////////////////////////////////////////////////
-//COMMON GLOBAL VARIABLES
+//GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////
 foreach(array_keys($_GET) as $field){
     $$field=$_GET[$field];
@@ -23,13 +23,12 @@ foreach(array_keys($_GET) as $field){
 foreach(array_keys($_POST) as $field){
     $$field=$_POST[$field];
 }
-
-////////////////////////////////////////////////////////////////////////
-//GLOBAL VARIABLES
-////////////////////////////////////////////////////////////////////////
 $TBORDER=0;
 $TWIDTH=800;
 $TCOLD=$TWIDTH/2;
+$ERRORS="";
+$STATUS="";
+$RECONDIR="data/recon";
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -281,12 +280,12 @@ RECON;
 
           if($im<$nummaterias){
 $reconocimientos.=<<<RECON
-		    <a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar materia</a> |
+		    <a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar otra materia</a> |
 RECON;
 	  }
 
 $reconocimientos.=<<<RECON
-		    <a href="JavaScript:void(null)" onclick="removeCourse(this)">Remover materia</a>
+		    <a href="JavaScript:void(null)" onclick="removeCourse(this)">Remover esta materia</a>
 		</td></tr>
 	      </table>	  
 RECON;
@@ -371,6 +370,18 @@ $reconocimientos.=<<<RECON
 RECON;
   }
   return $reconocimientos;
+}
+
+function errorMsg($msg)
+{
+  global $ERRORS;
+  $ERRORS.="<p>".$msg."</p>";
+}
+
+function statusMsg($msg)
+{
+  global $STATUS;
+  $STATUS.="<p>".$msg."</p>";
 }
 
 ////////////////////////////////////////////////////////////////////////
