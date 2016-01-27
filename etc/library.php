@@ -384,6 +384,112 @@ function statusMsg($msg)
   $STATUS.="<p>".$msg."</p>";
 }
 
+function getHeaders()
+{
+$header=<<<H
+<!-- ---------------------------------------------------------------------- -->
+<!-- HEADER -->
+<!-- ---------------------------------------------------------------------- -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
+  <link rel="stylesheet" href="css/sinfin.css" />
+  <script src="lib/jquery-ui/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+  <script src="lib/jquery-ui/moment.min-locales.js"></script>
+  <script src="lib/jquery-ui/moment.min-locales.js"></script>
+  <script src="js/sinfin.js"></script>
+</head>
+<body>
+H;
+ return $header;
+}
+
+function getHead()
+{
+$head=<<<H
+<!-- ---------------------------------------------------------------------- -->
+<!-- HEAD -->
+<!-- ---------------------------------------------------------------------- -->
+<table width=100% border=0>
+<tr>
+<td width=100px><image src="img/udea_fcen.jpg"/ height=120px></td>
+<td valign=bottom>
+  <div class="title">
+    <a href="index.php">Sinfin</a><br/>
+  </div>
+  <div class="subtitle">
+    Sistema Integrado de Información Curricular
+  </div>
+  <div class="affiliation">
+    Facultad de Ciencias Exactas y Naturales<br/>
+    Universidad de Antioquia
+  </div>
+</td>
+</table>
+H;
+ return $head;
+}
+
+function getMainMenu()
+{
+$menu=<<<M
+<div class="mainmenu">
+  <a href="index.php">Principal</a>
+  | <a href="reconoce.php">Reconocimientos</a>
+  | <a href="planes.php">Planes de Estudio</a> 
+  | <a href="asignaturas.php">Planes de Asignatura</a> 
+</div>
+M;
+ return $menu;
+}
+
+function getFooter()
+{
+  global $_SERVER;
+$filetime=date(DATE_RFC2822,filemtime($_SERVER["SCRIPT_FILENAME"]));
+$menu=<<<M
+<div class="footer">
+  Última actualización: $filetime - 
+  <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2016
+</div>
+</body>
+M;
+ return $menu;
+}
+
+function getMessages()
+{
+  global $ERRORS,$STATUS;
+  $msg="";
+
+  if(strlen($STATUS)){
+$msg.=<<<M
+  <div class="status">
+  $STATUS
+  </div>
+M;
+  }
+
+  if(strlen($ERRORS)){
+$msg.=<<<M
+  <div class="errors">
+  $ERRORS
+  </div>
+M;
+  }
+  return $msg;
+}
+
+function readRecon($recfile){
+  $fl=fopen($recfile,"r");
+  $object=fread($fl,filesize($recfile));
+  $data=unserialize($object);
+  fclose($fl);
+  return $data;
+}
+
 ////////////////////////////////////////////////////////////////////////
 //CONNECT TO DATABASE
 ////////////////////////////////////////////////////////////////////////

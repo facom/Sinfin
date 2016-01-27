@@ -40,13 +40,70 @@ table.materia{
 .boton{
     text-align:center;
 }
-.error{
-    background:pink;
-    padding:10px;
+div.title{
+    font-size:2em;
+    font-weight:bold;
+}
+div.subtitle{
+    font-size:1.5em;
+    font-weight:bold;
     font-style:italic;
 }
-.status{
+div.affiliation{
+    font-size:1.2em;
+}
+div.mainmenu{
+    padding:10px;
+    border-top:solid black 1px;
+    border-bottom:solid black 1px;
+}
+div.submenu{
+    padding:10px;
+    border-bottom:solid black 1px;
+    font-size:0.9em;
+}
+div.moduletitle{
+    text-align:center;
+    padding:10px;
+    background:lightgray;
+    border-bottom:solid black 1px;
+    font-weight:bold;
+    
+}
+div.footer{
+    float:bottom;
+    /*position:fixed;*/
+    bottom:0px;
+    width:100%;
+    font-size:0.8em;
+    padding:1em;
+    border-top:solid black 1px;
+    font-style:italic;
+    background:white;
+    z-index:1000;
+}
+div.container{
+    padding:10px;
+}
+div.status{
+    position:absolute;
+    top:0px;
+    right:0px;
+    width:20%;
+    height:10%;
     background:lightblue;
     padding:10px;
     font-style:italic;
+    overflow:auto;
+}
+div.errors{
+    position:absolute;
+    top:10%;
+    right:0px;
+    width:20%;
+    height:10%;
+    background:pink;
+    padding:10px;
+    font-style:italic;
+    overflow:auto;
 }
