@@ -136,12 +136,39 @@ function updateStudentForm(element)
 
 function updateCredits(course,credit)
 {
+    var id=course.id;
+    var parts=id.split("_");
     var value=course[course.selectedIndex].value;
     var props=value.split(":");
+    var codigo=props[0];
     var creditos=props[1];
     var $credito_show=$('#'+credit);
-    $credito_show.html(creditos);
+    $credito_show.val(creditos);
+    if(codigo=="000000"){
+	$('#smasignatura_'+parts[1]+'_'+parts[2]).show();
+    }else{
+	$('#smasignatura_'+parts[1]+'_'+parts[2]).hide();
+	$('#masignatura_'+parts[1]+'_'+parts[2]).val('');
+    }
 }
+function updateMateria(course)
+{
+    var id=course.id;
+    var parts=id.split("_");
+    var value=course[course.selectedIndex].value;
+    var props=value.split(":");
+    var codigo=props[0];
+    var creditos=props[1];
+    if(codigo=="000000"){
+	$('#smmateria_'+parts[1]+'_'+parts[2]).show();
+    }else{
+	$('#smmateria_'+parts[1]+'_'+parts[2]).hide();
+	$('#mmateria_'+parts[1]+'_'+parts[2]).val('');
+    }
+}
+
+
+
 function updateAverage(numnota){
     var i;
     var n=0;

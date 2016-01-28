@@ -14,6 +14,12 @@ $DATABASE="Sinfin";
 $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
+//FOR 32 BITS
+$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";
+
+//FOR 64 BITS
+//$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";
+
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////
@@ -258,10 +264,13 @@ RECON;
 	  $nsel="selmateria_${ir}_${im}";
 	  $vsel=$$nsel;
 
+	  $nmm="mmateria_${ir}_${im}";
+	  $vmm=$$nmm;
+
 	  //SELECT TYPE OF MATERIA INPUT
 	  $input="";
 $input.=<<<I
-  <select id="materia_${ir}_${im}" name="smateria_${ir}_${im}" class="ccursos hidden">
+  <select id="materia_${ir}_${im}" name="smateria_${ir}_${im}" class="ccursos hidden" onchange="updateMateria(this)">
     $vsel
   </select>
 I;
@@ -275,6 +284,15 @@ $reconocimientos.=<<<RECON
 		    <input type="hidden" name="qmateria_${ir}_${im}" value="$vqm" class="confirm">
 		    $input
 		</td></tr>
+		
+		<tr id="smmateria_${ir}_${im}" class="hidden">
+		  <td class="field">Materia manual:</td>
+		  <td class="input">
+		    <input type="text" id="mmateria_${ir}_${im}" name="mmateria_${ir}_${im}" value="$vmm" class="confirm">
+		  </td>
+		</tr>
+		
+
 		<tr><td class="field">Universidad:</td><td class="input"><input type="text" name="univ_${ir}_${im}" value="$vuniv" onchange="updateUniv(this,'${ir}')" readonly></td></tr>
 		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
 		<tr><td class="agregar" id="materia_${ir}_${im}" colspan=2>
@@ -316,6 +334,9 @@ RECON;
 	  $nqa="qasignatura_${ir}_${ia}";
 	  $vqa=$$nqa;
 
+	  $nma="masignatura_${ir}_${ia}";
+	  $vma=$$nma;
+
 $reconocimientos.=<<<RECON
 	      <table id="iasignatura_${ir}_${ia}" class="materia $chidden" border="${TBORDER}px" width="${TWIDTH}px">
 		<tr>
@@ -327,9 +348,16 @@ $reconocimientos.=<<<RECON
 		    </select>
 		  </td>
 		</tr>
+		
+		<tr id="smasignatura_${ir}_${ia}" class="hidden">
+		  <td class="field">Asignatura manual:</td>
+		  <td class="input">
+		    <input type="text" id="masignatura_${ir}_${ia}" name="masignatura_${ir}_${ia}" value="$vma" class="confirm">
+		  </td>
+		</tr>
+
 		<tr><td class="field">Créditos:</td><td class="input">
-		    <div id="creditos_${ir}_${ia}">$vcreditos</div>
-		    <input type="hidden" name="creditos_${ir}_${ia}" value="$vcreditos">
+		    <input type="text" id="creditos_${ir}_${ia}" name="creditos_${ir}_${ia}" value="$vcreditos">
 		</td></tr>
 		<tr><td class="field">Definitiva:</td><td class="input"><input type="text" name="definitiva_${ir}_${ia}" value="$vdef"></td></tr>
 		<tr><td class="agregar" id="asignatura_${ir}_${ia}" colspan=2>
