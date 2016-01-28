@@ -33,6 +33,16 @@ $content.=<<<M
 <div class="container">
 M;
 
+
+////////////////////////////////////////////////////////////////////////
+//DEBUGGING
+////////////////////////////////////////////////////////////////////////
+if(0){
+  if($results=mysqlCmd("select * from Estudiantes")){
+    print_r($results);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////
 //ACTIVE PART
 ////////////////////////////////////////////////////////////////////////
@@ -42,8 +52,13 @@ if(isset($action)){
   //LOAD DATA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="load"){
-    if(!isset($recfile)){
-      errorMsg("Debe proveer un archivo para cargar los datos");
+    if(!($recdir=getRecdir($recid))){
+      errorMsg("No se encontro el reconocimiento '$recid'");
+    }else{    
+      $recfile=$recdir."/recon.dat";
+      if(!isset($recfile)){
+	errorMsg("Debe proveer un archivo para cargar los datos");
+      }
     }
     if(strlen($ERROR)==0){
       //READ DATA
@@ -60,12 +75,20 @@ if(isset($action)){
     }
   }
   if($action=="delete"){
-    if(!isset($recfile)){
-      errorMsg("Debe proveer un archivo para borrarlo");
+    if(!($recdir=getRecdir($recid))){
+      errorMsg("No se encontro el reconocimiento '$recid'");
+    }else{
+      $recfile=$recdir."/recon.dat";
+      if(!isset($recfile)){
+	errorMsg("No se encontro el archivo de reconocimiento para borrarlo");
+      }
     }
-    if(strlen($ERROR)==0){
-      shell_exec("mv \$(dirname $recfile) trash");
-      statusMsg("Reconocimiento borrado...");
+    if(strlen($ERRORS)==0){
+      //REMOVE FILE
+      shell_exec("mv \$(dirname $recfile) trash;");
+      statusMsg("Reconocimiento '$recid' borrado...");
+      //REMOVE DATABASE ENTRY
+      mysqlCmd("delete from Reconocimientos where recid='$recid';");
     }
     goto endaction;
   }
@@ -187,9 +210,16 @@ if(isset($action)){
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //SUBMIT DATA
+  //GUARDAR DATA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="Guardar"){
+  if($action=="Cancelar"){
+    statusMsg("Edición cancelada.");
+    goto endaction;
+  }
+  if($action=="Guardar" or
+     $action=="Revisado" or
+     $action=="Aprobado"
+     ){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //BASIC CHECKS
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -209,7 +239,7 @@ if(isset($action)){
       errorMsg("Debe proveer una nota para la materia a reconocer");
       $mode="edit";
     }
-    if(isBlank($cedula)){
+    if(isBlank($documento)){
       errorMsg("Debe proveer un documento de identificación");
       $mode="edit";
     }
@@ -225,14 +255,30 @@ if(isset($action)){
       errorMsg("Debe escoger un plan de estudios del que salió");
       $mode="edit";
     }
+    if($action=="Revisado"){
+      if(isBlank($responsables)){
+	errorMsg("Debe proveer un nombre o lista de nombres de responsables");
+	$mode="edit";
+      }else{
+	$status=1;
+      }
+    }
+    if($action=="Aprobado"){
+      if(isBlank($acto)){
+	errorMsg("Debe proveer un acto administrativo");
+	$mode="edit";
+      }else{
+	$status=2;
+      }
+    }
+    $_GET["status"]=$status;
   
     if(strlen($ERRORS)==0){
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      //STORING RESULTS
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      //STORING RESULTS ON DISK
       if(!isset($recfile)){
-	$recid=generateRandomString();
-	$recdir="$ROOTDIR/data/recon/${cedula}_${planid}_${recid}";
+	$recid=generateRandomString(6);
+	$recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
 	$recfile="$recdir/recon.dat";
 	if(!is_dir($recdir)){shell_exec("mkdir -p $recdir");}
       }
@@ -246,8 +292,25 @@ if(isset($action)){
       fwrite($fl,serialize($_GET));
       fclose($fl);
 
+      //SET STATUS
+      if($action=="Guardar"){$status=0;}
+      if($action=="Revisada"){$status=1;}
+      if($action=="Aprobada"){$status=2;}
+
+      //UPDATING STUDENTS DATABASE
+      insertSql("Estudiantes",array("documento"=>"",
+				    "nombre"=>"",
+				    "email"=>""));
+      //UPDATING RECONOCIMIENTOS
+      insertSql("Reconocimientos",array("recid"=>"",
+					"fecha"=>"date",
+					"acto"=>"",
+					"responsables"=>"",
+					"status"=>"",
+					"Planes_planid"=>"planid",
+					"Estudiantes_documento"=>"documento"));
       //SHOW STATUS
-      statusMsg("Reconocimiento almacenado en $recfile...");
+      statusMsg("Reconocimiento $recid almacenado...");
     }
   }
 
@@ -300,51 +363,61 @@ else{
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="lista"){
 
-$content.=<<<C
-<h2>Solicitudes</h2>
+    $content.="<h2>Solicitudes de Reconocimiento de Materias</h2>";
+    $table="";
+$table.=<<<C
 <table width=100% border=1px>
   <thead>
     <tr>
-      <th>#</th>
+      <th>ID</th>
       <th>Fecha</th>
+      <th>Estado</th>
       <th>Documento</th>
-      <th>Estudiante</th>
-      <th>Universidad</th>
+      <th>Nombre</th>
       <th>Programa</th>
       <th>Acciones</th>
     </tr>
   </thead>
 C;
 
-    exec("ls $RECONDIR",$dirs);
-    $i=1;
-    $fields=array("date","cedula","nombre","universidad","planid");
-    foreach($dirs as $dir){
+    $qtable=0;
+    $results=mysqlCmd("select * from Reconocimientos",$qout=1);
+    if($results){
+      $qtable=1;
+      $i=1;
 
-      //READ DATA 
-      $qrecfile="$RECONDIR/$dir/recon.dat";
-      $data=readRecon($qrecfile);
+      $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid");
+      foreach($results as $result){
+	foreach($fields as $field){
+	  $name="l".$field;
+	  $$name=$result["$field"];
+	}
+	$Estudiante=mysqlCmd("select * from Estudiantes where documento='$lEstudiantes_documento'");
+	$lnombre=$Estudiante["nombre"];
 
-      //LOAD DATA IN LOCAL VARIABLES
-      foreach($fields as $field){
-	$name="l".$field;
-	$$name=$data["$field"];
-      }
-      
-      $urecfile=urlencode($qrecfile);
-      $edit="<a href=?action=load&mode=edit&recfile=$urecfile>Editar</a><br/>";
-      $delete="<a href=?action=delete&mode=lista&recfile=$urecfile>Borrar</a><br/>";
-      $preview="<a href=?action=generate&mode=preview&recfile=$urecfile>Ver</a><br/>";
+	$Plan=mysqlCmd("select * from Planes where planid='$lPlanes_planid'");
+	$lprogramaid=$Plan["Programas_programaid"];
+	$lversion=$Plan["version"];
+	$Programa=mysqlCmd("select * from Programas where programaid='$lprogramaid'");
+	$lprograma=$Programa["programa"];
+	
+	if(isBlank($lstatus)){$lstatus=0;}
+	$lstatus=$RECONSTATUS[$lstatus];
+	if(isBlank($lacto)){$lacto="Plataforma";}
+
+	$edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
+	$delete="<a href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
+	$preview="<a href=?action=generate&mode=preview&recid=$lrecid>Ver</a><br/>";
 
       //RENDER TABLE ROW
-$content.=<<<C
+$table.=<<<C
 <tr>
-  <td>$i</td>
-  <td>$ldate</td>
-  <td>$lcedula</td>
+  <td>$lrecid</td>
+  <td>$lfecha</td>
+  <td>$lstatus<br/><i>$lacto</i></td>
+  <td>$lEstudiantes_documento</td>
   <td>$lnombre</td>
-  <td>$luniversidad</td>
-  <td>$lplanid</td>
+  <td>$lprograma (versión $lversion)</td>
   <td>
     $edit
     $delete
@@ -352,18 +425,19 @@ $content.=<<<C
   </td>
 </tr>
 C;
-
-
-      //$content.="<a href='?mode=edit&action=load&recfile=$urecfile'>$lnombre - $qrecfile</a><br/>";
-
-      $i++;
+      }
     }
 
-$content.=<<<C
+$table.=<<<C
 </table>
 C;
 
-
+    if($qtable){
+      $content.=$table;
+    }else{
+      $content.="<i>No hay reconocimientos con este criterio de búsqueda</i>";
+    }
+    
     goto end;
 
 
@@ -379,9 +453,18 @@ C;
 
     //INPUT FILE
     if(isset($recfile)){
-      $inprecfile="<input type='hidden' name='recfile' value='$recfile'>";
+      $inprecfile="<input type='hidden' name='recfile' value='$recfile'><input type='hidden' name='recid' value='$recid'>";
     }else{
       $inprecfile="";
+    }
+
+    echo "Status: $status<br/>";
+    if(isset($status)){
+      $rstatus=$RECONSTATUS["$status"];
+    }
+    else{
+      $status=0;
+      $rstatus="Nuevo";
     }
 
     //FORM
@@ -407,13 +490,18 @@ $content.=<<<C
     </tr>
 
     <tr class="form-field">
+      <td class="field">Documento de identidad:</td>
+      <td class="input"><input type="text" name="documento" value="$documento" onchange="updateStudentForm(this)"></td>
+    </tr>
+
+    <tr class="form-field">
       <td class="field">Nombre estudiante:</td>
       <td class="input"><input type="text" name="nombre" value="$nombre"></td>
     </tr>
 
     <tr class="form-field">
-      <td class="field">Documento de identidad:</td>
-      <td class="input"><input type="text" name="cedula" value="$cedula"></td>
+      <td class="field">Correo electrónico:</td>
+      <td class="input"><input type="text" name="email" value="$email"></td>
     </tr>
 
     <tr class="form-field">
@@ -441,6 +529,26 @@ $content.=<<<C
       </td>
     </tr>
 
+    <tr class="reservado"><td colspan=2><hr/><b>Reservado para la Coordinación</b></td></tr>
+  
+    <tr class="form-field reservado">
+      <td class="field">Estado:</td>
+      <td class="input">
+	$rstatus
+	<input type="hidden" name="status" value="$status">
+      </td>
+    </tr>
+
+    <tr class="form-field reservado">
+      <td class="field">Acto administrativo:</td>
+      <td class="input"><input type="text" name="acto" value="$acto"></td>
+    </tr>
+
+    <tr class="form-field reservado">
+      <td class="field">Responsables:</td>
+      <td class="input"><input type="text" name="responsables" value="$responsables"></td>
+    </tr>
+
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
     <!-- RECONOCIMIENTOS -->
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
@@ -463,7 +571,10 @@ $content.=<<<C
     <tr class="boton">
       <td colspan=2>
 	<input type="submit" name="action" value="Guardar">
-	<input type="reset" value="Cancelar">
+	<input type="submit" name="action" value="Cancelar">
+	<input type="reset" value="Limpiar">
+	<input type="submit" name="action" value="Revisado">
+	<input type="submit" name="action" value="Aprobado">
       </td>
     </tr>
 

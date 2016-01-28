@@ -119,6 +119,21 @@ function updatecCourses(element)
     }
 }
 
+function onStudent(result)
+{
+    var info=JSON.parse(result);
+    if(info){
+	for(var key in info){
+	    $('[name="'+key+'"]').val(info[key]);
+	}
+    }
+}
+function updateStudentForm(element)
+{
+    var documento=$(element).val();
+    ajaxDo('updatestudent','documento:'+documento,onStudent);
+}
+
 function updateCredits(course,credit)
 {
     var value=course[course.selectedIndex].value;
@@ -127,7 +142,6 @@ function updateCredits(course,credit)
     var $credito_show=$('#'+credit);
     $credito_show.html(creditos);
 }
-
 function updateAverage(numnota){
     var i;
     var n=0;
@@ -149,7 +163,6 @@ function updateAverage(numnota){
 	$def['value']=Math.round10(promedio,-1);
     }
 }
-
 function updateUniv(elem){
     var univ=$(elem).val();
     var i;

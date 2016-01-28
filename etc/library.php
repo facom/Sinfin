@@ -30,6 +30,8 @@ $ERRORS="";
 $STATUS="";
 $RECONDIR="data/recon";
 
+$RECONSTATUS=array("Solicitado","Revisado","Aprobado");
+
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
 ////////////////////////////////////////////////////////////////////////
@@ -488,6 +490,46 @@ function readRecon($recfile){
   $data=unserialize($object);
   fclose($fl);
   return $data;
+}
+
+function insertSql($table,$mapfields)
+{
+  global $GLOBALS;
+  foreach(array_keys($GLOBALS) as $var){$$var=$GLOBALS["$var"];}
+  
+  $fields="(";
+  $values="(";
+  $udpate="";
+  $i=0;
+  foreach(array_keys($mapfields) as $field){
+    $nvalue=$mapfields["$field"];
+    if($nvalue==""){$nvalue=$field;}
+    $value=$$nvalue;
+    $fields.="$field,";
+    $values.="'$value',";
+    if($i>0){$update.="$field=VALUES($field),";}
+    $i++;
+  }
+  $fields=rtrim($fields,",").")";
+  $values=rtrim($values,",").")";
+  $update=rtrim($update,",");
+  $sql="insert into $table $fields values $values on duplicate key update $update";
+  $result=mysqlCmd($sql);
+  
+  return $result;
+}
+
+function getRecdir($recid)
+{
+  global $ROOTDIR;
+  if($results=mysqlCmd("select * from Reconocimientos where recid='$recid'")){
+    $documento=$results["Estudiantes_documento"];
+    $planid=$results["Planes_planid"];
+    $recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
+  }else{
+    $recdir=0;
+  }
+  return $recdir;
 }
 
 ////////////////////////////////////////////////////////////////////////

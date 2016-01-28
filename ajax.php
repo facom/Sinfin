@@ -1,8 +1,3 @@
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-</head>
-<body>
 <?php
 ////////////////////////////////////////////////////////////////////////
 //LOAD LIBRARY
@@ -23,7 +18,20 @@ if($action=="updatecourses"){
   $planid=$ps["planid"];
   $cursos=updateCursos($planid);
   $html.=generateSelection($cursos,"curso","");
-}else{
+}
+else
+if($action=="updatestudent"){
+   $ps=parseParams($params);
+   $documento=$ps["documento"];
+   if($results=mysqlCmd("select * from Estudiantes where documento='$documento'")){
+     $nombre=$results["nombre"];
+     $email=$results["email"];
+     $html.="{\"nombre\":\"$nombre\",\"email\":\"$email\"}";
+   }else{
+     $html.="0";
+   }
+}
+else{
   $html.="Option not recognized";
 }
 
@@ -32,5 +40,3 @@ if($action=="updatecourses"){
 ////////////////////////////////////////////////////////////////////////
 echo $html;
 ?>
-</body>
-</html>

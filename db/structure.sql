@@ -106,13 +106,13 @@ create table Estudiantes (
        -- Relation
        -- Estudiante puede haber estado matriculado en 3 programas
 
-       -- e.g. 211-v1-m1;211-v1-m2;
+       -- e.g. 211-v1-m1;211-v1-m2
        Planes_planid_1_s varchar(10),
        -- e.g. 210-v1-m1;
        Planes_planid_2_s varchar(10),
        Planes_planid_3_s varchar(10),
 
-       -- e.g. 211-v1-m1:0302120c1,0304130c2,0304560c1;211-v1-m2:0311304c1;
+       -- e.g. 211-v1-m1:0302120c1,0304130c2,0304560c1;211-v1-m2:0311304c1
        Cursos_cursoid_1_s varchar(1000),
        Cursos_cursoid_2_s varchar(1000),
        Cursos_cursoid_3_s varchar(1000),
@@ -122,4 +122,25 @@ create table Estudiantes (
        extra2 varchar(255),
        extra3 varchar(255),
        primary key (documento)
+);
+
+create table Reconocimientos (
+       -- Basic
+       -- e.g. 6 characters string aj0788a
+       recid varchar(10),
+       fecha varchar(50),
+       status varchar(10),
+       -- e.g. Acta 23 de 2016, Comité de Pregrado
+       acto varchar(255),
+
+       -- Relation
+       -- Plan en el que se realizan reconocimientos
+       Planes_planid varchar(10),
+       Estudiantes_documento varchar(20),
+
+       -- Extras
+       extra1 varchar(255),
+       extra2 varchar(255),
+       extra3 varchar(255),
+       primary key (recid)       
 );

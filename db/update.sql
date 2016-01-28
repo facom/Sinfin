@@ -1,6 +1,10 @@
 use Sinfin;
 
-
+/*alter table Reconocimientos add responsables varchar(255);*/
+alter table Reconocimientos drop column acto;
+alter table Reconocimientos add acto varchar(255);
+/*alter table Reconocimientos add acto varchar(255);*/
+/*alter table Reconocimientos add status varchar(10);*/
 /*
 alter table Cursos add fechaacuerdo varchar(3);
 alter table Cursos add semanas varchar(3);
@@ -12,6 +16,7 @@ alter table misiones add cumplido1 varchar(255);
 update Comisiones set estado='cumplida',qcumplido=1,cumplido1='empty.pdf',cumplido2='',destinoscumplido='pregradofisica@udea.edu.co;',confirmacumplido='pregradofisica@udea.edu.co::2015-12-18 12:06:56;',infocumplido='Cumplido de comisión otorgada.' where (tipocom='servicios' or tipocom='estudio') and fechafin<now();
 */
 
+/*
 insert ignore into Programas (programaid,programa,instituto) values ('210','Física','Física');
 insert ignore into Programas (programaid,programa,instituto) values ('211','Astronomía','Física');
 insert ignore into Programas (programaid,programa,instituto) values ('204','Biología','Biología');
@@ -41,3 +46,25 @@ insert ignore into Planes (planid,version,modificacion,Programas_programaid) val
 -- TECNOLOGIA QUIMICA
 insert ignore into Planes (planid,version,modificacion,Programas_programaid) values ('222-v5-m1','5','1','222');
 insert ignore into Planes (planid,version,modificacion,Programas_programaid) values ('222-v6-m1','6','1','222');
+*/
+
+/*
+create table Reconocimientos (
+       -- Basic
+       -- e.g. 6 characters string aj0788a
+       recid varchar(10),
+       fecha varchar(50),
+
+       -- Relation
+       -- Plan en el que se realizan reconocimientos
+       Planes_planid varchar(10),
+       Estudiantes_documento varchar(20),
+
+       -- Extras
+       extra1 varchar(255),
+       extra2 varchar(255),
+       extra3 varchar(255),
+       primary key (recid)       
+);
+*/
+
