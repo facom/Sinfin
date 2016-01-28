@@ -31,7 +31,7 @@ pull:
 
 backup:
 	@echo "Backuping sinfin..."
-	@bash -x backup.sh 
+	@bash backup.sh 
 
 restore:
 	@echo "Restoring table $TABLE..."

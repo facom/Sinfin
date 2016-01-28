@@ -141,6 +141,16 @@ if(isset($action)){
       if($_GET["$key"]>0){
 	$qchecked["$varname"]=1;
 	$content.="$('#i$varname').show();";
+	$parts=preg_split("/_/",$varname);
+	$type=$parts[0];
+	if($type=="materia"){$varname="smateria_".$parts[1]."_".$parts[2];}
+	$codigo=$$varname;
+	if($codigo=="000000:0"){
+	  $parts=preg_split("/_/",$varname);
+	  $section=$parts[1];
+	  $num=$parts[2];
+	  $content.="$('#sm${type}_${section}_${num}').show();";
+	}
       }else{
 	$qchecked["$varname"]=0;
       }
@@ -174,13 +184,15 @@ if(isset($action)){
       $scurso=$$asignatura;
       $parts=preg_split("/:/",$$asignatura);
       $ncred="creditos_${section}_${ncourse}";
-      $$ncred=$parts[1];
+      //$$ncred=$parts[1];
       $nsel="selasignatura_${section}_${ncourse}";
+      $cursos["000000:0"]="No listada";
       $$nsel=generateSelection($cursos,"$asignatura",$scurso);
     }
     else{
       $scurso="--";
       $nsel="selasignatura_${section}_${ncourse}";
+      $cursos["000000:0"]="No listada";
       $$nsel=generateSelection($cursos,"$asignatura",$scurso);
     }
   }
@@ -198,12 +210,14 @@ if(isset($action)){
 	$name="s".$materia;
 	$smateria=$$name;
 	$nsel="selmateria_${section}_${ncourse}";
+	$ccursos["000000:0"]="No listada";
 	$$nsel=generateSelection($ccursos,"$name",$smateria);
       }
       else{
 	$name="s".$materia;
 	$smateria="--";
 	$nsel="selmateria_${section}_${ncourse}";
+	$ccursos["000000:0"]="No listada";
 	$$nsel=generateSelection($ccursos,"$name",$smateria);
       }
     }
@@ -407,7 +421,8 @@ C;
 
 	$edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
 	$delete="<a href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
-	$preview="<a href=?action=generate&mode=preview&recid=$lrecid>Ver</a><br/>";
+	//$preview="<a href=?action=generate&mode=preview&recid=$lrecid>Ver</a><br/>";
+	$preview="<a href=genrecon.php?recid=$lrecid>Ver</a><br/>";
 
       //RENDER TABLE ROW
 $table.=<<<C
@@ -458,7 +473,6 @@ C;
       $inprecfile="";
     }
 
-    echo "Status: $status<br/>";
     if(isset($status)){
       $rstatus=$RECONSTATUS["$status"];
     }
