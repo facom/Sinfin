@@ -1,6 +1,7 @@
 DATABASE=Sinfin
 USERDB=sinfin
 TABLE="Reconocimientos"
+BACKDIR="data/dump"
 
 clean:
 	touch delete.pyc delete~
@@ -9,8 +10,8 @@ clean:
 
 cleanrecon:
 	@echo -n "Please provide password for user '$(USERDB)': "
-	mysql -u sinfin -p $(DATABASE) -e "truncate table $(TABLE);"
-	rm -rf data/recon/*
+	@mysql -u sinfin -p $(DATABASE) -e "truncate table $(TABLE);"
+	@rm -rf data/recon/*
 
 cleantrash:
 	rm -rf trash/*
@@ -34,11 +35,11 @@ backup:
 
 restore:
 	@echo "Restoring table $TABLE..."
-	@-p7zip -d etc/data/sinfin.tar.7z
-	@-tar xf etc/data/sinfin.tar
+	@-p7zip -d $(BACKDIR)/$(DATABASE).tar.7z
+	@-tar xf $(BACKDIR)/$(DATABASE).tar
 	@echo -n "Enter root mysql password: "
-	@mysql -u root -p Sinfin < etc/data/sinfin.sql
-	@p7zip etc/data/sinfin.tar
+	@mysql -u root -p $(DATABASE) < $(BACKDIR)/$(DATABASE).sql
+	@p7zip $(BACKDIR)/$(DATABASE).tar
 
 permissions:
 	@echo "Setting web permissions..."
