@@ -1,18 +1,21 @@
+DATABASE=Sinfin
+USERDB=sinfin
+TABLE="Reconocimientos"
+
 clean:
 	touch delete.pyc delete~
 	rm -r *.pyc
 	find . -name "*~" -exec rm {} \;
 
 cleanrecon:
+	@echo -n "Please provide password for user '$(USERDB)': "
+	mysql -u sinfin -p $(DATABASE) -e "truncate table $(TABLE);"
 	rm -rf data/recon/*
 
-cleandb:clean
-	mysql -u comisiones --password="123" < initialize.sql
-	python insert.py data/profesores-fcen.csv
-	touch comisiones/delete
-	rm -r comisiones/*
-	touch scratch/delete
-	rm -r scratch/*
+cleantrash:
+	rm -rf trash/*
+
+cleanall:clean cleanrecon cleantrash
 
 commit:
 	@echo "Commiting changes..."
@@ -26,16 +29,16 @@ pull:
 	@chown -R www-data.www-data .
 
 backup:
-	@echo "Backuping comisiones..."
-	@bash combackup.sh Quakes
+	@echo "Backuping sinfin..."
+	@bash -x backup.sh 
 
 restore:
-	@echo "Restoring table Quakes..."
-	@-p7zip -d etc/data/comisiones.tar.7z
-	@-tar xf etc/data/comisiones.tar
-	@echo "Enter root mysql password..."
-	@mysql -u root -p Comisiones < etc/data/comisiones.sql
-	@p7zip etc/data/comisiones.tar
+	@echo "Restoring table $TABLE..."
+	@-p7zip -d etc/data/sinfin.tar.7z
+	@-tar xf etc/data/sinfin.tar
+	@echo -n "Enter root mysql password: "
+	@mysql -u root -p Sinfin < etc/data/sinfin.sql
+	@p7zip etc/data/sinfin.tar
 
 permissions:
 	@echo "Setting web permissions..."
