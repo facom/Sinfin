@@ -27,3 +27,5 @@ insert ignore into Planes (planid,version,modificacion,Programas_programaid) val
 -- TECNOLOGIA QUIMICA
 insert ignore into Planes (planid,version,modificacion,Programas_programaid) values ('222-v5-m1','5','1','222');
 insert ignore into Planes (planid,version,modificacion,Programas_programaid) values ('222-v6-m1','6','1','222');
+
+insert ignore into Usuarios (email,nombre,password,nivel) values ('pregradofisica@udea.edu.co','Pregrado Fisica',MD5('123'),'4');

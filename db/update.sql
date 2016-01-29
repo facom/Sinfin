@@ -68,6 +68,7 @@ create table Reconocimientos (
 );
 */
 
+/*
 create table Usuarios (
        -- Basic
        -- e.g. 6 characters string aj0788a
@@ -75,12 +76,15 @@ create table Usuarios (
        nombre varchar(50),
        password varchar(255),
 
-       -- e.g. 1, Basico ; 2, Profesor; 3, Administrador
+       -- e.g. Nivel de permisos 1, Basico ; 2, Modificacion; 3, Administrador basico; 4, Propietario
        nivel varchar(2),
 
        -- Extras
        extra1 varchar(255),
        extra2 varchar(255),
        extra3 varchar(255),
-       primary key (recid)       
+       primary key (email)       
 );
+*/
+
+insert ignore into Usuarios (email,nombre,password,nivel) values ('pregradofisica@udea.edu.co','Pregrado Fisica',MD5('123'),'4');

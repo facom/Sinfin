@@ -438,8 +438,78 @@ $header=<<<H
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="js/sinfin.js"></script>
+  <style>
+    #diagonal_label {
+    height:50px;
+    line-height:25px;
+    text-transform:uppercase;
+    font-family:sans-serif;
+    font-weight:bold;
+    text-align:center;
+    z-index: 20;
+    }
+
+    #diagonal_label a {
+    display:block;
+    height:100%;
+    color:#000;
+    text-decoration:none;
+    background: green;
+    }
+
+    #diagonal_label span {
+    display:inline-block;
+    margin:0 10px;
+    }
+    #break {display:none;}
+
+    @media only screen and (min-width : 480px) {
+
+    #diagonal_label {
+    width: 400px;
+    height:70px;
+    position:fixed;
+    right:-120px;
+    top:42px;
+    line-height:20px;
+    z-index: 20;
+    }
+    
+    #diagonal_label a {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    color: #fff;
+    }
+    
+    #diagonal_label span {
+    margin:0 3px;
+    }
+    
+    #diagonal_label b {
+    font-size:22px;
+    font-weight:normal;
+    display: inline-block;
+    padding-top: 6px;
+    }
+
+    #break { display: block; }
+    }    
+  </style>
+
 </head>
 <body>
+
+<div id="diagonal_label">
+  <a href="?" target="_blank">
+    <span><b>&nbsp;</b></span><br/>
+    <span>Versión Alpha 1.0</span><br id='break' />
+    <span></span>
+  </a>
+</div>
+
 H;
  return $header;
 }
