@@ -618,7 +618,7 @@ $content.=<<<C
     <tr>
       <td colspan=2>
 	<div id="reconocimiento_0" class="agregar">
-	  <a href="JavaScript:void(null)" onclick="addRecon(this)">Agregar reconocimiento</a>
+	  <a href="JavaScript:void(null)" onclick="addRecon(this);">Agregar reconocimiento</a>
 	</div>
 	$reconocimientos
       </td>
