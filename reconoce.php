@@ -369,6 +369,7 @@ $message=<<<M
 M;
          sendMail($email,$subject,$message,$headers);
          sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$headers);
+	 statusMsg("Mensaje enviado a $email y $EMAIL_USERNAME");
       }
 
       //SHOW STATUS
