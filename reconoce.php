@@ -368,7 +368,7 @@ $message=<<<M
 </p>
 M;
          sendMail($email,$subject,$message,$headers);
-         sendMail($EMAIL_USENAME,"[Historico] ".$subject,$message,$headers);
+         sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$headers);
       }
 
       //SHOW STATUS

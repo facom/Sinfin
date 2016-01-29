@@ -219,6 +219,10 @@ if($debug){
   print_r($obstexta);
 }
 $notas="";
+if(!isBlank($acto)){
+  $notas.="Acto administrativo $acto<br/>";
+}
+
 $obs=1;
 foreach($reconocimientos as $ir){
   if(preg_match("/,/",$obstextm[$ir]) or
