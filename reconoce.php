@@ -328,7 +328,11 @@ if(isset($action)){
 	$programa=$Programa["programa"];
 	$recdir=getRecdir($recid);
 	$recbase="$recdir/recon";
+	//$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
 	$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
+	echo "Siteurl: $recurl<br/>";
+	$recurl="http://astronomia-udea.co/principal/Sinfin/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
+	echo "Siteurl: $recurl";
 	
 	$headers="";
 	$headers.="From: noreply@udea.edu.co\r\n";
