@@ -328,12 +328,8 @@ if(isset($action)){
 	$programa=$Programa["programa"];
 	$recdir=getRecdir($recid);
 	$recbase="$recdir/recon";
-	//$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
 	$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
-	echo "Siteurl: $recurl<br/>";
-	$recurl="http://astronomia-udea.co/principal/Sinfin/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
-	echo "Siteurl: $recurl";
-	
+
 	$headers="";
 	$headers.="From: noreply@udea.edu.co\r\n";
 	$headers.="Reply-to: noreply@udea.edu.co\r\n";
@@ -353,7 +349,7 @@ $message=<<<M
 </p>
 <p>
   Puede encontrar los detalles de los reconocimientos en este documento:
-  <a href=$recurl target=_blank>Formato de reconocimientos diligenciado</a>.
+  <a href="$recurl" target="_blank">Formato de reconocimientos diligenciado</a>.
 </p>
 <p>
   Su solicitud ha sido entregada al Departamento de Admisiones y
