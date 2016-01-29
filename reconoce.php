@@ -448,6 +448,7 @@ C;
 
       $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid");
       foreach($results as $result){
+	$color="white";
 	foreach($fields as $field){
 	  $name="l".$field;
 	  $$name=$result["$field"];
@@ -462,6 +463,8 @@ C;
 	$lprograma=$Programa["programa"];
 	
 	if(isBlank($lstatus)){$lstatus=0;}
+	if($lstatus==1){$color="pink";}
+	if($lstatus==2){$color="lightblue";}
 	$lstatus=$RECONSTATUS[$lstatus];
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
@@ -471,7 +474,7 @@ C;
 
       //RENDER TABLE ROW
 $table.=<<<C
-<tr>
+<tr style="background:$color">
   <td>$lrecid</td>
   <td>$lfecha</td>
   <td>$lstatus<br/><i>$lacto</i></td>
