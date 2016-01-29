@@ -1,8 +1,9 @@
 use Sinfin;
 
 /*alter table Reconocimientos add responsables varchar(255);*/
-alter table Reconocimientos drop column acto;
-alter table Reconocimientos add acto varchar(255);
+/*alter table Reconocimientos drop column acto;*/
+/*alter table Reconocimientos add acto varchar(255);*/
+alter table Reconocimientos add column fechahora varchar(255);
 /*alter table Reconocimientos add acto varchar(255);*/
 /*alter table Reconocimientos add status varchar(10);*/
 /*

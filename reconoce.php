@@ -59,12 +59,18 @@ if(isset($action)){
 	errorMsg("Debe proveer un archivo para cargar los datos");
       }
     }
-    if(strlen($ERROR)==0){
+    if(strlen($ERRORS)==0){
       //READ DATA
-      $fl=fopen($recfile,"r");
-      $object=fread($fl,filesize($recfile));
-      $data=unserialize($object);
-      fclose($fl);
+      if(file_exists($recfile)){
+	$fl=fopen($recfile,"r");
+	$object=fread($fl,filesize($recfile));
+	$data=unserialize($object);
+	fclose($fl);
+      }else{
+	errorMsg("File '$recfile' not found.");
+	goto endaction;
+      }
+
       //COMBINE DATA
       $_GET=array_merge($_GET,$data);
       $_POST=array_merge($_POST,$data);
@@ -128,7 +134,10 @@ if(isset($action)){
   $qasignaturas=array();
   $qmaterias=array();
   $qchecked=array();
-  foreach(array_keys($_GET) as $key){
+  $nqreconocimientos=0;
+  $nqmaterias=0;
+  $nqasignaturas=0;
+  foreach(array_keys($_POST) as $key){
     if(preg_match("/^asignatura_/",$key)){
       array_push($qasignaturas,$key);
     }
@@ -137,8 +146,14 @@ if(isset($action)){
     }
     if(preg_match("/^q(\w+)/",$key,$matches)){
       $varname=$matches[1];
-      if($_GET["$key"]>0){
+      if($_POST["$key"]>0){
 	$qchecked["$varname"]=1;
+	if(preg_match("/reconocimiento/",$varname)){
+	  $nqreconocimientos++;
+	}
+	if(preg_match("/materia/",$varname)){$nqmaterias++;}
+	if(preg_match("/asignatura/",$varname)){$nqasignaturas++;}
+
 	$content.="$('#i$varname').show();";
 	$parts=preg_split("/_/",$varname);
 	$type=$parts[0];
@@ -232,15 +247,15 @@ if(isset($action)){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //BASIC CHECKS
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if(!$qchecked["reconocimiento_1"]){
+    if(!$nqreconocimientos){
       errorMsg("Debe proveer al menos un reconocimiento");
       $mode="edit";
     }
-    else if(!$qchecked["materia_1_1"]){
+    else if(!$nqmaterias){
       errorMsg("Debe proveer al menos una materia");
       $mode="edit";
     }
-    else if(!$qchecked["asignatura_1_1"]){
+    else if(!$nqasignaturas){
       errorMsg("Debe proveer al menos una asignatura para reconocer");
       $mode="edit";
     } 
@@ -280,25 +295,30 @@ if(isset($action)){
 	$status=2;
       }
     }
-    $_GET["status"]=$status;
+    $_POST["status"]=$status;
   
     if(strlen($ERRORS)==0){
 
+      //GENERATE recid
+      $recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
+      $recfile="$recdir/recon.dat";
+
       //STORING RESULTS ON DISK
-      if(!isset($recfile)){
+      if(!file_exists($recfile)){
 	$recid=generateRandomString(6);
 	$recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
 	$recfile="$recdir/recon.dat";
 	if(!is_dir($recdir)){shell_exec("mkdir -p $recdir");}
+	statusMsg("Nuevo reconocimiento creado");
       }
 
       //UNSET VARIABLES
-      unset($_GET["action"]);
-      unset($_GET["mode"]);
+      unset($_POST["action"]);
+      unset($_POST["mode"]);
 
       //SAVE SERIALIZED ARRAY
       $fl=fopen($recfile,"w");
-      fwrite($fl,serialize($_GET));
+      fwrite($fl,serialize($_POST));
       fclose($fl);
 
       //SET STATUS
@@ -313,6 +333,7 @@ if(isset($action)){
       //UPDATING RECONOCIMIENTOS
       insertSql("Reconocimientos",array("recid"=>"",
 					"fecha"=>"date",
+					"fechahora"=>"DATE",
 					"acto"=>"",
 					"responsables"=>"",
 					"status"=>"",
@@ -442,7 +463,7 @@ $table.=<<<C
 C;
 
     $qtable=0;
-    $results=mysqlCmd("select * from Reconocimientos",$qout=1);
+    $results=mysqlCmd("select * from Reconocimientos order by fechahora desc,Estudiantes_documento asc",$qout=1);
     if($results){
       $qtable=1;
       $i=1;
@@ -533,7 +554,7 @@ C;
     //FORM
 $content.=<<<C
 <center>
-<form>
+<form method="post" enctype="multipart/form-data" accept-charset="utf-8">
   $inprecfile
   <input type="hidden" name="mode" value="lista">
   <table border="${TBORDER}px" width="${TWIDTH}px">

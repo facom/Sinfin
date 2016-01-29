@@ -187,18 +187,8 @@ function updateAverage(numnota){
     }
 }
 function updateUniv(elem){
-    /*
     var univ=$(elem).val();
-    var i;
-    for(i=1;i<=10;i++){
-	for(j=1;j<=3;j++){
-	    name="[name='univ_"+i+"_"+j+"']";
-	    var $def=jQuery(name)[0];
-	    var val=$def['value'];
-	    $def['value']=univ;
-	}
-    }
-    */
+    $('.univ').val(univ);
 }
 
 function activateUniv(element){
@@ -207,7 +197,7 @@ function activateUniv(element){
     if(programa=='other'){
 	$univ.val('');
     }else{
-	$univ.val('Universidad de Antioquia');
+	$univ.val('U. de A.');
     }
     updateUniv('#universidad');
 }

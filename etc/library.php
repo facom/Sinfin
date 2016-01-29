@@ -242,7 +242,7 @@ function generateReconocimientos()
     $$var=$GLOBALS["$var"];
   }
 
-  $numrecon=10;
+  $numrecon=20;
   $nummaterias=3;
   $numasignaturas=3;
   $chidden="hidden";
@@ -287,9 +287,10 @@ RECON;
 	  $vqm=$$nqm;
 	  $nsel="selmateria_${ir}_${im}";
 	  $vsel=$$nsel;
-
 	  $nmm="mmateria_${ir}_${im}";
 	  $vmm=$$nmm;
+	  $nsemestre="semestre_${ir}_${im}";
+	  $vsemestre=$$nsemestre;
 
 	  //SELECT TYPE OF MATERIA INPUT
 	  $input="";
@@ -308,6 +309,12 @@ $reconocimientos.=<<<RECON
 		    <input type="hidden" name="qmateria_${ir}_${im}" value="$vqm" class="confirm">
 		    $input
 		</td></tr>
+
+		<tr class="ccursos_input">
+		  <td class="field">Semestre:</td><td class="input">
+		    <input type="text" name="semestre_${ir}_${im}" value="$vsemestre">
+		  </td>
+		</tr>
 		
 		<tr id="smmateria_${ir}_${im}" class="hidden">
 		  <td class="field">Materia manual:</td>
@@ -317,7 +324,7 @@ $reconocimientos.=<<<RECON
 		</tr>
 		
 
-		<tr><td class="field">Universidad:</td><td class="input"><input type="text" name="univ_${ir}_${im}" value="$vuniv" onchange="updateUniv(this,'${ir}')"></td></tr>
+		<tr><td class="field">Universidad:</td><td class="input"><input class="univ" type="text" name="univ_${ir}_${im}" value="$vuniv"></td></tr>
 		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
 		<tr><td class="agregar" id="materia_${ir}_${im}" colspan=2>
 RECON;

@@ -129,6 +129,7 @@ create table Reconocimientos (
        -- e.g. 6 characters string aj0788a
        recid varchar(10),
        fecha varchar(50),
+       fechahora varchar(50),
        status varchar(10),
        -- e.g. Acta 23 de 2016, Comité de Pregrado
        acto varchar(255),
