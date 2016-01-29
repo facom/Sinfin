@@ -9,14 +9,6 @@ $ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
 require("$ROOTDIR/etc/library.php");
 //echo "<div style='font-size:0.8em'>".$_SERVER["QUERY_STRING"]."</div>";
 
-if(!isset($_SERVER["PHP_AUTH_USER"])){
-  header('WWW-Authenticate: Basic realm="My Realm"');
-  header('HTTP/1.0 401 Unauthorized');
-  echo 'Text to send if user hits Cancel button';
- }else{
-  echo "Hello.";
- }
-
 ////////////////////////////////////////////////////////////////////////
 //INITIALIZATION
 ////////////////////////////////////////////////////////////////////////
