@@ -21,7 +21,7 @@ $content.=getMainMenu();
 ////////////////////////////////////////////////////////////////////////
 $content.=<<<M
 <div class="moduletitle">
-  Modulo de Planes de Estudio
+  Modulo de Planes de Asignatura
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 

@@ -68,3 +68,19 @@ create table Reconocimientos (
 );
 */
 
+create table Usuarios (
+       -- Basic
+       -- e.g. 6 characters string aj0788a
+       email varchar(50),
+       nombre varchar(50),
+       password varchar(255),
+
+       -- e.g. 1, Basico ; 2, Profesor; 3, Administrador
+       nivel varchar(2),
+
+       -- Extras
+       extra1 varchar(255),
+       extra2 varchar(255),
+       extra3 varchar(255),
+       primary key (recid)       
+);
