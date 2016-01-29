@@ -242,7 +242,7 @@ function generateReconocimientos()
     $$var=$GLOBALS["$var"];
   }
 
-  $numrecon=10;
+  $numrecon=20;
   $nummaterias=3;
   $numasignaturas=3;
   $chidden="hidden";
@@ -317,7 +317,7 @@ $reconocimientos.=<<<RECON
 		</tr>
 		
 
-		<tr><td class="field">Universidad:</td><td class="input"><input type="text" name="univ_${ir}_${im}" value="$vuniv" onchange="updateUniv(this,'${ir}')" readonly></td></tr>
+		<tr><td class="field">Universidad:</td><td class="input"><input type="text" name="univ_${ir}_${im}" value="$vuniv" onchange="updateUniv(this,'${ir}')"></td></tr>
 		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
 		<tr><td class="agregar" id="materia_${ir}_${im}" colspan=2>
 RECON;
