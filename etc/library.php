@@ -16,13 +16,14 @@ $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
-    echo $out;
-}
-//FOR 32 BITS
-$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";
+    if(preg_match("/86_64/",$out)){$arch="64";}
+    else{$arch="32";}
+}else{$arch=shell_exec("cat .arch");}
 
-//FOR 64 BITS
-//$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";
+//HTML 2 PDF CONVERTER
+if($arch==32){$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";}
+else{$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";}
+echo $H2PDF;
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
