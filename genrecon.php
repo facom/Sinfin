@@ -321,8 +321,8 @@ $format.=<<<F
 	  </tr>
 
 	  <tr>
-	    <td class=content style="$border;font-size:1.0em;">$documento</td>
-	    <td class=content style="$border;font-size:1.0em;">$nombre</td>
+	    <td class=content style="$border;font-size:0.8em;">$documento</td>
+	    <td class=content style="$border;font-size:0.8em;">$nombre</td>
 
 	    <td style="padding:0px;border-right:solid black 1px;">
 
