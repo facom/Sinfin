@@ -16,6 +16,7 @@ $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
+    echo $out;
 }
 //FOR 32 BITS
 $H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";
