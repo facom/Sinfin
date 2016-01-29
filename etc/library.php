@@ -51,6 +51,15 @@ $FILENAME=$_SERVER["SCRIPT_NAME"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
 $SITEURL="http://$HOST$BASEDIR/";
+$REFERER=$_SERVER["HTTP_REFERER"];
+
+/*
+echo "COOKIES:";
+print_r($_COOKIES);
+echo "<br/>SESSION:";
+print_r($_SESSION);
+*/
+//phpinfo();
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
