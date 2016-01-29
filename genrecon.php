@@ -69,7 +69,7 @@ foreach(array_keys($data) as $key){
 }
 $hrow="";
 $totcred=0;
-$obs=0;
+$nobs=0;
 $obstextm=array();
 $obstexta=array();
 foreach($reconocimientos as $ir){
@@ -158,9 +158,10 @@ foreach($reconocimientos as $ir){
 
   $nrows=max($nmaterias,$nasignaturas);
   if($nmaterias!=$nasignaturas){
-    $obs++;
+    $nobs++;
+    $obs=$nobs;
   }else{
-    $obs=0;
+    $obs="";
   }
 
   $im=0;$ia=0;
@@ -252,9 +253,10 @@ $format.=<<<F
   td.title{
   text-align:center;
   padding:5px;
+  background:lightgray;
   }
   td.content{
-  height:50px;
+  height:20px;
   padding:10px;
   }
   td.date{
@@ -313,8 +315,8 @@ $format.=<<<F
 	  </tr>
 
 	  <tr>
-	    <td class=content style="$border">$documento</td>
-	    <td class=content style="$border">$nombre</td>
+	    <td class=content style="$border;font-size:1.0em;">$documento</td>
+	    <td class=content style="$border;font-size:1.0em;">$nombre</td>
 
 	    <td style="padding:0px;border-right:solid black 1px;">
 
@@ -356,8 +358,8 @@ $format.=<<<F
 	    <td class=title style="$border">FIRMA DEL ESTUDIANTE</td>
 	  </tr>
 	  <tr>
-	    <td class=title style="$border">$programa</td>
-	    <td class=title style="$border">$signature</td>
+	    <td class=content style="$border;font-size:1.0em;">$programa</td>
+	    <td class=content style="$border;font-size:1.0em;">$signature</td>
 	  </tr>
 	</table>
       </td>
@@ -372,9 +374,9 @@ $format.=<<<F
 	      <td width=30%></td>
 	      <td width=10%></td>
 
-	      <td width=5%></td>
+	      <td width=7%></td>
 	      <td width=10%></td>
-	      <td width=30%></td>
+	      <td width=27%></td>
 	      <td width=7%></td>
 	      <td width=7%></td>
 	    </tr>
@@ -441,18 +443,20 @@ $format.=<<<F
 	  </thead>
 
 	  <tr>
-	    <td class="title" style="border-right:solid 1px;text-align:left">
-	      OBSERVACIONES (OBS):<br/>
-              $notas
+	    <td class=content style="border-right:solid 1px;text-align:left">
 	    </td>
 	    <td class="title" style="border-bottom:solid 1px;text-align:left;font-size:8px;">
 	      FECHA RECONOCIMIENTO
 	    </td>
 	  </tr>
-	  <tr>
-	    <td class="title" style="border-right:solid 1px;"></td>
-	    <td>
 
+	  <tr>
+	    <td class=content style="border-right:solid 1px;text-align:left" valign=top>
+	      OBSERVACIONES (OBS):<br/>
+              $notas
+	    </td>
+
+	    <td>
 	      <table border=0 width=100% cellspacing=0 cellpadding=0 height=100% style="border-bottom:solid 1px">
 		<thead>
 		  <tr>
@@ -472,12 +476,12 @@ $format.=<<<F
 		  <td class=date >$ano</td>
 		</tr>
 	      </table>
-    <div style="height:100px;border-bottom:solid 1px;width:100%;">
-    </div>
-    <div style="text-align:center">
-      Facultad - Firma y Sello
-    </div>
 
+	      <div style="height:50px;border-bottom:solid 1px;width:100%;">
+	      </div>
+	      <div style="text-align:center">
+		Facultad - Firma y Sello
+	      </div>
 	    </td>
 	  </tr>
            
@@ -507,6 +511,6 @@ shell_exec("cd $recdir;$H2PDF $recbase.html $recbase.pdf");
 ////////////////////////////////////////////////////////////////////////
 //REFRESH TO REFERRING PAGE
 ////////////////////////////////////////////////////////////////////////
-//header("Refresh:1;url=$REFERER");
+header("Refresh:0;url=$recurl.pdf");
 ?>
 </html>	

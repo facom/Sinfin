@@ -421,8 +421,7 @@ C;
 
 	$edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
 	$delete="<a href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
-	//$preview="<a href=?action=generate&mode=preview&recid=$lrecid>Ver</a><br/>";
-	$preview="<a href=genrecon.php?recid=$lrecid>Ver</a><br/>";
+	$preview="<a href=genrecon.php?recid=$lrecid target=_blank>Ver</a><br/>";
 
       //RENDER TABLE ROW
 $table.=<<<C
