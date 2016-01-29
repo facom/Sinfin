@@ -52,7 +52,6 @@ $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
 $SITEURL="http://$HOST$BASEDIR/";
 $REFERER=$_SERVER["HTTP_REFERER"];
-echo "SITEURL: $SITEURL";
 
 /*
 echo "COOKIES:";
