@@ -127,12 +127,14 @@ foreach($reconocimientos as $ir){
       $asignatura=$$name;
       $name="masignatura_${ir}_${ia}";
       $manual=$$name;
+      $name="mcodigo_${ir}_${ia}";
+      $mcodigo=$$name;
       $name="creditos_${ir}_${ia}";
       $creditos=$$name;
       $name="definitiva_${ir}_${ia}";
       $definitiva=$$name;
       if(!isBlank($manual)){
-	$codigo="000000";
+	$codigo=$mcodigo;
 	$asignatura=$manual;
       }else{
 	$codigo=$asignatura;

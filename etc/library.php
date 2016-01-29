@@ -46,6 +46,12 @@ $RECONDIR="data/recon";
 $RECONSTATUS=array("Solicitado","Revisado","Aprobado");
 $SINFIN="<b>SInfIn</b>";
 
+$HOST=$_SERVER["HTTP_HOST"];
+$FILENAME=$_SERVER["SCRIPT_NAME"];
+$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
+$BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
+$SITEURL="http://$HOST$BASEDIR/";
+
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
 ////////////////////////////////////////////////////////////////////////
@@ -216,6 +222,7 @@ function updateCursos($planid)
     $nombre=$curso["nombre"];
     $cursos["$codigo:$creditos"]=$nombre;
   }
+  $cursos["000000:0"]="No listada";
   return $cursos;
 }
 
@@ -345,6 +352,9 @@ RECON;
 	  $nma="masignatura_${ir}_${ia}";
 	  $vma=$$nma;
 
+	  $nca="mcodigo_${ir}_${ia}";
+	  $vca=$$nca;
+
 $reconocimientos.=<<<RECON
 	      <table id="iasignatura_${ir}_${ia}" class="materia $chidden" border="${TBORDER}px" width="${TWIDTH}px">
 		<tr>
@@ -361,6 +371,13 @@ $reconocimientos.=<<<RECON
 		  <td class="field">Asignatura manual:</td>
 		  <td class="input">
 		    <input type="text" id="masignatura_${ir}_${ia}" name="masignatura_${ir}_${ia}" value="$vma" class="confirm">
+		  </td>
+		</tr>
+
+		<tr id="smcodigo_${ir}_${ia}" class="hidden">
+		  <td class="field">Codigo manual:</td>
+		  <td class="input">
+		    <input type="text" id="mcodigo_${ir}_${ia}" name="mcodigo_${ir}_${ia}" value="$vca" class="confirm">
 		  </td>
 		</tr>
 
