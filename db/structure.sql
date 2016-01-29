@@ -1,6 +1,6 @@
--- create user 'sinfin'@'localhost' identified by '123';
--- grant all privileges on Sinfin.* to 'sinfin'@'localhost';
--- flush privileges;
+create user 'sinfin'@'localhost' identified by '123';
+grant all privileges on Sinfin.* to 'sinfin'@'localhost';
+flush privileges;
 create database Sinfin;
 use Sinfin;
 drop table if exists Programas,Planes,Cursos,Estudiantes;
