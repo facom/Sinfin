@@ -322,6 +322,26 @@ if(isset($action)){
 					"status"=>"",
 					"Planes_planid"=>"planid",
 					"Estudiantes_documento"=>"documento"));
+
+      //SEND EMAIL
+      if($action=="Aprobado"){
+	$headers="";
+	$headers.="From: noreply@udea.edu.co\r\n";
+	$headers.="Reply-to: noreply@udea.edu.co\r\n";
+	$headers.="MIME-Version: 1.0\r\n";
+	$headers.="MIME-Version: 1.0\r\n";
+	$headers.="Content-type: text/html\r\n";
+	$subject="[SInfIn] Reconocimiento de Materias Aprobado";
+$message=<<<M
+<p>
+  Señor(a) estudiante,
+</p>
+<p>
+</p>
+M;	
+        sendMail($email,$subject,$message,$headers);
+      }
+
       //SHOW STATUS
       statusMsg("Reconocimiento $recid almacenado...");
     }
