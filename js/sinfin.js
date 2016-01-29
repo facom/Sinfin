@@ -1,16 +1,5 @@
 $(document).ready(function(){
-    /*
-    var $confirm=$('[class="confirm"]');
-    var num=$confirm['length'];
-    for(i=0;i<num;i++){
-	var element=$confirm[i];
-	var val=element.getAttribute('value')
-	alert(val);
-	var name=element.getAttribute('name')
-	alert(name);
-	break;
-    }
-    */
+    //None
 });
 
 // Closure
@@ -66,7 +55,7 @@ function defaultSuccess(result){
     alert('Success:\n'+result);
 }
 function defaultError(xhttp,status,error){
-    alert('Error:\n'+error);
+    alert('Error:\n'+getAttrs(error));
 }
 
 function getAttrs(object,context){
@@ -80,8 +69,12 @@ function getAttrs(object,context){
     return attributes;
 }
 
-function ajaxDo(action,params='',onsuc=defaultSuccess,onerr=defaultError)
+function ajaxDo(action,params,onsuc,onerr)
 {
+    if(typeof(params)=='undefined'){params='';}
+    if(typeof(onsuc)=='undefined'){onsuc=defaultSuccess;}
+    if(typeof(onerr)=='undefined'){onerr=defaultError;}
+
     var ajax='ajax.php';
     
     jQuery.ajax({
@@ -269,7 +262,6 @@ function addRecon(element)
     }
     section++;
     var toggle="reconocimiento_"+section;
-    
     var $eblock=$('#i'+toggle);
     $eblock.css('display','block');
 
