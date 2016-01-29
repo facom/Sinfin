@@ -325,6 +325,15 @@ if(isset($action)){
 
       //SEND EMAIL
       if($action=="Aprobado"){
+        $Plan=mysqlCmd("select * from Planes where planid='$planid'");
+	$programaid=$Plan["Programas_programaid"];
+	$version=$Plan["version"];
+	$Programa=mysqlCmd("select * from Programas where programaid='$programaid'");
+	$programa=$Programa["programa"];
+	$recdir=getRecdir($recid);
+	$recbase="$recdir/recon";
+	$recurl=preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
+	
 	$headers="";
 	$headers.="From: noreply@udea.edu.co\r\n";
 	$headers.="Reply-to: noreply@udea.edu.co\r\n";
@@ -337,9 +346,33 @@ $message=<<<M
   Señor(a) estudiante,
 </p>
 <p>
+  La Coordinación de Pregrado ha analizado una solicitud de materias
+  radicada a nombre de <b>$nombre</b> (documento de
+  identidad <b>$documento</b>) para el programa de
+  pregrado <b>$programa</b> (versión <b>$version</b>).
 </p>
-M;	
-        sendMail($email,$subject,$message,$headers);
+<p>
+  Puede encontrar los detalles de los reconocimientos en este documento:
+  <a href=$recurl target=_blank>Formato de reconocimientos diligenciado</a>.
+</p>
+<p>
+  Su solicitud ha sido entregada al Departamento de Admisiones y
+  Registro para que la procesen.  En este momento el trámite esta en
+  manos de ellos. Solo a través suyo usted puede personalmente
+  averiguar el estado del proceso a partir de ahora.
+</p>
+<p>
+  Si tiene inquietudes sobre el resultado de la solicitud no dude en
+  contactar su coordinación de pregrado y preguntar por el caso <b>$recid</b>
+</p>
+<p>Atentamente,</p>
+<p>
+  <b>Coordinación de Pregrado</b><br/>
+  <b>Facultad de Ciencias Exactas y Naturales</b>
+</p>
+M;
+         sendMail($email,$subject,$message,$headers);
+         sendMail($EMAIL_USENAME,"[Historico] ".$subject,$message,$headers);
       }
 
       //SHOW STATUS

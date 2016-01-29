@@ -95,6 +95,7 @@ div.status{
     padding:10px;
     font-style:italic;
     overflow:auto;
+    zindex:10000;
 }
 div.errors{
     position:absolute;
@@ -106,6 +107,7 @@ div.errors{
     padding:10px;
     font-style:italic;
     overflow:auto;
+    zindex:10000;
 }
 tr.reservado{
     color:gray;
