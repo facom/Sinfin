@@ -25,6 +25,10 @@ if($arch==32){$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";}
 else{$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";}
 
 ////////////////////////////////////////////////////////////////////////
+//VERIFY IDENTITY
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////
 foreach(array_keys($_GET) as $field){
@@ -39,8 +43,8 @@ $TCOLD=$TWIDTH/2;
 $ERRORS="";
 $STATUS="";
 $RECONDIR="data/recon";
-
 $RECONSTATUS=array("Solicitado","Revisado","Aprobado");
+$SINFIN="<b>SInfIn</b>";
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -478,7 +482,7 @@ $menu=<<<M
   | <a href="reconoce.php">Reconocimientos</a>
   | <a href="documentos.php">Documentos</a>
   | <a href="ayuda.php">Ayuda</a>
-  | <a href="usuario.php">Usuario</a>
+  | <a href="usuarios.php">Usuarios</a>
 </div>
 M;
  return $menu;

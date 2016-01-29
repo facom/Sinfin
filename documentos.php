@@ -21,7 +21,7 @@ $content.=getMainMenu();
 ////////////////////////////////////////////////////////////////////////
 $content.=<<<M
 <div class="moduletitle">
-  Modulo de Planes de Estudio
+  Documentos
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 
@@ -35,26 +35,9 @@ M;
 ////////////////////////////////////////////////////////////////////////
 $content.=<<<C
 <p>
-En este módulo tendrá acceso a la información completa sobre los
-Planes de Estudio de los programas de pregrado ofrecidos por la
-Facultad de Ciencias Exactas y Naturales (FCEN).
+En este módulo tendrá acceso a documentos de interés sobre el
+Currículo en la Facultad de Ciencias Exactas y Naturales FCEN.
 </p>
-
-<p>Aquí encontrará:</p>
-
-<ul>
-
-<li>Lista de los programas de pregrado ofrecidos por la FCEN.</li>
-
-<li>Lista de las distintas versiones de los planes de estudio.</i>
-
-<li>Planes de estudio detallados de los programas.</li>
-
-<li>Diagramas de flujo curricular mostrando la relación entre los
-cursos de un determinado programa.</li>
-
-</ul>
-
 C;
 
 ////////////////////////////////////////////////////////////////////////
