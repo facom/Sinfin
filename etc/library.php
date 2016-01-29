@@ -451,10 +451,12 @@ $head=<<<H
 <td width=100px><image src="img/udea_fcen.jpg"/ height=120px></td>
 <td valign=bottom>
   <div class="title">
-    <a href="index.php">Sinfin</a><br/>
+    <a href="index.php">SInfIn</a><br/>
   </div>
   <div class="subtitle">
-    Sistema Integrado de Información Curricular
+    <span style="color:blue">S</span>istema 
+    <span style="color:blue">In</span>tegrado de 
+    <span style="color:blue">In</span>formación Curricular
   </div>
   <div class="affiliation">
     Facultad de Ciencias Exactas y Naturales<br/>
@@ -471,9 +473,12 @@ function getMainMenu()
 $menu=<<<M
 <div class="mainmenu">
   <a href="index.php">Principal</a>
-  | <a href="reconoce.php">Reconocimientos</a>
   | <a href="planes.php">Planes de Estudio</a> 
   | <a href="asignaturas.php">Planes de Asignatura</a> 
+  | <a href="reconoce.php">Reconocimientos</a>
+  | <a href="documentos.php">Documentos</a>
+  | <a href="ayuda.php">Ayuda</a>
+  | <a href="usuario.php">Usuario</a>
 </div>
 M;
  return $menu;

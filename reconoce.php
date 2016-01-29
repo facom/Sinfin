@@ -28,7 +28,6 @@ $content.=<<<M
   <a href="?">Inicio</a> 
   | <a href="?mode=lista">Lista</a>
   | <a href="?mode=edit&action=common">Nuevo</a> 
-  | <a href="?">Usuario</a> 
 </div>
 <div class="container">
 M;
@@ -339,8 +338,6 @@ if(!isset($mode)){
   //PRINCIPAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
-  <p>¡Bienvenido al modulo de reconocimientos!</p>  
-
   <p>Por reconocimiento entendemos el procedimiento en el que una o
   varias asignaturas que fueron matriculadas o aprobadas por un
   estudiante en la Universidad o en otra institución, son reconocidas
