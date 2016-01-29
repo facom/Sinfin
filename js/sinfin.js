@@ -146,9 +146,12 @@ function updateCredits(course,credit)
     $credito_show.val(creditos);
     if(codigo=="000000"){
 	$('#smasignatura_'+parts[1]+'_'+parts[2]).show();
+	$('#smcodigo_'+parts[1]+'_'+parts[2]).show();
     }else{
 	$('#smasignatura_'+parts[1]+'_'+parts[2]).hide();
 	$('#masignatura_'+parts[1]+'_'+parts[2]).val('');
+	$('#smcodigo_'+parts[1]+'_'+parts[2]).hide();
+	$('#mcodigo_'+parts[1]+'_'+parts[2]).val('');
     }
 }
 function updateMateria(course)

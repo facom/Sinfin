@@ -185,13 +185,11 @@ if(isset($action)){
       $ncred="creditos_${section}_${ncourse}";
       //$$ncred=$parts[1];
       $nsel="selasignatura_${section}_${ncourse}";
-      $cursos["000000:0"]="No listada";
       $$nsel=generateSelection($cursos,"$asignatura",$scurso);
     }
     else{
       $scurso="--";
       $nsel="selasignatura_${section}_${ncourse}";
-      $cursos["000000:0"]="No listada";
       $$nsel=generateSelection($cursos,"$asignatura",$scurso);
     }
   }
@@ -209,14 +207,12 @@ if(isset($action)){
 	$name="s".$materia;
 	$smateria=$$name;
 	$nsel="selmateria_${section}_${ncourse}";
-	$ccursos["000000:0"]="No listada";
 	$$nsel=generateSelection($ccursos,"$name",$smateria);
       }
       else{
 	$name="s".$materia;
 	$smateria="--";
 	$nsel="selmateria_${section}_${ncourse}";
-	$ccursos["000000:0"]="No listada";
 	$$nsel=generateSelection($ccursos,"$name",$smateria);
       }
     }
@@ -332,7 +328,7 @@ if(isset($action)){
 	$programa=$Programa["programa"];
 	$recdir=getRecdir($recid);
 	$recbase="$recdir/recon";
-	$recurl=preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
+	$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
 	
 	$headers="";
 	$headers.="From: noreply@udea.edu.co\r\n";
@@ -343,7 +339,7 @@ if(isset($action)){
 	$subject="[SInfIn] Reconocimiento de Materias Aprobado";
 $message=<<<M
 <p>
-  Señor(a) estudiante,
+  Señor(a) Estudiante,
 </p>
 <p>
   La Coordinación de Pregrado ha analizado una solicitud de materias
