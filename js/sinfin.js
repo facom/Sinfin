@@ -187,6 +187,7 @@ function updateAverage(numnota){
     }
 }
 function updateUniv(elem){
+    /*
     var univ=$(elem).val();
     var i;
     for(i=1;i<=10;i++){
@@ -197,6 +198,7 @@ function updateUniv(elem){
 	    $def['value']=univ;
 	}
     }
+    */
 }
 
 function activateUniv(element){
