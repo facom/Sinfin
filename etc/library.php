@@ -23,7 +23,6 @@ if(!file_exists(".arch")){
 //HTML 2 PDF CONVERTER
 if($arch==32){$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";}
 else{$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";}
-echo $H2PDF;
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
