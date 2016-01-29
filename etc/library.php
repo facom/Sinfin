@@ -242,7 +242,7 @@ function generateReconocimientos()
     $$var=$GLOBALS["$var"];
   }
 
-  $numrecon=20;
+  $numrecon=10;
   $nummaterias=3;
   $numasignaturas=3;
   $chidden="hidden";
