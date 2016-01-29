@@ -38,8 +38,42 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //ENTRAR
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+  if($action=="Entrar"){
+    //TEST FORM
+    if(isBlank($email) or
+       !preg_match("/@/",$email)){
+      errorMsg("Debe proveer un correo electrónico valido");
+      unset($mode);
+      goto endaction;
+    }
+    if(isBlank($password)){
+      errorMsg("Password no provisto");
+      unset($mode);
+      goto endaction;
+    }
+    if(strlen($ERRORS)==0){
+      //CHECK IF USER EXISTS
+      if($results=mysqlCmd("select * from Usuarios where email='$email'")){
+	$subpass=md5($password);
+	$nombre=$results["nombre"];
+	if($subpass==$results["password"]){
+	  statusMsg("Ingreso exitoso");
+	  $urlref="index.php";
+	  if(!preg_match("/usuarios/",$REFERER)){
+	    $urlref=$REFERER;
+	  }
+	  echo "Start session:<br/>";
+	  session_start();
+	  $_SESSION["nombre"]=$nombre;
+	  header("Refresh:1;url=$urlref");
+	}else{
+	  errorMsg("Password invalido");
+	}
+      }else{
+	errorMsg("Usuario no existe");
+      }
+    }
+  }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //FINAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,7 +94,7 @@ $content.=<<<C
 <table>
 <tr>
   <td>Usuario:</td>
-  <td><input type="text" name="email" placeholder="Su e-mail"></td>
+  <td><input type="text" name="email" placeholder="Su e-mail" value="$email"></td>
 </tr>
 <tr>
   <td>Contraseña:</td>
