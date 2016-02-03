@@ -1,9 +1,11 @@
 use Sinfin;
 
+alter table Reconocimientos add notificado varchar(255);
+/*alter table Estudiantes add column universidad varchar(255);*/
 /*alter table Reconocimientos add responsables varchar(255);*/
 /*alter table Reconocimientos drop column acto;*/
 /*alter table Reconocimientos add acto varchar(255);*/
-alter table Reconocimientos add column fechahora varchar(255);
+/*alter table Reconocimientos add column fechahora varchar(255);*/
 /*alter table Reconocimientos add acto varchar(255);*/
 /*alter table Reconocimientos add status varchar(10);*/
 /*
@@ -88,4 +90,6 @@ create table Usuarios (
 );
 */
 
+/*
 insert ignore into Usuarios (email,nombre,password,nivel) values ('pregradofisica@udea.edu.co','Pregrado Fisica',MD5('123'),'4');
+*/

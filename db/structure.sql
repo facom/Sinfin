@@ -102,6 +102,7 @@ create table Estudiantes (
        nombre varchar(100),
        email varchar(100),
        password varchar(50),
+       universidad varchar(255),
 
        -- Relation
        -- Estudiante puede haber estado matriculado en 3 programas
@@ -131,6 +132,8 @@ create table Reconocimientos (
        fecha varchar(50),
        fechahora varchar(50),
        status varchar(10),
+       notificado varchar(255),       
+
        -- e.g. Acta 23 de 2016, Comité de Pregrado
        acto varchar(255),
 
