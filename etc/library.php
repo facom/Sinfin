@@ -3,7 +3,9 @@
 //EXTERNAL LIBRARIES
 ////////////////////////////////////////////////////////////////////////
 require "lib/PHPMailer/PHPMailerAutoload.php";
+session_start();
 header("Content-Type: text/html;charset=UTF-8");
+//echo "Usuario:".$_SESSION["nombre"];
 
 ////////////////////////////////////////////////////////////////////////
 //CONFIGURATION
@@ -586,6 +588,7 @@ $menu=<<<M
   | <a href="documentos.php">Documentos</a>
   | <a href="ayuda.php">Ayuda</a>
   | <a href="usuarios.php">Usuarios</a>
+  | <a href="actions.php?action=Cerrar">Cerrar</a>
 </div>
 M;
  return $menu;
