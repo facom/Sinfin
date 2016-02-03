@@ -51,6 +51,7 @@ if(isset($action)){
   //LOAD DATA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="load"){
+
     if(!($recdir=getRecdir($recid))){
       errorMsg("No se encontro el reconocimiento '$recid'");
     }else{    
@@ -315,6 +316,7 @@ if(isset($action)){
       //UNSET VARIABLES
       unset($_POST["action"]);
       unset($_POST["mode"]);
+      $_POST["recid"]=$recid;
 
       //SAVE SERIALIZED ARRAY
       $fl=fopen($recfile,"w");
@@ -322,14 +324,25 @@ if(isset($action)){
       fclose($fl);
 
       //SET STATUS
+      $notificado="";
+      $qnotificado=0;
       if($action=="Guardar"){$status=0;}
-      if($action=="Revisada"){$status=1;}
-      if($action=="Aprobada"){$status=2;}
+      if($action=="Revisado"){$status=1;}
+      if($action=="Aprobado"){
+	$status=2;
+	if(isBlank($notificado)){
+	  $notificado=$DATE;
+	}else{
+	  $qnotificado=1;
+	}
+      }
 
       //UPDATING STUDENTS DATABASE
       insertSql("Estudiantes",array("documento"=>"",
 				    "nombre"=>"",
-				    "email"=>""));
+				    "email"=>"",
+				    "universidad"=>""));
+
       //UPDATING RECONOCIMIENTOS
       insertSql("Reconocimientos",array("recid"=>"",
 					"fecha"=>"date",
@@ -337,11 +350,12 @@ if(isset($action)){
 					"acto"=>"",
 					"responsables"=>"",
 					"status"=>"",
+					"notificado"=>"",
 					"Planes_planid"=>"planid",
 					"Estudiantes_documento"=>"documento"));
 
       //SEND EMAIL
-      if($action=="Aprobado"){
+      if($action=="Aprobado" and !$qnotificado){
         $Plan=mysqlCmd("select * from Planes where planid='$planid'");
 	$programaid=$Plan["Programas_programaid"];
 	$version=$Plan["version"];
@@ -448,7 +462,7 @@ else{
     $content.="<h2>Solicitudes de Reconocimiento de Materias</h2>";
     $table="";
 $table.=<<<C
-<table width=100% border=1px>
+<table width=100% border=1px style="font-size:12px">
   <thead>
     <tr>
       <th>ID</th>
@@ -456,6 +470,7 @@ $table.=<<<C
       <th>Estado</th>
       <th>Documento</th>
       <th>Nombre</th>
+      <th>Universidad</th>
       <th>Programa</th>
       <th>Acciones</th>
     </tr>
@@ -468,7 +483,7 @@ C;
       $qtable=1;
       $i=1;
 
-      $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid");
+      $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid","notificado");
       foreach($results as $result){
 	$color="white";
 	foreach($fields as $field){
@@ -477,6 +492,8 @@ C;
 	}
 	$Estudiante=mysqlCmd("select * from Estudiantes where documento='$lEstudiantes_documento'");
 	$lnombre=$Estudiante["nombre"];
+	$luniversidad=$Estudiante["universidad"];
+	if(isBlank($luniversidad)){$luniversidad="--";}
 
 	$Plan=mysqlCmd("select * from Planes where planid='$lPlanes_planid'");
 	$lprogramaid=$Plan["Programas_programaid"];
@@ -485,9 +502,15 @@ C;
 	$lprograma=$Programa["programa"];
 	
 	if(isBlank($lstatus)){$lstatus=0;}
-	if($lstatus==1){$color="pink";}
-	if($lstatus==2){$color="lightblue";}
 	$lstatus=$RECONSTATUS[$lstatus];
+	if($lstatus=="Revisado"){$color="pink";}
+	if($lstatus=="Aprobado"){
+	  $color="lightblue";
+	  if(!isBlank($lnotificado)){
+	    $color="lightgreen";
+	    $lstatus="Notificado";
+	  }
+	}
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
 	$edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
@@ -502,6 +525,7 @@ $table.=<<<C
   <td>$lstatus<br/><i>$lacto</i></td>
   <td>$lEstudiantes_documento</td>
   <td>$lnombre</td>
+  <td>$luniversidad</td>
   <td>$lprograma (versión $lversion)</td>
   <td>
     $edit
@@ -552,17 +576,38 @@ C;
     }
 
     //FORM
+$buttons.=<<<B
+    <tr class="boton">
+      <td colspan=2>
+	<input type="submit" name="action" value="Guardar">
+	<input type="submit" name="action" value="Cancelar">
+	<input type="reset" value="Limpiar">
+	<input type="submit" name="action" value="Revisado">
+	<input type="submit" name="action" value="Aprobado">
+      </td>
+    </tr>
+B;
+
 $content.=<<<C
 <center>
 <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
   $inprecfile
   <input type="hidden" name="mode" value="lista">
   <table border="${TBORDER}px" width="${TWIDTH}px">
+  $buttons
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
     <!-- INFORMACION -->
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
     <tr>
       <td colspan=2 class="section">Información Estudiante</td>
+    </tr>
+
+    <tr class="form-field">
+      <td class="field">ID:</td>
+      <td class="input">
+        $recid
+      </td>
+      <input type="hidden" name="recid" value="$recid">
     </tr>
 
     <tr class="form-field">
@@ -618,8 +663,9 @@ $content.=<<<C
     <tr class="form-field reservado">
       <td class="field">Estado:</td>
       <td class="input">
-	$rstatus
+        $rstatus
 	<input type="hidden" name="status" value="$status">
+	<input type="hidden" name="status" value="$notificado">
       </td>
     </tr>
 
@@ -652,16 +698,7 @@ $content.=<<<C
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
     <!-- BUTTONS -->
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
-    <tr class="boton">
-      <td colspan=2>
-	<input type="submit" name="action" value="Guardar">
-	<input type="submit" name="action" value="Cancelar">
-	<input type="reset" value="Limpiar">
-	<input type="submit" name="action" value="Revisado">
-	<input type="submit" name="action" value="Aprobado">
-      </td>
-    </tr>
-
+  $buttons
   </table>
 </form>
 </center>

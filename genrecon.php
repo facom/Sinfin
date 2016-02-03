@@ -93,6 +93,11 @@ foreach($reconocimientos as $ir){
       $select=$$name;
       $name="mmateria_${ir}_${im}";
       $manual=$$name;
+      $name="semestre_${ir}_${im}";
+      $semestre=$$name;
+      if(!isBlank($semestre)){
+	$semtxt=" ($semestre)";
+      }else{$semtxt="";}
       if(!isBlank($manual)){
 	$materia=$manual;
       }
@@ -107,7 +112,8 @@ foreach($reconocimientos as $ir){
       }
       array_push($materias,
 		 array("universidad"=>$univ,
-		       "materia"=>$materia)
+		       "materia"=>$materia,
+		       "semestre"=>$semtxt)
 		 );
     }
   }
@@ -176,9 +182,10 @@ foreach($reconocimientos as $ir){
       $materia=$materias[$im]["materia"];
       $obstextm[$ir].="$materia,";
       $universidad=$materias[$im]["universidad"];
+      $semtxt=$materias[$im]["semestre"];
       if($debug){echo "$im:$materia,$universidad<br/>";}
       $hrow.="<td class=content style='$border'>$materia</td>";
-      $hrow.="<td class=content style='$borderd'>$universidad</td>";
+      $hrow.="<td class=content style='$borderd'>$universidad$semtxt</td>";
     }else{
       if($debug){echo "No hay materia $im<br/>";}
       $hrow.="<td class=content style='$border'></td>";
@@ -377,8 +384,8 @@ $format.=<<<F
 	<table border=0 style='$border;' width=100% cellspacing=0 cellpadding=0>
 	  <thead>
 	    <tr>
-	      <td width=30%></td>
-	      <td width=10%></td>
+	      <td width=25%></td>
+	      <td width=15%></td>
 
 	      <td width=7%></td>
 	      <td width=10%></td>
