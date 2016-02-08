@@ -365,12 +365,6 @@ if(isset($action)){
 	$recbase="$recdir/recon";
 	$recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recbase).".pdf";
 
-	$headers="";
-	$headers.="From: noreply@udea.edu.co\r\n";
-	$headers.="Reply-to: noreply@udea.edu.co\r\n";
-	$headers.="MIME-Version: 1.0\r\n";
-	$headers.="MIME-Version: 1.0\r\n";
-	$headers.="Content-type: text/html\r\n";
 	$subject="[SInfIn] Reconocimiento de Materias Aprobado";
 $message=<<<M
 <p>
@@ -402,7 +396,7 @@ $message=<<<M
   <b>Facultad de Ciencias Exactas y Naturales</b>
 </p>
 M;
-         sendMail($email,$subject,$message,$headers);
+         sendMail($email,$subject,$message,$EHEADERS);
          sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$headers);
 	 statusMsg("Mensaje enviado a $email y $EMAIL_USERNAME");
       }
@@ -467,6 +461,7 @@ $table.=<<<C
     <tr>
       <th>ID</th>
       <th>Fecha</th>
+      <th>Instituto</th>
       <th>Estado</th>
       <th>Documento</th>
       <th>Nombre</th>
@@ -478,12 +473,42 @@ $table.=<<<C
 C;
 
     $qtable=0;
-    $results=mysqlCmd("select * from Reconocimientos order by fechahora desc,Estudiantes_documento asc",$qout=1);
+
+    $where="";
+    $seleccion="<p><b>Selección</b>: ";
+    if(isset($DOCUMENTO)){
+      //REGULAR USER
+      if($QPERMISO<=1){
+	$where="where Estudiantes_documento='$DOCUMENTO'";
+	$seleccion.="documento $DOCUMENTO";
+      }else
+      //COORDINADOR
+      if($QPERMISO==3){
+	if(preg_match("/instituto=(\w+);/",$PARAMETROS,$matches)){
+	  $instituto=$matches[1];
+	  $where="where instituto='$instituto'";
+	  $seleccion.="instituto $instituto";
+	}else{
+	  $where="Estudiantes_documento=''";
+	  $seleccion.="<i>No parametros</i>";
+	}
+      }
+      //ADMINISTRADOR
+      if($QPERMISO==4){
+	$where="";
+	$seleccion.="<i>Todos</i>";
+      }
+    }
+    $seleccion.="</p>";
+    $content.="$seleccion";
+
+    $results=mysqlCmd("select * from Reconocimientos $where order by fechahora desc,Estudiantes_documento asc",$qout=1);
+
     if($results){
       $qtable=1;
       $i=1;
 
-      $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid","notificado");
+      $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid","notificado","instituto");
       foreach($results as $result){
 	$color="white";
 	foreach($fields as $field){
@@ -522,6 +547,7 @@ $table.=<<<C
 <tr style="background:$color">
   <td>$lrecid</td>
   <td>$lfecha</td>
+  <td>$linstituto</td>
   <td>$lstatus<br/><i>$lacto</i></td>
   <td>$lEstudiantes_documento</td>
   <td>$lnombre</td>
@@ -590,7 +616,7 @@ B;
 
 $content.=<<<C
 <center>
-<form method="post" enctype="multipart/form-data" accept-charset="utf-8">
+$FORM
   $inprecfile
   <input type="hidden" name="mode" value="lista">
   <table border="${TBORDER}px" width="${TWIDTH}px">

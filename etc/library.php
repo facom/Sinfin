@@ -29,6 +29,32 @@ else{$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";}
 ////////////////////////////////////////////////////////////////////////
 //VERIFY IDENTITY
 ////////////////////////////////////////////////////////////////////////
+$QPERMISO=0;
+$NOMBRE="Anynymous";
+if(isset($_SESSION["permisos"])){
+  $QPERMISO=$_SESSION["permisos"];
+  $NOMBRE=$_SESSION["nombre"];
+  $DOCUMENTO=$_SESSION["documento"];
+  $PARAMETROS=$_SESSION["parametros"];
+}
+$PERMCSS="";
+$perm="inline";
+if($QPERMISO){$perm="none";}
+$PERMCSS.=".level0{display:$perm;}\n";
+for($i=1;$i<=4;$i++){
+  $perm="none";
+  if($i<=$QPERMISO){$perm="inline";}
+  $PERMCSS.=".level$i{display:$perm;}\n";
+}
+//echo "PERMS:<pre>$PERMCSS</pre><br/>";
+/*
+  Permisos
+ */
+$PERMISOS=array("0"=>"Anónimo",
+		"1"=>"Consulta",
+		"2"=>"Profesor",
+		"3"=>"Coordinador",
+		"4"=>"Administrador");
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -62,6 +88,15 @@ echo "<br/>SESSION:";
 print_r($_SESSION);
 */
 //phpinfo();
+
+$EHEADERS="";
+$EHEADERS.="From: noreply@udea.edu.co\r\n";
+$EHEADERS.="Reply-to: noreply@udea.edu.co\r\n";
+$EHEADERS.="MIME-Version: 1.0\r\n";
+$EHEADERS.="MIME-Version: 1.0\r\n";
+$EHEADERS.="Content-type: text/html\r\n";
+
+$FORM="<form method='post' enctype='multipart/form-data' accept-charset='utf-8'>";
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -459,6 +494,7 @@ function statusMsg($msg)
 
 function getHeaders()
 {
+  global $PERMCSS;
 $header=<<<H
 <!-- ---------------------------------------------------------------------- -->
 <!-- HEADER -->
@@ -474,6 +510,7 @@ $header=<<<H
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="js/sinfin.js"></script>
   <style>
+    $PERMCSS 
     #diagonal_label {
     height:50px;
     line-height:25px;
@@ -579,6 +616,9 @@ H;
 
 function getMainMenu()
 {
+  global $QPERMISO,$NOMBRE,$PERMISOS;
+  $permiso=$PERMISOS["$QPERMISO"];
+  $urlref=urlencode($_SERVER["REQUEST_URI"]);
 $menu=<<<M
 <div class="mainmenu">
   <a href="index.php">Principal</a>
@@ -587,8 +627,10 @@ $menu=<<<M
   | <a href="reconoce.php">Reconocimientos</a>
   | <a href="documentos.php">Documentos</a>
   | <a href="ayuda.php">Ayuda</a>
-  | <a href="usuarios.php">Usuarios</a>
-  | <a href="actions.php?action=Cerrar">Cerrar</a>
+  <span class="level0">| <a href="usuarios.php?urlref=$urlref">Usuarios</a></span>
+  <span class="level1">
+  | Sesión de <b>$NOMBRE</b> ($permiso) - <a href="actions.php?action=Cerrar">Cerrar</a>
+  </span>
 </div>
 M;
  return $menu;

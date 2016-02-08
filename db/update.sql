@@ -1,6 +1,18 @@
 use Sinfin;
 
-alter table Reconocimientos add notificado varchar(255);
+/*
+alter table Usuarios add column documento varchar(50);
+alter table Usuarios drop column nivel;
+alter table Usuarios add column permisos varchar(2);
+*/
+/*alter table Usuarios add column parametros varchar(1000) default '';*/
+alter table Reconocimientos add column instituto varchar(255);
+/*
+alter table Usuarios drop column permisos;
+alter table Usuarios add column permisos varchar(2) default '1';
+alter table Usuarios add column activada varchar(2) default '0';
+*/
+/*alter table Reconocimientos add notificado varchar(255);*/
 /*alter table Estudiantes add column universidad varchar(255);*/
 /*alter table Reconocimientos add responsables varchar(255);*/
 /*alter table Reconocimientos drop column acto;*/
