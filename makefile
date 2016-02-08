@@ -44,3 +44,6 @@ restore:
 permissions:
 	@echo "Setting web permissions..."
 	@chown -R www-data.www-data .
+
+edit:
+	@emacs -nw makefile *.php etc/library.php 
