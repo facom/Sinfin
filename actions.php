@@ -17,10 +17,7 @@ if(isset($action)){
   //CERRAR SESSION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Cerrar"){
-    $urlref="index.php";
-    if(!preg_match("/usuarios/",$REFERER)){
-      $urlref=$REFERER;
-    }
+    $urlref="$SITEURL/index.php";
     session_unset();
     header("Refresh:0;url=$urlref");
   }  

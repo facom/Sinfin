@@ -136,6 +136,7 @@ create table Reconocimientos (
 
        -- e.g. Acta 23 de 2016, Comité de Pregrado
        acto varchar(255),
+       instituto varchar(255),
 
        -- Relation
        -- Plan en el que se realizan reconocimientos
@@ -155,9 +156,11 @@ create table Usuarios (
        email varchar(50),
        nombre varchar(50),
        password varchar(255),
+       documento varchar(255),
 
        -- e.g. Nivel de permisos 1, Basico ; 2, Profesor; 3, Administrador
-       nivel varchar(2),
+       permisos varchar(2) default '1',
+       activada varchar(2) default '0',
 
        -- Extras
        extra1 varchar(255),
