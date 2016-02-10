@@ -5,11 +5,14 @@ alter table Usuarios add column documento varchar(50);
 alter table Usuarios drop column nivel;
 alter table Usuarios add column permisos varchar(2);
 */
+/*
 alter table Usuarios add column documento varchar(50);
 alter table Usuarios add column parametros varchar(1000) default '';
 alter table Usuarios drop column nivel;
 alter table Usuarios add column permisos varchar(2);
 alter table Reconocimientos add column instituto varchar(255);
+*/
+alter table Usuarios add column activada varchar(2) default '0';
 
 /*
 alter table Usuarios drop column permisos;
