@@ -89,9 +89,22 @@ function onUpdate(cursos)
     var $ecursos=$('.cursos');
     $ecursos.html(cursos);
 }
+
 function updateCourses(element)
 {
     ajaxDo('updatecourses','planid:'+element[element.selectedIndex].value,onUpdate);
+}
+
+function onUpdateInstituto(instituto)
+{
+    var $einstituto=$('#instituto');
+    $einstituto.html(instituto);
+    var $einstituto_form=$('#instituto_form');
+    $einstituto_form.val(instituto);
+}
+function updateInstituto(element)
+{
+    ajaxDo('updateinstituto','planid:'+element[element.selectedIndex].value,onUpdateInstituto);
 }
 
 function oncUpdate(cursos)
