@@ -27,7 +27,7 @@ $content.=<<<M
 <div class="submenu">
   <a href="?">Inicio</a> 
   | <a href="?mode=lista">Lista</a>
-  | <a href="?mode=edit&action=common">Nuevo</a> 
+  <span class="level1">| <a href="?mode=edit&action=common">Nuevo</a></span>
 </div>
 <div class="container">
 M;
@@ -125,6 +125,11 @@ if(isset($action)){
   $selprogramas=generateSelection($programas,"planid",$planid);
   $programas["other"]="Otro";
   $cselprogramas=generateSelection($programas,"planid",$cplanid);
+
+  //////////////////////////////////////////
+  //INSTITUTO
+  //////////////////////////////////////////
+  $selinstituto=generateSelection($INSTITUTOS,"instituto",$instituto);
 
   //////////////////////////////////////////
   //GET COURSES THAT CHANGED
@@ -241,7 +246,7 @@ if(isset($action)){
     statusMsg("Edición cancelada.");
     goto endaction;
   }
-  if($action=="Guardar" or
+  if($action=="Solicitar" or
      $action=="Revisado" or
      $action=="Aprobado"
      ){
@@ -326,7 +331,7 @@ if(isset($action)){
       //SET STATUS
       $notificado="";
       $qnotificado=0;
-      if($action=="Guardar"){$status=0;}
+      if($action=="Solicitar"){$status=0;}
       if($action=="Revisado"){$status=1;}
       if($action=="Aprobado"){
 	$status=2;
@@ -351,6 +356,7 @@ if(isset($action)){
 					"responsables"=>"",
 					"status"=>"",
 					"notificado"=>"",
+					"instituto"=>"",
 					"Planes_planid"=>"planid",
 					"Estudiantes_documento"=>"documento"));
 
@@ -538,9 +544,23 @@ C;
 	}
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
-	$edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
-	$delete="<a href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
-	$preview="<a href=genrecon.php?recid=$lrecid target=_blank>Ver</a><br/>";
+	if(($lstatus!="Revisado" and
+	   $lstatus!="Aprobado") or
+	   $QPERMISO>1){
+	  $edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
+	}else{$edit="";}
+	$delete="<a class='level3' href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
+	$generar="<a class='level3' href=genrecon.php?recid=$lrecid target=_blank>Generar</a><br/>";
+	
+	$recdir=getRecdir($lrecid);
+	$recbase="$recdir/recon";
+	$recurl=preg_replace("/^\/.+\/data/","data",$recbase);
+	
+	if(file_exists("$recbase.pdf")){
+	  $view="<a href=$recurl.pdf target=_blank>Ver</a><br/>";
+	}else{
+	  $view="No disponible";
+	}
 
       //RENDER TABLE ROW
 $table.=<<<C
@@ -555,8 +575,9 @@ $table.=<<<C
   <td>$lprograma (versión $lversion)</td>
   <td>
     $edit
+    $view
+    $generar
     $delete
-    $preview
   </td>
 </tr>
 C;
@@ -586,6 +607,10 @@ C;
     //TABLE OF RECONOCIMIENTOS
     $reconocimientos=generateReconocimientos();
 
+    //RECDIR
+    $recdir=getRecdir($recid);
+    $recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recdir);
+
     //INPUT FILE
     if(isset($recfile)){
       $inprecfile="<input type='hidden' name='recfile' value='$recfile'><input type='hidden' name='recid' value='$recid'>";
@@ -605,11 +630,10 @@ C;
 $buttons.=<<<B
     <tr class="boton">
       <td colspan=2>
-	<input type="submit" name="action" value="Guardar">
+	<input class="level3" type="submit" name="action" value="Revisado">
+	<input class="level4" type="submit" name="action" value="Aprobado">
+	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Cancelar">
-	<input type="reset" value="Limpiar">
-	<input type="submit" name="action" value="Revisado">
-	<input type="submit" name="action" value="Aprobado">
       </td>
     </tr>
 B;
@@ -676,17 +700,38 @@ $FORM
     </tr>
 
     <tr class="form-field">
+      <td class="field">Certificado de notas:</td>
+      <td class="input">
+	<input type="file" name="certificado_notas" value="$certificado_notas"><br/>
+	Archivo: $recurl <a href=$recurl/$certificado_notas>$certificado_notas</a>
+      </td>
+    </tr>
+
+    <tr class="form-field">
       <td class="field">Programa al que ingresa:</td>
       <td class="input">
-	<select name="planid" onchange="updateCourses(this)">
+	<select name="planid" onchange="updateCourses(this);updateInstituto(this);">
 	  $selprogramas
 	</select>
       </td>
     </tr>
 
-    <tr class="reservado"><td colspan=2><hr/><b>Reservado para la Coordinación</b></td></tr>
+    <tr class="form-field">
+      <td class="field">Instituto al que ingresa:</td>
+      <td class="input">
+	<span id="instituto">$instituto</span>
+	<input id="instituto_form" type="hidden" name="instituto" value="$instituto">
+	<!--
+	<select name="instituto">
+	  $selinstituto
+	</select>
+	-->
+      </td>
+    </tr>
+
+    <tr class="reservado level3"><td colspan=2><hr/><b>Reservado para la Coordinación</b></td></tr>
   
-    <tr class="form-field reservado">
+    <tr class="form-field reservado level3">
       <td class="field">Estado:</td>
       <td class="input">
         $rstatus
@@ -695,12 +740,12 @@ $FORM
       </td>
     </tr>
 
-    <tr class="form-field reservado">
+    <tr class="form-field reservado level3">
       <td class="field">Acto administrativo:</td>
       <td class="input"><input type="text" name="acto" value="$acto"></td>
     </tr>
 
-    <tr class="form-field reservado">
+    <tr class="form-field reservado level3">
       <td class="field">Responsables:</td>
       <td class="input"><input type="text" name="responsables" value="$responsables"></td>
     </tr>

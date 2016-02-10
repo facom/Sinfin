@@ -36,7 +36,35 @@ M;
 if(isset($action)){
   if(0){}else
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //REGISTART
+  //CAMBIAR
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Cambiar"){
+    //TEST FORM
+    if(isBlank($pass1) or
+       isBlank($pass2)){
+      errorMsg("Debe proveer una contraseña");
+      goto endaction;
+    }
+    if($pass1!=$pass2){
+      errorMsg("Las contraseñas no coinciden");
+      goto endaction;
+    }
+    $results=mysqlCmd("select * from Usuarios where email='$email'");
+    $spass=$results["password"];
+    if($pass!=$spass){
+      errorMsg("Fallo en la autenticación");
+      goto endaction;
+    }
+    if(strlen($ERRORS)==0){
+      $password=md5($pass1);
+      mysqlCmd("update Usuarios set password='$password' where email='$email'");
+      statusMsg("Contraseña modificada");
+      unset($mode);
+      header("Refresh:1;url=$SITEURL/usuarios.php");
+    }
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //REGISTAR
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Registrese"){
     //TEST FORM
@@ -83,6 +111,7 @@ if(isset($action)){
       //MESSAGES
       statusMsg("Usuario registrado. Revise su e-mail y active su cuenta.");
       unset($mode);
+
 $message=<<<M
 <p>
   Señor(a) Usuario,
@@ -119,10 +148,48 @@ M;
     }
   }else
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //ENTRAR
+  //CONFIRMAR
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="confirmar"){
     statusMsg("Cuenta de $email activada");
+    header("Refresh:1;url=$SITEURL/usuarios.php");
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //RECUPERA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Recupera"){
+    
+    if($results=mysqlCmd("select * from Usuarios where email='$email'")){
+
+      $pass=$results["password"];
+
+$message=<<<M
+<p>
+  Señor(a) Usuario,
+</p>
+<p>
+  Hemos recibido una solicitud de recuperación de su contraseña
+  en $SINFIN. Para cambiar su contraseña actual vaya al enlace provisto abajo:
+</p>
+<p>
+  <a href="$SITEURL/usuarios.php?mode=cambiar&email=$email&pass=$pass">Click para cambiar su contraseña</a>
+</p>
+<p>Atentamente,</p>
+<p>
+  <b>Coordinación de Pregrado</b><br/>
+  <b>Facultad de Ciencias Exactas y Naturales</b>
+</p>
+M;
+      $subject="[SInfIn] Cambio de contraseña";
+
+      sendMail($email,$subject,$message,$EHEADERS);
+
+      statusMsg("Hemos enviado un mensaje de recuperación a su cuenta de correo");
+    }else{
+      errorMsg("Correo electrónico no reconocido.");
+      $mode="recupera";
+      goto endaction;
+    }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //ENTRAR
@@ -137,6 +204,11 @@ M;
     }
     if(isBlank($password)){
       errorMsg("Password no provisto");
+      unset($mode);
+      goto endaction;
+    }
+    if(!mysqlCmd("select * from Usuarios where email='$email'")){
+      errorMsg("No existe un usuario asociado a este correo electrónico");
       unset($mode);
       goto endaction;
     }
@@ -156,6 +228,7 @@ M;
 	    if(preg_match("/^\d$/",$key)){continue;}
 	    $_SESSION["$key"]=$results[$key];
 	  }
+	  if(preg_match("/usuarios/",$urlref)){$urlref="index.php";}
 	  header("Refresh:1;url=$urlref");
 	}else{
 	  errorMsg("Password invalido");
@@ -262,6 +335,40 @@ $content.=<<<C
 </table>
 </form>
 C;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CAMBIO DE CONTRASEÑA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($mode=="cambiar"){
+    $results=mysqlCmd("select * from Usuarios where email='$email'");
+    $spass=$results["password"];
+    if($pass==$spass){
+$content.=<<<C
+$FORM
+<h3>Cambio de Contraseña para $email</h3>
+<input type="hidden" name="pass" value="$pass">
+<input type="hidden" name="email" value="$email">
+<table>
+<tr>
+  <td>Contraseña nueva:</td>
+  <td><input type="password" name="pass1" placeholder="Su contraseña"></td>
+</tr>
+<tr>
+  <td>Repita su contraseña:</td>
+  <td><input type="password" name="pass2" placeholder="Su contraseña otra vez"></td>
+</tr>
+<tr>
+  <td colspan=2>
+    <input type="submit" name="action" value="Cambiar">
+  </td>
+</tr>
+</table>
+</form>
+C;
+    }else{
+      errorMsg("Contraseña no reconocida");
+      $content.="<i>Fallo de autenticación</i>";
+    }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //FINAL

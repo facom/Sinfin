@@ -6,6 +6,7 @@ tr.form-field{
 }
 td.field{
     border:solid blue 0px;
+    vertical-align:top;
 }
 td.input{
     border:solid green 0px;

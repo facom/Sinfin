@@ -39,12 +39,17 @@ if(isset($_SESSION["permisos"])){
 }
 $PERMCSS="";
 $perm="inline";
-if($QPERMISO){$perm="none";}
-$PERMCSS.=".level0{display:$perm;}\n";
+$nperm="none";
+if($QPERMISO){
+  $perm="none";
+  $nperm="inline";
+}
+$PERMCSS.=".level0{display:$perm;}\n.nolevel0{display:$nperm;}\n";
 for($i=1;$i<=4;$i++){
   $perm="none";
-  if($i<=$QPERMISO){$perm="inline";}
-  $PERMCSS.=".level$i{display:$perm;}\n";
+  $nperm="inline";
+  if($i<=$QPERMISO){$perm="inline";$nperm="none";}
+  $PERMCSS.=".level$i{display:$perm;}\n.nolevel$i{display:$nperm;}\n";
 }
 //echo "PERMS:<pre>$PERMCSS</pre><br/>";
 /*
@@ -55,6 +60,11 @@ $PERMISOS=array("0"=>"Anónimo",
 		"2"=>"Profesor",
 		"3"=>"Coordinador",
 		"4"=>"Administrador");
+
+$INSTITUTOS=array("fisica"=>"Instituto de Física",
+		  "biologia"=>"Instituto de Biología",
+		  "quimica"=>"Instituto de Química",
+		  "quimica"=>"Instituto de Matemáticas");
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -286,6 +296,9 @@ function generateReconocimientos()
 
   $reconocimientos="";
   $hidden="";
+  $recdir=getRecdir($recid);
+  $recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recdir);
+
   for($ir=1;$ir<=$numrecon;$ir++){
 
     $nqr="qreconocimiento_${ir}";
@@ -328,6 +341,8 @@ RECON;
 	  $vmm=$$nmm;
 	  $nsemestre="semestre_${ir}_${im}";
 	  $vsemestre=$$nsemestre;
+	  $nprograma="programa_${ir}_${im}";
+	  $vprograma=$$nprograma;
 
 	  //SELECT TYPE OF MATERIA INPUT
 	  $input="";
@@ -360,6 +375,12 @@ $reconocimientos.=<<<RECON
 		  </td>
 		</tr>
 		
+		<tr><!-- class="ccursos_input"-->
+		  <td class="field">Programa de la asignatura:</td><td class="input">
+		    <input type="file" name="programa_${ir}_${im}" value="$vprograma"><br/>
+		    Archivo: $recurl <a href=$recurl/$vprograma>$vprograma</a>
+		  </td>
+		</tr>
 
 		<tr><td class="field">Universidad:</td><td class="input"><input class="univ" type="text" name="univ_${ir}_${im}" value="$vuniv"></td></tr>
 		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
@@ -380,9 +401,9 @@ RECON;
 	}
 
 $reconocimientos.=<<<RECON
-	  <tr><td class="materias">Reconocida por</td></tr>
+	  <tr class="level3"><td class="materias">Reconocida por</td></tr>
 
-	  <tr class="materias_reconocidas">
+	  <tr class="materias_reconocidas level3">
 
 	    <td>
 
@@ -494,22 +515,26 @@ function statusMsg($msg)
 
 function getHeaders()
 {
-  global $PERMCSS;
-$header=<<<H
-<!-- ---------------------------------------------------------------------- -->
-<!-- HEADER -->
-<!-- ---------------------------------------------------------------------- -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-  <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
-  <link rel="stylesheet" href="css/sinfin.css" />
-  <script src="lib/jquery-ui/jquery.min.js"></script>
-  <script src="lib/jquery-ui/jquery.min.js"></script>
-  <script src="lib/jquery-ui/jquery-ui.min.js"></script>
-  <script src="lib/jquery-ui/moment.min-locales.js"></script>
-  <script src="lib/jquery-ui/moment.min-locales.js"></script>
-  <script src="js/sinfin.js"></script>
-  <style>
+  global $PERMCSS,$QPERMISO;
+  
+  //STYLES
+  $style="<style>\n";
+
+  //SPECIAL
+  $colors=array("0"=>"white",
+		"1"=>"lightblue",
+		"2"=>"lightgreen",
+		"3"=>"pink",
+		"4"=>"pink");
+  if($QPERMISO>0){
+    $color=$colors[$QPERMISO];
+    $style.=".menuperm{background:$color;}\n";
+  }else{
+    $style.=".menuperm{}\n";
+  }
+
+  //DIAGONAL LABEL
+$style.=<<<S
     $PERMCSS 
     #diagonal_label {
     height:50px;
@@ -569,8 +594,26 @@ $header=<<<H
 
     #break { display: block; }
     }    
-  </style>
+S;
 
+
+    $style.="</style>\n";
+
+$header=<<<H
+<!-- ---------------------------------------------------------------------- -->
+<!-- HEADER -->
+<!-- ---------------------------------------------------------------------- -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
+  <link rel="stylesheet" href="css/sinfin.css" />
+  <script src="lib/jquery-ui/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+  <script src="lib/jquery-ui/moment.min-locales.js"></script>
+  <script src="lib/jquery-ui/moment.min-locales.js"></script>
+  <script src="js/sinfin.js"></script>
+  $style
 </head>
 <body>
 
@@ -620,7 +663,7 @@ function getMainMenu()
   $permiso=$PERMISOS["$QPERMISO"];
   $urlref=urlencode($_SERVER["REQUEST_URI"]);
 $menu=<<<M
-<div class="mainmenu">
+<div class="mainmenu menuperm">
   <a href="index.php">Principal</a>
   | <a href="planes.php">Planes de Estudio</a> 
   | <a href="asignaturas.php">Planes de Asignatura</a> 

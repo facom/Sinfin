@@ -13,6 +13,9 @@ if($action=="test"){
   $html.="Test";
 }
 else
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//UPDATE COURSE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if($action=="updatecourses"){
   $ps=parseParams($params);
   $planid=$ps["planid"];
@@ -20,6 +23,23 @@ if($action=="updatecourses"){
   $html.=generateSelection($cursos,"curso","");
 }
 else
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//UPDATE COURSE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if($action=="updateinstituto"){
+  $ps=parseParams($params);
+  $planid=$ps["planid"];
+  preg_match("/(\d+)-/",$planid,$matches);
+  $programaid=$matches[1];
+  $results=mysqlCmd("select instituto from Programas where programaid='$programaid'");
+  $instituto=$results["instituto"];
+  //$instituto=$INSTITUTOS["$instituto"];
+  $html.="$instituto";
+}
+else
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//UPDATE STUDENT
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if($action=="updatestudent"){
    $ps=parseParams($params);
    $documento=$ps["documento"];
