@@ -26,7 +26,7 @@ $content.=<<<M
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 
-  | <a href="?mode=lista">Lista</a>
+  <span class="level1">| <a href="?mode=lista">Lista</a></span>
   <span class="level1">| <a href="?mode=edit&action=common">Nuevo</a></span>
 </div>
 <div class="container">
@@ -240,13 +240,16 @@ if(isset($action)){
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //GUARDAR DATA
+  //CANCELAR 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Cancelar"){
     statusMsg("Edición cancelada.");
     goto endaction;
   }
-  if($action=="Solicitar" or
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //GUARDAR DATA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Guardar" or
      $action=="Revisado" or
      $action=="Aprobado"
      ){
@@ -261,10 +264,13 @@ if(isset($action)){
       errorMsg("Debe proveer al menos una materia");
       $mode="edit";
     }
+    /*
+    //No se requiere para que el estudiante pueda entrar el reconocimiento
     else if(!$nqasignaturas){
       errorMsg("Debe proveer al menos una asignatura para reconocer");
       $mode="edit";
-    } 
+    }
+    */
     else if($nota_1_1+0==0){
       errorMsg("Debe proveer una nota para la materia a reconocer");
       $mode="edit";
@@ -304,18 +310,34 @@ if(isset($action)){
     $_POST["status"]=$status;
   
     if(strlen($ERRORS)==0){
-
+      
       //GENERATE recid
       $recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
       $recfile="$recdir/recon.dat";
 
       //STORING RESULTS ON DISK
       if(!file_exists($recfile)){
-	$recid=generateRandomString(6);
 	$recdir="$ROOTDIR/data/recon/${documento}_${planid}_${recid}";
 	$recfile="$recdir/recon.dat";
 	if(!is_dir($recdir)){shell_exec("mkdir -p $recdir");}
 	statusMsg("Nuevo reconocimiento creado");
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      //UPLOAD FILE
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      foreach(array_keys($_FILES) as $key){
+	$file=$_FILES["$key"];
+	$filename=$file["name"];
+	if(!isBlank($filename)){
+	  preg_match("/(.+)\.(\w+)$/",$filename,$matches);
+	  $filebase=$matches[1];
+	  $fileext=$matches[2];
+	  $tmp=$file["tmp_name"];
+	  $filefinal="$key.$fileext";
+	  shell_exec("cp -rf $tmp $recdir/$filefinal");
+	  $_POST["$key"]=$filefinal;
+	}
       }
 
       //UNSET VARIABLES
@@ -331,7 +353,7 @@ if(isset($action)){
       //SET STATUS
       $notificado="";
       $qnotificado=0;
-      if($action=="Solicitar"){$status=0;}
+      if($action=="Guardar"){$status=0;}
       if($action=="Revisado"){$status=1;}
       if($action=="Aprobado"){
 	$status=2;
@@ -462,7 +484,7 @@ else{
     $content.="<h2>Solicitudes de Reconocimiento de Materias</h2>";
     $table="";
 $table.=<<<C
-<table width=100% border=1px style="font-size:12px">
+<table class="level1" width=100% border=1px style="font-size:12px">
   <thead>
     <tr>
       <th>ID</th>
@@ -481,7 +503,11 @@ C;
     $qtable=0;
 
     $where="";
-    $seleccion="<p><b>Selección</b>: ";
+    if($QPERMISO>1){
+      $seleccion="<p class='level1'><b>Selección</b>: ";
+    }else{
+      $seleccion="<p><i>Usted no tiene permisos para ver esta lista</i></p>";
+    }
     if(isset($DOCUMENTO)){
       //REGULAR USER
       if($QPERMISO<=1){
@@ -555,11 +581,15 @@ C;
 	$recdir=getRecdir($lrecid);
 	$recbase="$recdir/recon";
 	$recurl=preg_replace("/^\/.+\/data/","data",$recbase);
-	
+
 	if(file_exists("$recbase.pdf")){
-	  $view="<a href=$recurl.pdf target=_blank>Ver</a><br/>";
+	  if($lstatus=="Revisado" or $lstatus=="Aprobado" or $lstatus=="Notificado"){
+	    $view="<a href=$recurl.pdf target=_blank>Ver</a><br/>";
+	  }else{
+	    $view="Solicitado<br/>";
+	  }
 	}else{
-	  $view="No disponible";
+	  $view="No disponible<br/>";
 	}
 
       //RENDER TABLE ROW
@@ -607,6 +637,11 @@ C;
     //TABLE OF RECONOCIMIENTOS
     $reconocimientos=generateReconocimientos();
 
+    //RECID
+    if(!isset($recid)){
+	$recid=generateRandomString(6);
+    }
+
     //RECDIR
     $recdir=getRecdir($recid);
     $recurl="$SITEURL/".preg_replace("/^\/.+\/data/","data",$recdir);
@@ -632,7 +667,7 @@ $buttons.=<<<B
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
 	<input class="level4" type="submit" name="action" value="Aprobado">
-	<input type="submit" name="action" value="Solicitar">
+	<input type="submit" name="action" value="Guardar">
 	<input type="submit" name="action" value="Cancelar">
       </td>
     </tr>
@@ -702,8 +737,9 @@ $FORM
     <tr class="form-field">
       <td class="field">Certificado de notas:</td>
       <td class="input">
-	<input type="file" name="certificado_notas" value="$certificado_notas"><br/>
-	Archivo: $recurl <a href=$recurl/$certificado_notas>$certificado_notas</a>
+	<input type="file" name="certificado_notas"><br/>
+	<i class="archivo">Archivo: <a href=$recurl/$certificado_notas target=_blank>$certificado_notas</a></i>
+	<input type="hidden" name="certificado_notas" value="$certificado_notas"><br/>
       </td>
     </tr>
 
