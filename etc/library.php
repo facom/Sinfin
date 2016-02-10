@@ -377,8 +377,9 @@ $reconocimientos.=<<<RECON
 		
 		<tr><!-- class="ccursos_input"-->
 		  <td class="field">Programa de la asignatura:</td><td class="input">
-		    <input type="file" name="programa_${ir}_${im}" value="$vprograma"><br/>
-		    Archivo: $recurl <a href=$recurl/$vprograma>$vprograma</a>
+		    <input type="file" name="programa_${ir}_${im}"><br/>
+		    <i class="archivo">Archivo: <a href=$recurl/$vprograma>$vprograma</a></i>
+		    <input type="hidden" name="programa_${ir}_${im}" value="$vprograma"><br/>
 		  </td>
 		</tr>
 
