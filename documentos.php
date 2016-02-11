@@ -25,7 +25,7 @@ $content.=<<<M
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 
-  | <a href="?mode=mode">Modo</a>
+  <span class="level5">| <a href="?mode=mode">Modo</a></span>
 </div>
 <div class="container">
 M;
