@@ -326,6 +326,7 @@ if(isset($action)){
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       //UPLOAD FILE
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      $n=0;
       foreach(array_keys($_FILES) as $key){
 	$file=$_FILES["$key"];
 	$filename=$file["name"];
@@ -337,8 +338,10 @@ if(isset($action)){
 	  $filefinal="$key.$fileext";
 	  shell_exec("cp -rf $tmp $recdir/$filefinal");
 	  $_POST["$key"]=$filefinal;
+	  $n++;
 	}
       }
+      statusMsg("$n archivos subidos...");
 
       //UNSET VARIABLES
       unset($_POST["action"]);
@@ -445,11 +448,11 @@ if(!isset($mode)){
   //PRINCIPAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
-  <p>Por reconocimiento entendemos el procedimiento en el que una o
-  varias asignaturas que fueron matriculadas o aprobadas por un
-  estudiante en la Universidad o en otra institución, son reconocidas
-  como si las hubiera matriculado y ganado en su programa de estudio
-  actual.</p>
+  <p>Este es el módulo de reconocimientos de $SINFIN.  Por
+  reconocimiento entendemos el procedimiento en el que una o varias
+  asignaturas que fueron matriculadas o aprobadas por un estudiante en
+  la Universidad o en otra institución, son reconocidas como si las
+  hubiera matriculado y ganado en su programa de estudio actual.</p>
 
   <p>A través de este módulo podrá:</p>
 
@@ -462,6 +465,14 @@ $content.=<<<C
     <li>Generar formatos de texto requeridos para el trámite en la Universidad</li>
 
   </ul>
+
+  <p>
+    Para acceder a todos los servicios de este módulo
+    debe <a href=usuarios.php?mode=nuevo>crear una cuenta de
+    usuario</a> o <a href=usuarios.php>iniciar sesión con una cuenta
+    existente</a>.
+  </p>
+
 C;
 
 }
@@ -488,11 +499,11 @@ $table.=<<<C
   <thead>
     <tr>
       <th>ID</th>
+      <th>Documento</th>
+      <th>Nombre</th>
       <th>Fecha</th>
       <th>Instituto</th>
       <th>Estado</th>
-      <th>Documento</th>
-      <th>Nombre</th>
       <th>Universidad</th>
       <th>Programa</th>
       <th>Acciones</th>
@@ -571,11 +582,19 @@ C;
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
 	if(($lstatus!="Revisado" and
-	   $lstatus!="Aprobado") or
+	   $lstatus!="Aprobado" and 
+	    $lstatus!="Notificado") or
 	   $QPERMISO>1){
 	  $edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
 	}else{$edit="";}
-	$delete="<a class='level3' href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
+
+	
+	if(($lstatus!="Revisado" and
+	    $lstatus!="Aprobado" and 
+	    $lstatus!="Notificado") or
+	   $QPERMISO>1){
+	  $delete="<a class='level1' href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
+	}else{$delete="";}
 	$generar="<a class='level3' href=genrecon.php?recid=$lrecid target=_blank>Generar</a><br/>";
 	
 	$recdir=getRecdir($lrecid);
@@ -596,11 +615,11 @@ C;
 $table.=<<<C
 <tr style="background:$color">
   <td>$lrecid</td>
+  <td>$lEstudiantes_documento</td>
+  <td>$lnombre</td>
   <td>$lfecha</td>
   <td>$linstituto</td>
   <td>$lstatus<br/><i>$lacto</i></td>
-  <td>$lEstudiantes_documento</td>
-  <td>$lnombre</td>
   <td>$luniversidad</td>
   <td>$lprograma (versión $lversion)</td>
   <td>
@@ -765,7 +784,9 @@ $FORM
       </td>
     </tr>
 
-    <tr class="reservado level3"><td colspan=2><hr/><b>Reservado para la Coordinación</b></td></tr>
+    <tr class="reservado level3">
+      <td colspan=2><b>Reservado para la Coordinación</b></td>
+    </tr>
   
     <tr class="form-field reservado level3">
       <td class="field">Estado:</td>

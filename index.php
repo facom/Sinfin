@@ -57,7 +57,15 @@ reconocimientos, etc.) y de unos conjuntos de servicios específicos
 
 <ul>
 
-<li><a href=planes.php>Planes de Estudio</a>.  Este módulo le brinda
+<li><a href=reconoce.php>Reconocimientos</a>.  Este módulo le brinda
+información y servicios relacionados con el sistema de reconocimientos
+de materias para los estudiantes nuevos, de reingreso o transferencia
+en los programas de la FCEN.  Los reconocimientos permiten que una
+asignatura cursada y aprobada en otro programa o institución sea
+reconocida por una que debe ser vista en el programa de la FCEN en el
+que se encuentra matriculado el estudiante.</li>
+
+<li><a href=planes.php>Planes de Estudio (pensums)</a>.  Este módulo le brinda
 información y servicios relacionados con los planes de estudio de los
 programas de la FCEN.  Por planes de estudio nos referimos al conjunto
 de asignaturas y la relación entre ellas que define un programa
@@ -69,14 +77,6 @@ asignatura de los cursos ofrecidos en los programas académicos de la
 FCEN.  Los planes de asignatura contienen toda la información
 relacionada con cursos específicos (objetivos, metodología, temáticas,
 bibliografía, etc.).</li>
-
-<li><a href=reconoce.php>Reconocimientos</a>.  Este módulo le brinda
-información y servicios relacionados con el sistema de reconocimientos
-de materias para los estudiantes nuevos, de reingreso o transferencia
-en los programas de la FCEN.  Los reconocimientos permiten que una
-asignatura cursada y aprobada en otro programa o institución sea
-reconocida por una que debe ser vista en el programa de la FCEN en el
-que se encuentra matriculado el estudiante.</li>
 
 </ul>
 

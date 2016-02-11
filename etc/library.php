@@ -51,6 +51,7 @@ for($i=1;$i<=4;$i++){
   if($i<=$QPERMISO){$perm="inline";$nperm="none";}
   $PERMCSS.=".level$i{display:$perm;}\n.nolevel$i{display:$nperm;}\n";
 }
+$PERMCSS.=".level5{display:none;}\n.nolevel5{display:inline;}\n";
 //echo "PERMS:<pre>$PERMCSS</pre><br/>";
 /*
   Permisos
@@ -107,6 +108,7 @@ $EHEADERS.="MIME-Version: 1.0\r\n";
 $EHEADERS.="Content-type: text/html\r\n";
 
 $FORM="<form method='post' enctype='multipart/form-data' accept-charset='utf-8'>";
+$MANATWORK="<p><center><img src=img/manatwork.png width=10%></center></p>";
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -378,7 +380,7 @@ $reconocimientos.=<<<RECON
 		<tr><!-- class="ccursos_input"-->
 		  <td class="field">Programa de la asignatura:</td><td class="input">
 		    <input type="file" name="programa_${ir}_${im}"><br/>
-		    <i class="archivo">Archivo: <a href=$recurl/$vprograma>$vprograma</a></i>
+		    <i class="archivo">Archivo: <a href=$recurl/$vprograma target=_blank>$vprograma</a></i>
 		    <input type="hidden" name="programa_${ir}_${im}" value="$vprograma"><br/>
 		  </td>
 		</tr>
@@ -402,7 +404,9 @@ RECON;
 	}
 
 $reconocimientos.=<<<RECON
-	  <tr class="level3"><td class="materias">Reconocida por</td></tr>
+	  <tr class="header level3">
+	    <td class="materias">Reconocida por</td>
+	  </tr>
 
 	  <tr class="materias_reconocidas level3">
 
@@ -511,7 +515,7 @@ function errorMsg($msg)
 function statusMsg($msg)
 {
   global $STATUS;
-  $STATUS.="<p>".$msg."</p>";
+  $STATUS.="".$msg."<br/>";
 }
 
 function getHeaders()
@@ -666,9 +670,9 @@ function getMainMenu()
 $menu=<<<M
 <div class="mainmenu menuperm">
   <a href="index.php">Principal</a>
+  | <a href="reconoce.php">Reconocimientos</a>
   | <a href="planes.php">Planes de Estudio</a> 
   | <a href="asignaturas.php">Planes de Asignatura</a> 
-  | <a href="reconoce.php">Reconocimientos</a>
   | <a href="documentos.php">Documentos</a>
   | <a href="ayuda.php">Ayuda</a>
   <span class="level0">| <a href="usuarios.php?urlref=$urlref">Usuarios</a></span>
