@@ -331,6 +331,8 @@ $message=<<<M
 </p>
 <p>
   Una nueva solicitud de reconocimiento ha sido radicada en $SINFIN.
+  La solicitud ha sido presentada a nombre de <b>$nombre</b>
+  (ID <b>$documento</b>), e-mail <b>$email</b>.
 </p>
 <p>
   Conéctese y proceda con la revisión y eventual aprobación de la solicitud.
