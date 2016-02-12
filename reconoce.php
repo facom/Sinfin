@@ -512,7 +512,7 @@ $content.=<<<C
 
   <p>Encuentre abajo un video tutorial sobre como presentar solicitudes de reconocimiento</p>
 
-  <p>
+  <p style="text-align:center">
     <iframe width="$WIDTHVID" height="$HEIGHTVID"
             src="https://www.youtube.com/embed/O85cGBINggU"
             frameborder="0" allowfullscreen>
