@@ -49,6 +49,11 @@ Planes de Asignatura de los cursos ofrecidos en los programas de la FCEN.
 
 </ul>
 $MANATWORK
+
+<p>
+Mientras implementamos este módulo puede ver los Planes de Estudio en
+este enlace: <a href=http://bit.ly/fcen-planes-asignatura>http://bit.ly/fcen-planes-asignatura</a>
+</p>
 C;
 
 ////////////////////////////////////////////////////////////////////////

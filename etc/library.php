@@ -38,20 +38,21 @@ if(isset($_SESSION["permisos"])){
   $PARAMETROS=$_SESSION["parametros"];
 }
 $PERMCSS="";
-$perm="inline";
+$type="inline";
+$perm="$type";
 $nperm="none";
 if($QPERMISO){
   $perm="none";
-  $nperm="inline";
+  $nperm="$type";
 }
 $PERMCSS.=".level0{display:$perm;}\n.nolevel0{display:$nperm;}\n";
 for($i=1;$i<=4;$i++){
   $perm="none";
-  $nperm="inline";
-  if($i<=$QPERMISO){$perm="inline";$nperm="none";}
+  $nperm="$type";
+  if($i<=$QPERMISO){$perm="$type";$nperm="none";}
   $PERMCSS.=".level$i{display:$perm;}\n.nolevel$i{display:$nperm;}\n";
 }
-$PERMCSS.=".level5{display:none;}\n.nolevel5{display:inline;}\n";
+$PERMCSS.=".level5{display:none;}\n.nolevel5{display:$type;}\n";
 //echo "PERMS:<pre>$PERMCSS</pre><br/>";
 /*
   Permisos
@@ -82,7 +83,7 @@ $TCOLD=$TWIDTH/2;
 $ERRORS="";
 $STATUS="";
 $RECONDIR="data/recon";
-$RECONSTATUS=array("Solicitado","Revisado","Aprobado");
+$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado");
 $SINFIN="<b>SInfIn</b>";
 
 $HOST=$_SERVER["HTTP_HOST"];
@@ -405,12 +406,12 @@ RECON;
 
 $reconocimientos.=<<<RECON
 	  <tr class="header level3">
-	    <td class="materias">Reconocida por</td>
+	    <td width=800px class="materias">Reconocida por</td>
 	  </tr>
 
 	  <tr class="materias_reconocidas level3">
 
-	    <td>
+	    <td width=800px>
 
 	      <div id="asignatura_${ir}_0" class="agregar">
 		<a href="JavaScript:void(null)" onclick="addCourse(this)">Agregar asignatura</a>
@@ -486,7 +487,7 @@ $reconocimientos.=<<<RECON
 	  </tr>
 	</table>
 
-	<div class="agregar" id="reconocimiento_${ir}">
+	<div class="agregar" style="background:lightgreen;" id="reconocimiento_${ir}">
 RECON;
 
  if($ir<$numrecon){

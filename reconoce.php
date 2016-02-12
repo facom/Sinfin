@@ -77,6 +77,15 @@ if(isset($action)){
       $_POST=array_merge($_POST,$data);
       foreach(array_keys($_GET) as $field){$$field=$_GET[$field];}
       foreach(array_keys($_POST) as $field){$$field=$_POST[$field];}
+
+      if($status<=2){
+	if($QPERMISO<=2){
+	  errorMsg("Usted no tiene permisos para editar esta solicitud");
+	  $mode="lista";
+	  goto endaction;
+	}
+      }
+
       statusMsg("Datos cargados...");
     }
   }
@@ -90,6 +99,11 @@ if(isset($action)){
       }
     }
     if(strlen($ERRORS)==0){
+      if($QPERMISO<=1){
+	errorMsg("Usted no tiene permisos para eliminar esta solicitud");
+	$mode="lista";
+	goto endaction;
+      }
       //REMOVE FILE
       shell_exec("mv \$(dirname $recfile) trash;");
       statusMsg("Reconocimiento '$recid' borrado...");
@@ -251,7 +265,8 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Guardar" or
      $action=="Revisado" or
-     $action=="Aprobado"
+     $action=="Aprobado" or
+     $action=="Solicitar"
      ){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //BASIC CHECKS
@@ -307,8 +322,29 @@ if(isset($action)){
 	$status=2;
       }
     }
+    if($action=="Solicitar"){
+      //SEND A NOTIFICATION MESSAGE
+      $subject="[SInfIn] Reconocimiento de Materias '$recid' Solicitado";
+$message=<<<M
+<p>
+  Señor(a) Coordinador,
+</p>
+<p>
+  Una nueva solicitud de reconocimiento ha sido radicada en $SINFIN.
+</p>
+<p>
+  Conéctese y proceda con la revisión y eventual aprobación de la solicitud.
+</p>
+<p>
+  <b>Sistema Integrado de Información Curricular</b><br/>
+</p>
+M;
+      sendMail($EMAIL_USERNAME,$subject,$message,$EHEADERS);
+      statusMsg("Notificación de solicitud enviada a la coordinación");
+    }
+      
+
     $_POST["status"]=$status;
-  
     if(strlen($ERRORS)==0){
       
       //GENERATE recid
@@ -356,7 +392,8 @@ if(isset($action)){
       //SET STATUS
       $notificado="";
       $qnotificado=0;
-      if($action=="Guardar"){$status=0;}
+      if($action=="Solicitar"){$status=0;}
+      if($action=="Guardar"){$status=3;}
       if($action=="Revisado"){$status=1;}
       if($action=="Aprobado"){
 	$status=2;
@@ -428,7 +465,7 @@ $message=<<<M
 </p>
 M;
          sendMail($email,$subject,$message,$EHEADERS);
-         sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$headers);
+         sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$EHEADERS);
 	 statusMsg("Mensaje enviado a $email y $EMAIL_USERNAME");
       }
 
@@ -514,7 +551,7 @@ C;
     $qtable=0;
 
     $where="";
-    if($QPERMISO>1){
+    if($QPERMISO>=1){
       $seleccion="<p class='level1'><b>Selección</b>: ";
     }else{
       $seleccion="<p><i>Usted no tiene permisos para ver esta lista</i></p>";
@@ -523,17 +560,17 @@ C;
       //REGULAR USER
       if($QPERMISO<=1){
 	$where="where Estudiantes_documento='$DOCUMENTO'";
-	$seleccion.="documento $DOCUMENTO";
+	$seleccion.="documento $DOCUMENTO<br/>";
       }else
       //COORDINADOR
       if($QPERMISO==3){
 	if(preg_match("/instituto=(\w+);/",$PARAMETROS,$matches)){
 	  $instituto=$matches[1];
 	  $where="where instituto='$instituto'";
-	  $seleccion.="instituto $instituto";
+	  $seleccion.="instituto $instituto<br/>";
 	}else{
 	  $where="Estudiantes_documento=''";
-	  $seleccion.="<i>No parametros</i>";
+	  $seleccion.="<i>No parametros</i><br/>";
 	}
       }
       //ADMINISTRADOR
@@ -553,7 +590,7 @@ C;
 
       $fields=array("recid","acto","status","fecha","Estudiantes_documento","Planes_planid","notificado","instituto");
       foreach($results as $result){
-	$color="white";
+	$color="lightgray";
 	foreach($fields as $field){
 	  $name="l".$field;
 	  $$name=$result["$field"];
@@ -572,6 +609,7 @@ C;
 	if(isBlank($lstatus)){$lstatus=0;}
 	$lstatus=$RECONSTATUS[$lstatus];
 	if($lstatus=="Revisado"){$color="pink";}
+	if($lstatus=="Solicitado"){$color="yellow";}
 	if($lstatus=="Aprobado"){
 	  $color="lightblue";
 	  if(!isBlank($lnotificado)){
@@ -581,17 +619,13 @@ C;
 	}
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
-	if(($lstatus!="Revisado" and
-	   $lstatus!="Aprobado" and 
-	    $lstatus!="Notificado") or
+	if($lstatus=="Editado" or
 	   $QPERMISO>1){
 	  $edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
 	}else{$edit="";}
 
 	
-	if(($lstatus!="Revisado" and
-	    $lstatus!="Aprobado" and 
-	    $lstatus!="Notificado") or
+	if($lstatus=="Editado" or
 	   $QPERMISO>1){
 	  $delete="<a class='level1' href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
 	}else{$delete="";}
@@ -673,10 +707,15 @@ C;
     }
 
     if(isset($status)){
-      $rstatus=$RECONSTATUS["$status"];
+      if(!isBlank($status)){
+	$rstatus=$RECONSTATUS["$status"];
+      }else{
+	$status=3;
+	$rstatus="Nuevo";
+      }	
     }
     else{
-      $status=0;
+      $status=3;
       $rstatus="Nuevo";
     }
 
@@ -686,6 +725,7 @@ $buttons.=<<<B
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
 	<input class="level4" type="submit" name="action" value="Aprobado">
+	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Guardar">
 	<input type="submit" name="action" value="Cancelar">
       </td>
@@ -784,27 +824,28 @@ $FORM
       </td>
     </tr>
 
-    <tr class="reservado level3">
-      <td colspan=2><b>Reservado para la Coordinación</b></td>
+    <tr class="reservado">
+      <td style="border-top:solid black 1px;" colspan=2>
+	<b>Reservado para la Coordinación</b>
+      </td>
     </tr>
   
-    <tr class="form-field reservado level3">
+    <tr class="form-field reservado">
       <td class="field">Estado:</td>
       <td class="input">
         $rstatus
 	<input type="hidden" name="status" value="$status">
-	<input type="hidden" name="status" value="$notificado">
       </td>
     </tr>
 
-    <tr class="form-field reservado level3">
-      <td class="field">Acto administrativo:</td>
-      <td class="input"><input type="text" name="acto" value="$acto"></td>
+    <tr class="form-field reservado">
+      <td class="field level3">Acto administrativo:</td>
+      <td class="input level3"><input type="text" name="acto" value="$acto"></td>
     </tr>
 
-    <tr class="form-field reservado level3">
-      <td class="field">Responsables:</td>
-      <td class="input"><input type="text" name="responsables" value="$responsables"></td>
+    <tr class="form-field reservado">
+      <td class="field level3">Responsables:</td>
+      <td class="input level3"><input type="text" name="responsables" value="$responsables"></td>
     </tr>
 
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
@@ -816,7 +857,7 @@ $FORM
   
     <tr>
       <td colspan=2>
-	<div id="reconocimiento_0" class="agregar">
+	<div id="reconocimiento_0" class="agregar" style="background:lightgreen;">
 	  <a href="JavaScript:void(null)" onclick="addRecon(this);">Agregar reconocimiento</a>
 	</div>
 	$reconocimientos
