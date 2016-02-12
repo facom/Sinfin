@@ -93,6 +93,9 @@ $BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
 $SITEURL="http://$HOST$BASEDIR/";
 $REFERER=$_SERVER["HTTP_REFERER"];
 
+$WIDTHVID=400;
+$HEIGHTVID=$WIDTHVID/1.4;
+
 /*
 echo "COOKIES:";
 print_r($_COOKIES);
