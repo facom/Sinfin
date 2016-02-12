@@ -1,6 +1,7 @@
 body{
     font-family:Verdana;
 }
+
 tr.form-field{
     background:white;
 }
@@ -20,6 +21,9 @@ td.section{
 tr.agregar,td.agregar,.agregar{
     text-align:center;
     font-size:0.8em;
+    border-top:solid black 1px;
+    padding:5px;
+    background:lightgray;
 }
 .reconocimiento{
     background:lightblue;
@@ -32,7 +36,7 @@ td.materias{
     text-align:center;
 }
 table.materia{
-    border:solid black 1px;
+    border:solid black 0px;
     width:100%;
 }
 .hidden{
@@ -101,7 +105,7 @@ div.status{
 }
 div.errors{
     position:absolute;
-    top:10%;
+    top:0%;
     width:20%;
     left:40%;
     height:10%;
@@ -112,7 +116,7 @@ div.errors{
     z-index:10000;
 }
 tr.reservado{
-    color:gray;
+    color:red;
 }
 i.archivo{
     font-size:10px;

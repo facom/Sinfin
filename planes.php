@@ -54,6 +54,12 @@ Facultad de Ciencias Exactas y Naturales (FCEN).
 cursos de un determinado programa.</li>
 
 </ul>
+$MANATWORK
+
+<p>
+Mientras implementamos este módulo puede ver los Planes de Estudio en
+este enlace: <a href=http://bit.ly/fcen-pensums>http://bit.ly/fcen-pensums</a>
+</p>
 
 C;
 
