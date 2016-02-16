@@ -350,6 +350,9 @@ RECON;
 	  $nprograma="programa_${ir}_${im}";
 	  $vprograma=$$nprograma;
 
+	  $nobs="observaciones_${ir}_${im}";
+	  $vobs=$$nobs;
+
 	  //SELECT TYPE OF MATERIA INPUT
 	  $input="";
 $input.=<<<I
@@ -390,7 +393,24 @@ $reconocimientos.=<<<RECON
 		</tr>
 
 		<tr><td class="field">Universidad:</td><td class="input"><input class="univ" type="text" name="univ_${ir}_${im}" value="$vuniv"></td></tr>
-		<tr><td class="field">Calificación:</td><td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td></tr>
+		<tr>
+		  <td class="field">
+		    Calificación:<br/>
+		    <span class="help">Use "." no ","</span>
+		  </td>
+		  <td class="input"><input type="text" name="nota_${ir}_${im}" value="$vnota" onchange="updateAverage('${ir}')"></td>
+		</tr>
+		
+		<tr>
+		  <td class="field">
+		    Observaciones:<br/>
+		    <span class="help">
+		      Información complementaria
+		    </span>
+		  </td>
+		  <td class="input"><input type="text" name="observaciones_${ir}_${im}" value="$vobs"></td>
+		</tr>
+
 		<tr><td class="agregar" id="materia_${ir}_${im}" colspan=2>
 RECON;
 
