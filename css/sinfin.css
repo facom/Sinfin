@@ -8,9 +8,11 @@ tr.form-field{
 td.field{
     border:solid blue 0px;
     vertical-align:top;
+    padding:5px;
 }
 td.input{
     border:solid green 0px;
+    vertical-align:top;
 }
 td.section{
     font-weight:bold;
@@ -120,4 +122,8 @@ tr.reservado{
 }
 i.archivo{
     font-size:10px;
+}
+span.help{
+    font-style:italic;
+    font-size:12px;
 }
