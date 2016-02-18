@@ -83,7 +83,7 @@ $TCOLD=$TWIDTH/2;
 $ERRORS="";
 $STATUS="";
 $RECONDIR="data/recon";
-$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado");
+$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado","Rechazado");
 $SINFIN="<b>SInfIn</b>";
 
 $HOST=$_SERVER["HTTP_HOST"];
