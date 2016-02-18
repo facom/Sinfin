@@ -266,7 +266,8 @@ if(isset($action)){
   if($action=="Guardar" or
      $action=="Revisado" or
      $action=="Aprobado" or
-     $action=="Solicitar"
+     $action=="Solicitar" or
+     $action=="Rechazado"
      ){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //BASIC CHECKS
@@ -322,6 +323,41 @@ if(isset($action)){
 	$status=2;
       }
     }
+    if($action=="Rechazado"){
+      $status=4;
+      //SEND A NOTIFICATION MESSAGE
+      $subject="[SInfIn] Reconocimiento de Materias '$recid' Rechazado";
+$message=<<<M
+<p>
+  Señor(a) Estudiante,
+</p>
+<p>
+  Su solicitud de reconocimiento radicada en $SINFIN y presentada a nombre de <b>$nombre</b>
+  (ID <b>$documento</b>), e-mail <b>$email</b>, ha sido revisada y rechazada.
+</p>
+<p>
+  Estas son las observaciones realizadas por el revisor:
+  <blockquote style="color:red;font-style:italic">
+  $observaciones
+  </blockquote>
+</p>
+<p>
+  Modifique la solicitud en correspondencia a las observaciones
+  realizadas o comience una nueva solicitud si así lo sugiere el
+  revisor.
+</p>
+<p>
+  Recuerde ver completamente el videotutorial que encontrará en
+  <a href="http://www.youtube.com/watch?v=O85cGBINggU">este
+  enlace</a>.
+<p>
+  <b>Sistema Integrado de Información Curricular</b><br/>
+</p>
+M;
+      sendMail($email,$subject,$message,$EHEADERS);
+      sendMail($EMAIL_USERNAME,"[Historico] ".$subject,$message,$EHEADERS);
+      statusMsg("Notificación de rechazo enviada a $email");
+    }
     if($action=="Solicitar"){
       //SEND A NOTIFICATION MESSAGE
       $subject="[SInfIn] Reconocimiento de Materias '$recid' Solicitado";
@@ -361,6 +397,15 @@ M;
 	statusMsg("Nuevo reconocimiento creado");
       }
 
+      //GET INSTITUTO
+      if(isBlank($instituto)){
+	preg_match("/(\d+)-/",$planid,$matches);
+	$programaid=$matches[1];
+	$results=mysqlCmd("select instituto from Programas where programaid='$programaid'");
+	$instituto=$results["instituto"];
+	$_POST["instituto"]=$instituto;
+      }
+
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       //UPLOAD FILE
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -386,25 +431,28 @@ M;
       unset($_POST["mode"]);
       $_POST["recid"]=$recid;
 
-      //SAVE SERIALIZED ARRAY
-      $fl=fopen($recfile,"w");
-      fwrite($fl,serialize($_POST));
-      fclose($fl);
-
       //SET STATUS
-      $notificado="";
       $qnotificado=0;
       if($action=="Solicitar"){$status=0;}
       if($action=="Guardar"){$status=3;}
       if($action=="Revisado"){$status=1;}
       if($action=="Aprobado"){
 	$status=2;
-	if(isBlank($notificado)){
+	if(!isset($notificado) or isBlank($notificado)){
 	  $notificado=$DATE;
 	}else{
 	  $qnotificado=1;
 	}
       }
+      if(!isset($notificado)){
+	$notificado="";
+      }
+      $_POST["notificado"]=$notificado;
+
+      //SAVE SERIALIZED ARRAY
+      $fl=fopen($recfile,"w");
+      fwrite($fl,serialize($_POST));
+      fclose($fl);
 
       //UPDATING STUDENTS DATABASE
       insertSql("Estudiantes",array("documento"=>"",
@@ -594,7 +642,7 @@ C;
     $seleccion.="</p>";
     $content.="$seleccion";
 
-    $results=mysqlCmd("select * from Reconocimientos $where order by fechahora desc,Estudiantes_documento asc",$qout=1);
+    $results=mysqlCmd("select * from Reconocimientos $where order by status,fechahora desc,Estudiantes_documento asc",$qout=1);
 
     if($results){
       $qtable=1;
@@ -622,6 +670,7 @@ C;
 	$lstatus=$RECONSTATUS[$lstatus];
 	if($lstatus=="Revisado"){$color="pink";}
 	if($lstatus=="Solicitado"){$color="yellow";}
+	if($lstatus=="Rechazado"){$color="white";}
 	if($lstatus=="Aprobado"){
 	  $color="lightblue";
 	  if(!isBlank($lnotificado)){
@@ -631,13 +680,13 @@ C;
 	}
 	if(isBlank($lacto)){$lacto="Plataforma";}
 
-	if($lstatus=="Editado" or
+	if($lstatus=="Editado" or $lstatus=="Rechazado" or 
 	   $QPERMISO>1){
 	  $edit="<a href=?action=load&mode=edit&recid=$lrecid>Editar</a><br/>";
 	}else{$edit="";}
 
 	
-	if($lstatus=="Editado" or
+	if($lstatus=="Editado" or $lstatus=="Rechazado" or 
 	   $QPERMISO>1){
 	  $delete="<a class='level1' href=?action=delete&mode=lista&recid=$lrecid>Borrar</a><br/>";
 	}else{$delete="";}
@@ -737,6 +786,7 @@ $buttons.=<<<B
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
 	<input class="level4" type="submit" name="action" value="Aprobado">
+	<input class="level3" type="submit" name="action" value="Rechazado">
 	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Guardar">
 	<input type="submit" name="action" value="Cancelar">
@@ -748,6 +798,7 @@ $content.=<<<C
 <center>
 $FORM
   $inprecfile
+  <input type="hidden" name="notificado" value="$notificado">
   <input type="hidden" name="mode" value="lista">
   <table border="${TBORDER}px" width="${TWIDTH}px">
   $buttons
@@ -858,6 +909,11 @@ $FORM
     <tr class="form-field reservado">
       <td class="field level3">Responsables:</td>
       <td class="input level3"><input type="text" name="responsables" value="$responsables"></td>
+    </tr>
+
+    <tr class="form-field reservado">
+      <td class="field level1">Observaciones:</td>
+      <td class="input level1"><textarea name="observaciones">$observaciones</textarea></td>
     </tr>
 
     <!-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& -->
