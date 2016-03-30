@@ -785,7 +785,7 @@ $buttons.=<<<B
     <tr class="boton">
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
-	<input class="level4" type="submit" name="action" value="Aprobado">
+	<input class="level3" type="submit" name="action" value="Aprobado">
 	<input class="level3" type="submit" name="action" value="Rechazado">
 	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Guardar">
