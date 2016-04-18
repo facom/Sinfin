@@ -672,7 +672,7 @@ $head=<<<H
     <a href="index.php">SInfIn</a><br/>
   </div>
   <div class="subtitle">
-    <span style="color:blue">S</span>istema 
+    <span style="color:blue">S</span>istema de
     <span style="color:blue">Inf</span>ormación curricular
     <span style="color:blue">In</span>tegrada
   </div>
@@ -694,15 +694,29 @@ function getMainMenu()
 $menu=<<<M
 <div class="mainmenu menuperm">
   <a href="index.php">Principal</a>
-  | <a href="comite.php">Comite de Curriculo</a>
-  | <a href="reconoce.php">Reconocimientos</a>
-  | <a href="planes.php">Planes de Estudio</a> 
-  | <a href="asignaturas.php">Planes de Asignatura</a> 
-  | <a href="documentos.php">Documentos</a>
-  | <a href="ayuda.php">Ayuda</a>
+
   <span class="level0">| <a href="usuarios.php?urlref=$urlref">Usuarios</a></span>
+
   <span class="level1">
   | Sesión de <b>$NOMBRE</b> ($permiso) - <a href="actions.php?action=Cerrar">Cerrar</a>
+  <br/>
+  </span>
+
+  <span class="level1">
+  <b>Información:</b> 
+    <a href="comite.php">Comité de Curriculo</a>
+  | <a href="documentos.php">Documentos</a>
+  | <a href="ayuda.php">Ayuda</a>
+  </span><br/>
+
+  <span class="level1">
+  <b>Módulos</b>:
+    <a href="reconoce.php">Reconocimientos</a>
+  | <a href="planes.php">Planes de Estudio</a> 
+  | <a href="asignaturas.php">Planes de Asignatura</a> 
+  <span class="level4">
+  | <a href="movilidad.php">Bolsa de Movilidad</a> 
+  </span>
   </span>
 </div>
 M;
