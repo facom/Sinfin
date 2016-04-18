@@ -39,7 +39,7 @@ if(isset($action)){
 //BODY
 ////////////////////////////////////////////////////////////////////////
 $content.=<<<C
-<p>¡Bienvenido al <b>Sistema Integrado de Información Curricular (SInfIn)</b>!</p>
+<p>¡Bienvenido al <b>Sistema de Información Curricular Integrada (SInfIn)</b>!</p>
 
 <p><b>SInFIn</b> es una plataforma de información sobre distintos
 aspectos del Currículo de la <b>Facultad de Ciencias Exactas y
