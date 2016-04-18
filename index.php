@@ -46,13 +46,14 @@ aspectos del Currículo de la <b>Facultad de Ciencias Exactas y
 Naturales</b> (FCEN).  La plataforma además ofrece algunos servicios
 de edición y consulta en línea para administradores, profesores y
 estudiantes, destinados a facilitar la gestión y acceso a la
-infromación curricular.</p>
+información curricular.</p>
 
 <p>La plataforma consta de una serie de bases de datos (programas
 académicos, planes de estudio, planes de asignatura, estudiantes,
 reconocimientos, etc.) y de unos conjuntos de servicios específicos
 (<b>Módulos</b>).</p>
 
+<span class="level1">
 <p>Los módulos y servicios disponibles en la presente versión son:</p>
 
 <ul>
@@ -79,11 +80,17 @@ relacionada con cursos específicos (objetivos, metodología, temáticas,
 bibliografía, etc.).</li>
 
 </ul>
+</span>
 
 <p>Además de los módulos de servicio mencionado <b>SInfIn</b> ofrece
 otra información de interés sobre el Currículo.  Encontrara los
 enlaces a todos los conjuntos de información adicionales ofrecidos por
 el sistema en el Menú Principal de esta página.
+
+<p class="level0" style="color:blue">
+Para acceder debe registrarse y crear una cuenta de usuario o usar una
+cuenta existente.
+</p>
 
 C;
 

@@ -63,6 +63,8 @@ div.mainmenu{
     padding:10px;
     border-top:solid black 1px;
     border-bottom:solid black 1px;
+    margin-top:20px;
+    text-align:center;
 }
 div.submenu{
     padding:10px;
