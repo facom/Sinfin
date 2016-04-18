@@ -209,8 +209,8 @@ function sendMail($email,$subject,$message,$headers="")
   $mail->SMTPAuth = true;
   $mail->Username = $GLOBALS["EMAIL_USERNAME"];
   $mail->Password = $GLOBALS["EMAIL_PASSWORD"];
-  $mail->setFrom($mail->Username, 'Sistema de Solicitud de Comisiones FCEN/UdeA');
-  $mail->addReplyTo($mail->Username, 'Sistema de Solicitud de Comisiones FCEN/UdeA');
+  $mail->setFrom($mail->Username, 'Sistema de Información Curricular Integrada FCEN/UdeA');
+  $mail->addReplyTo($mail->Username, 'Sistema de Información Curricular Integrada FCEN/UdeA');
   $mail->addAddress($email,"Destinatario");
   $mail->Subject=$subject;
   $mail->CharSet="UTF-8";
@@ -232,7 +232,7 @@ function sendShortMail($email,$subject,$message)
   $headers.="Content-type: text/html\r\n";
 $message.=<<<M
 <p>
-<b>Sistema de Solicitud de Comisiones<br/>
+<b>Sistema de Información Curricular Integrada<br/>
 Decanato, FCEN</b>
 </p>
 M;
@@ -673,8 +673,8 @@ $head=<<<H
   </div>
   <div class="subtitle">
     <span style="color:blue">S</span>istema 
-    <span style="color:blue">In</span>tegrado de 
-    <span style="color:blue">In</span>formación Curricular
+    <span style="color:blue">Inf</span>ormación curricular
+    <span style="color:blue">In</span>tegrada
   </div>
   <div class="affiliation">
     Facultad de Ciencias Exactas y Naturales<br/>
@@ -694,6 +694,7 @@ function getMainMenu()
 $menu=<<<M
 <div class="mainmenu menuperm">
   <a href="index.php">Principal</a>
+  | <a href="comite.php">Comite de Curriculo</a>
   | <a href="reconoce.php">Reconocimientos</a>
   | <a href="planes.php">Planes de Estudio</a> 
   | <a href="asignaturas.php">Planes de Asignatura</a> 
