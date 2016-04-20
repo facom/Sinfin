@@ -291,3 +291,64 @@ function removeRecon(element)
     block['value']=0;
 }
 
+Number.prototype.formatMoney = function(c, d, t){
+var n = this, 
+    c = isNaN(c = Math.abs(c)) ? 2 : c, 
+    d = d == undefined ? "." : d, 
+    t = t == undefined ? "," : t, 
+    s = n < 0 ? "-" : "", 
+    i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", 
+    j = (j = i.length) > 3 ? j % 3 : 0;
+   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};
+
+function plainNumber($element){
+    var valtxt=$element.val()
+    var value=valtxt.replace(/[,\.\$\']/g,'');
+    value=Math.round(value);
+    value="$"+value.formatMoney(0,".",",");
+    $element.val(value);
+}
+
+function calcularTotal(element){    
+    $total=$("#total");
+    $totalfield=$("#totalfield");
+    var total=0,value,valtxt,$element;
+    for(i=1;i<=5;i++){
+	$element=$("[name=value"+i+"]");
+	if($element.val()=="") continue;
+	plainNumber($element);
+	valtxt=$element.val();
+	value=valtxt.replace(/[,\.\$\']/g,'');
+	total+=Math.round(value);
+    }
+    total="$"+total.formatMoney(0,".",",");
+    $total.html(total);
+    $totalfield.val(total);
+}
+
+function onFillProfesor(result)
+{
+    if(result=='0'){
+	alert("Documento del profesor no encontrado.");
+	$('[name=profesor]').val('');
+	$('[name=email_profesor]').val('');
+    }else{
+	var info=JSON.parse(result);
+	$('[name=profesor]').val(info['nombre']);
+	$('[name=email_profesor]').val(info['email']);
+    }
+}
+
+function fillProfesor(element)
+{
+    ajaxDo('fillProfesor','documento:'+element.value,onFillProfesor);
+}
+
+function toggleHelp(element)
+{
+    var $element=$(element);
+    var name=$element.parent().attr('id');
+    var $ayuda=$('#'+name+'_help');
+    $ayuda.toggle();
+}
