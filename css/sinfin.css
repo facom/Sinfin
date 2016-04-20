@@ -170,3 +170,7 @@ input.boton{
     font-size:1.5em;
     padding:5px;
 }
+#cargamovil{
+    margin-top:10px;
+    display:none;
+}

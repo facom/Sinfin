@@ -56,21 +56,55 @@ if(isset($action)){
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CARGAR SOLICITUD
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Cargar"){
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //UPLOAD FILE
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    $movilfile=$_FILES["movilfile"];
+    if($movilfile["size"]>0){
+      $movilidnew=$movilid;
+      $movildir="data/movilidad/$movilid";
+      shell_exec("mkdir -p $movildir");
+      $name=$movilfile["name"];
+      $tmp=$movilfile["tmp_name"];
+      shell_exec("cp $tmp $movildir/$name");
+      shell_exec("cd $movildir;unzip $name");
+      include("$movildir/movilidad.php");
+      $movilid=$movilidnew;
+      $blankfields=array("nombre","cumplido","compromiso","fechapresenta","historia","apoyo","monto","respuesta","observacionesadmin","acto");
+      foreach($blankfields as $field){unset($$field);}
+      statusMsg("Solicitud cargada.");
+    }else{
+      errorMsg("Ningún archivo fue provisto.");
+    }
+    $mode="editar";
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //DESCARGAR
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="descargar"){
-    
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //CREATE DOWNLOADABLE FILE
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
     if($movil=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
       $movildir="data/movilidad/$movilid";
-      $fl=fopen("$movildir/movilidad.txt","w");
+
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      //CREATE DOWNLOADABLE FILE
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      $fl=fopen("$movildir/movilidad.php","w");
+      fwrite($fl,"<?php\n");
       foreach(array_keys($MOVILIDAD_FIELDS) as $field){
 	fwrite($fl,"\$$field='".$movil["$field"]."';\n");
       }
+      fwrite($fl,"?>\n");
       fclose($fl);
-      shell_exec("cd $movildir;zip ../../tmp/movilidad
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      //ZIP FILES
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      shell_exec("cd $movildir;zip -r ../../../tmp/movilidad_$movilid.zip *.*");
+      header("Refresh:0;url=tmp/movilidad_$movilid.zip");
       $mode="lista";
       statusMsg("Solicitud descargada.");
       goto endaction;
@@ -144,8 +178,9 @@ if(isset($action)){
   }
 
   if($action=="Borrar"){
-    if(mysqlCmd("delete from Movilidad where movilid='$movilid'")){
-      $movildir="data/movilidad/$movilid";
+    mysqlCmd("delete from Movilidad where movilid='$movilid'");
+    $movildir="data/movilidad/$movilid";
+    if(is_dir($movildir)){
       shell_exec("rm -r $movildir");
       statusMsg("Solicitud '$movilid' borrada.");
     }else{
@@ -410,6 +445,15 @@ Complete o modifique el formulario a continuación para presentar una solicitud 
 </p>
 
 <center>
+<form action="movilidad.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+  <a href="JavaScript:void(null)" onclick="$('#cargamovil').toggle()" style="font-size:0.8em";>Cargar desde un archivo</a>
+  <div id="cargamovil">
+    <input type="file" name="movilfile">
+    <input type="submit" name="action" value="Cargar">
+    <input type="hidden" name="movilid" value="$movilid">
+</form>
+</div>
+
 <form action="movilidad.php?loadmovil" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 <input type="hidden" name="mode" value="editar">
 <table width=60% cellspacing=10px>
