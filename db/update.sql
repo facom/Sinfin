@@ -12,7 +12,15 @@ alter table Usuarios drop column nivel;
 alter table Usuarios add column permisos varchar(2);
 alter table Reconocimientos add column instituto varchar(255);
 */
+/*
 alter table Usuarios add column activada varchar(2) default '0';
+*/
+/*alter table Usuarios add column tipo varchar(100) default 'visitante';*/
+/*alter table Usuarios add column programa varchar(100) default 'ninguno';*/
+/*alter table Movilidad add column duracion varchar(4);*/
+/*alter table Movilidad drop column estado;*/
+/*alter table Movilidad add column estado varchar(50);*/
+alter table Movilidad add column nombre varchar(50);
 
 /*
 alter table Usuarios drop column permisos;

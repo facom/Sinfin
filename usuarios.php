@@ -40,27 +40,38 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Cambiar"){
     //TEST FORM
-    if(isBlank($pass1) or
-       isBlank($pass2)){
-      errorMsg("Debe proveer una contraseña");
+    if(isBlank($pass)){
+      errorMsg("Debe proveer su contraseña");
       goto endaction;
     }
-    if($pass1!=$pass2){
-      errorMsg("Las contraseñas no coinciden");
-      goto endaction;
+    if(!isBlank($pass1)){
+      if(isBlank($pass2)){
+	errorMsg("No confirmo la contraseña nueva");
+	goto endaction;
+      }
+      if($pass1!=$pass2){
+	errorMsg("Las contraseñas nuevas no coinciden");
+	goto endaction;
+      }
     }
     $results=mysqlCmd("select * from Usuarios where email='$email'");
     $spass=$results["password"];
+    $pass=md5($pass);
     if($pass!=$spass){
       errorMsg("Fallo en la autenticación");
       goto endaction;
     }
+
+    //CHANGE
     if(strlen($ERRORS)==0){
-      $password=md5($pass1);
-      mysqlCmd("update Usuarios set password='$password' where email='$email'");
-      statusMsg("Contraseña modificada");
+      if(!isBlank($pass1)){$npass=md5($pass1);}
+      else{$npass=$spass;}
+      $sql="update Usuarios set password='$npass',email='$email',nombre='$nombre',tipo='$tipo',documento='$documento' where email='$email'";
+      //echo "SQL:$sql<br/>";
+      mysqlCmd($sql);
+      statusMsg("Información modificada. Conéctese de nuevo.");
       unset($mode);
-      header("Refresh:1;url=$SITEURL/usuarios.php");
+      header("Refresh:1;url=$SITEURL/actions.php?action=Cerrar");
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -340,22 +351,47 @@ C;
   //CAMBIO DE CONTRASEÑA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="cambiar"){
-    $results=mysqlCmd("select * from Usuarios where email='$email'");
+    $results=mysqlCmd("select * from Usuarios where email='$EMAIL'");
     $spass=$results["password"];
-    if($pass==$spass){
+    $tiposel=generateSelection($TIPOS,"tipo",$TIPO);
+
+    if($PASS==$spass){
 $content.=<<<C
 $FORM
-<h3>Cambio de Contraseña para $email</h3>
-<input type="hidden" name="pass" value="$pass">
-<input type="hidden" name="email" value="$email">
+<h3>Cambio de Información para $NOMBRE</h3>
 <table>
 <tr>
-  <td>Contraseña nueva:</td>
-  <td><input type="password" name="pass1" placeholder="Su contraseña"></td>
+  <td>Nombre:</td>
+  <td><input name="nombre" value="$NOMBRE"></td>
 </tr>
 <tr>
+  <td>Documento:</td>
+  <td><input name="documento" value="$DOCUMENTO"></td>
+</tr>
+<tr>
+  <td>Tipo:</td>
+  <td>$tiposel</td>
+</tr>
+<tr>
+  <td>E-mail:</td>
+  <td><input name="email" value="$EMAIL"></td>
+</tr>
+<tr>
+  <td>Contraseña actual:</td>
+  <td><input type="password" name="pass" placeholder="Su contraseña actual"></td>
+</tr>
+<tr>
+<td colspan=2>
+<a href="JavaScript:void(null)" onclick="$('.newpass').toggle()">Click para cambiar también su contraseña</a>
+</td>
+</tr>
+<tr class="newpass">
+  <td>Contraseña nueva:</td>
+  <td><input type="password" name="pass1" placeholder="Contraseña nueva"></td>
+</tr>
+<tr class="newpass">
   <td>Repita su contraseña:</td>
-  <td><input type="password" name="pass2" placeholder="Su contraseña otra vez"></td>
+  <td><input type="password" name="pass2" placeholder="Contraseña nueva otra vez"></td>
 </tr>
 <tr>
   <td colspan=2>

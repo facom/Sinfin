@@ -35,7 +35,10 @@ if(isset($_SESSION["permisos"])){
   $QPERMISO=$_SESSION["permisos"];
   $NOMBRE=$_SESSION["nombre"];
   $DOCUMENTO=$_SESSION["documento"];
+  $PASS=$_SESSION["password"];
   $PARAMETROS=$_SESSION["parametros"];
+  $EMAIL=$_SESSION["email"];
+  $TIPO=$_SESSION["tipo"];
 }
 $PERMCSS="";
 $type="inline";
@@ -66,7 +69,68 @@ $PERMISOS=array("0"=>"Anónimo",
 $INSTITUTOS=array("fisica"=>"Instituto de Física",
 		  "biologia"=>"Instituto de Biología",
 		  "quimica"=>"Instituto de Química",
-		  "quimica"=>"Instituto de Matemáticas");
+		  "matematicas"=>"Instituto de Matemáticas");
+
+$TIPOS=array("visitante"=>"Visitante",
+	     "estudiante"=>"Estudiante activo",
+	     "profesor"=>"Profesor",
+	     "administrativo"=>"Usuario administrativo");
+
+////////////////////////////////////////////////////////////////////////
+//MOVILIDAD
+////////////////////////////////////////////////////////////////////////
+$TIPO_EVENTO=array("pasantia"=>"Pasantía",
+		   "evento"=>"Evento académico");
+
+$DURACION_EVENTO=array("corto"=>"Corta duración (1 a 7 días)",
+		       "largo"=>"Larga duración (8 a 35 días)",
+		       "prolongado"=>"Prolongado (mayor o igual a 35 días)");
+
+$LUGAR_EVENTO=array("colombia"=>"Colombia",
+		    "andino"=>"Pacto andino, centro américa o el Caribe",
+		    "resto"=>"Resto del mundo incluyendo México");
+
+$PROGRAMAS_FCEN=array("astronomia"=>"Astronomía",
+		      "biologia"=>"Biología",
+		      "estadística"=>"Estadística",
+		      "fisica"=>"Física",
+		      "matematicas"=>"Matemáticas",
+		      "quimica"=>"Química",
+		      "tecnoquimica"=>"Tecnología Química",
+		      "ninguno"=>"Ninguno escogido"
+		      );
+
+$APOYOS=array("nalcorto"=>"Nacional Corto",
+	      "nallargo"=>"Nacional Largo",
+	      "nalprolongado"=>"Nacional Prolongado",
+	      "andinocorto"=>"Andino Corto",
+	      "andinolargo"=>"Andino Largo",
+	      "andinoprolongado"=>"Andino Prolongado",
+	      "internalcorto"=>"Internacional Corto",
+	      "internallargo"=>"Internacional Largo",
+	      "internalprolongado"=>"Internacional Prolongado"
+	      );
+
+$ESTADOS=array("presentada"=>"Presentada",
+	       "pendiente_apoyo"=>"Pendiente confirmación profesor",
+	       "pendiente_aprobacion"=>"Pendiente aprobación FCEN",
+	       "aprobada"=>"Aprobada",
+	       "devuelta"=>"Devuelta",
+	       "realizada"=>"Realizada",
+	       "cumplida"=>"Cumplida",
+	       "terminada"=>"Terminada");
+
+$ESTADOS_COLOR=array("presentada"=>"#ffffcc",
+		     "pendiente_apoyo"=>"#ccffff",
+		     "pendiente_aprobacion"=>"#99ccff",
+		     "aprobada"=>"#ccffcc",
+		     "devuelta"=>"#ffccff",
+		     "realizada"=>"#d1d1e0",
+		     "cumplida"=>"#ffcccc",
+		     "terminada"=>"#f2f2f2");
+
+$BOOLEAN=array("0"=>"No",
+	       "1"=>"Si");
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -150,12 +214,14 @@ function generateSelection($values,$name,$value,$options="",$readonly=0)
     $selection.=$value;
     return $selection;
   }
+  $selection.="<select name='$name'>";
   foreach(array_keys($parts) as $part){
     $show=$parts[$part];
     $selected="";
     if($part==$value){$selected="selected";}
     $selection.="<option value='$part' $selected>$show";
   }
+  $selection.="</select>";
   return $selection;
 }
 
@@ -177,8 +243,25 @@ function mysqlCmd($sql,$qout=0)
   return $result;
 }
 
+function mysqlCmdDB($db,$sql,$qout=0)
+{
+  if(!($out=mysqli_query($db,$sql))){
+    die("Error:".mysqli_error($db));
+  }
+  if(!($result=sqlNoblank($out))){
+    return 0;
+  }
+  if($qout){
+    $result=array($result);
+    while($row=mysqli_fetch_array($out)){
+      array_push($result,$row);
+    }
+  }
+  return $result;
+}
+
 function generateRandomString($length = 10) {
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $characters = '0123456789abc0defghijkmnpqrstuvwxyz';//ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   $randomString = '';
   for ($i = 0; $i < $length; $i++) {
     $randomString .= $characters[rand(0, strlen($characters) - 1)];
@@ -635,14 +718,18 @@ $header=<<<H
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
   <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
+  <link href="lib/daterangepicker/jquery.comiseo.daterangepicker.css" rel="stylesheet">
   <link rel="stylesheet" href="css/sinfin.css" />
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery-ui.min.js"></script>
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
-  <script src="lib/jquery-ui/moment.min-locales.js"></script>
+  <script src="lib/daterangepicker/jquery.comiseo.daterangepicker.js"></script>
   <script src="js/sinfin.js"></script>
   $style
+  
+  <script>
+  </script>
 </head>
 <body>
 
@@ -698,7 +785,7 @@ $menu=<<<M
   <span class="level0">| <a href="usuarios.php?urlref=$urlref">Usuarios</a></span>
 
   <span class="level1">
-  | Sesión de <b>$NOMBRE</b> ($permiso) - <a href="actions.php?action=Cerrar">Cerrar</a>
+  | Sesión de <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso) - <a href="actions.php?action=Cerrar">Cerrar</a>
   <br/>
   </span>
 
@@ -790,8 +877,8 @@ function insertSql($table,$mapfields)
   $values=rtrim($values,",").")";
   $update=rtrim($update,",");
   $sql="insert into $table $fields values $values on duplicate key update $update";
+  //echo "SQL: $sql<br/>";
   $result=mysqlCmd($sql);
-  
   return $result;
 }
 
@@ -808,13 +895,101 @@ function getRecdir($recid)
   return $recdir;
 }
 
+function fechaRango($id,$start="",$end=""){
+$code=<<<C
+<input type="hidden" id="fecharango" name="fecharango">
+<script>
+    $("#$id").daterangepicker({
+        presetRanges: [{
+            text: 'Hoy',
+	    dateStart: function() { return moment() },
+	    dateEnd: function() { return moment() }
+	}, {
+            text: 'Mañana',
+	    dateStart: function() { return moment().add('days', 1) },
+	    dateEnd: function() { return moment().add('days', 1) }
+	}, {
+            text: 'La próxima semana',
+            dateStart: function() { return moment().add('weeks', 1).startOf('week') },
+            dateEnd: function() { return moment().add('weeks', 1).endOf('week') }
+	}],
+	datepickerOptions: {
+            minDate: 0,
+            maxDate: null
+        },
+	applyOnMenuSelect: false,
+	initialText : 'Seleccione el rango de fechas...',
+	applyButtonText : 'Escoger',
+	clearButtonText : 'Limpiar',
+	cancelButtonText : 'Cancelar',
+    });
+    jQuery(function($){
+        $.datepicker.regional['es'] = {
+            closeText: 'Cerrar',
+            prevText: '&#x3c;Ant',
+            nextText: 'Sig&#x3e;',
+            currentText: 'Hoy',
+            monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                         'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+            monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun',
+                              'Jul','Ago','Sep','Oct','Nov','Dic'],
+            dayNames: ['Domingo','Lunes','Martes','Mi&eacute;rcoles','Jueves','Viernes','S&aacute;bado'],
+            dayNamesShort: ['Dom','Lun','Mar','Mi&eacute;','Juv','Vie','S&aacute;b'],
+            dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','S&aacute;'],
+            weekHeader: 'Sm',
+            dateFormat: 'dd/mm/yy',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: ''};
+        $.datepicker.setDefaults($.datepicker.regional['es']);
+    });
+C;
+
+  if(!isBlank($start)){
+$code.=<<<C
+  $("#$id").daterangepicker({
+      onOpen: $("#$id").daterangepicker(
+          "setRange",
+          {start:$.datepicker.parseDate("yy-mm-dd","$start"),
+           end:$.datepicker.parseDate("yy-mm-dd","$end")}
+      )
+  });
+C;
+  }else{
+$code.=<<<C
+  var today = moment().toDate();
+  var tomorrow = moment().add('days', 1).startOf('day').toDate();
+  $("#$id").daterangepicker({
+    onOpen: $("#$id").daterangepicker("setRange",{start: today,end: tomorrow})
+    });
+C;
+  }
+    
+  $code.="</script>";
+  return $code;
+}
+
 ////////////////////////////////////////////////////////////////////////
 //CONNECT TO DATABASE
 ////////////////////////////////////////////////////////////////////////
 $DB=mysqli_connect("localhost",$USER,$PASSWORD,$DATABASE);
 mysqli_set_charset($DB,'utf8');
-mysql_query("set names 'utf8'");
+mysqli_query($DB,"set names 'utf8'");
 $result=mysqlCmd("select now();",$qout=0);
 $DATE=$result[0];
 $DATE_ARRAY=preg_split("/ /",$DATE);
+
+////////////////////////////////////////////////////////////////////////
+//TABLE FIELDS
+////////////////////////////////////////////////////////////////////////
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//MOVILIDAD
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$results=mysqlCmd("describe Movilidad;",$qout=1);
+$MOVILIDAD_FIELDS=array();
+foreach($results as $field){
+  $fieldname=$field[0];
+  $MOVILIDAD_FIELDS["$fieldname"]=$fieldname;
+}
 ?>

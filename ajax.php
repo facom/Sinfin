@@ -51,6 +51,22 @@ if($action=="updatestudent"){
      $html.="0";
    }
 }
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//FILL PROFESOR
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if($action=="fillProfesor"){
+   $ps=parseParams($params);
+   $documento=$ps["documento"];
+   $db=mysqli_connect("localhost","comisiones","123","Comisiones");
+   if($results=mysqlCmdDB($db,"select * from Profesores where cedula='$documento'")){
+     $nombre=$results["nombre"];
+     $email=$results["email"];
+     $html.="{\"nombre\":\"$nombre\",\"email\":\"$email\"}";
+   }else{
+     $html.="0";
+   }
+}
+
 else{
   $html.="Option not recognized";
 }
