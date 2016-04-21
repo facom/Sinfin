@@ -17,6 +17,337 @@ $content.=getHead();
 $content.=getMainMenu();
 
 ////////////////////////////////////////////////////////////////////////
+//ROUTINES
+////////////////////////////////////////////////////////////////////////
+function cambiaEstado($movilid,$newestado)
+{
+  global $MOVILIDAD_FIELDS,$SITEURL,$ESTADOS,$EMAIL_ADMIN,$SINFIN;
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //OBTIENE VARIABLES EXTERNAS
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  foreach(array_keys($MOVILIDAD_FIELDS) as $var){
+    $$var=$GLOBALS["$var"];
+  }
+  $codigo=$GLOBALS["codigo"];
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CAMBIA EL ESTADO
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  $sql="update Movilidad set estado='$newestado' where movilid='$movilid'";
+  mysqlCmd($sql);
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //ENVIA MENSAJE AL ESTUDIANTE
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  $viejoestado=$ESTADOS["$estado"];
+  $nuevoestado=$ESTADOS["$newestado"];
+  $subject="[SInfIn] Actualización de su solicitud de movilidad estudiantil $movilid";
+$message.=<<<M
+<p>
+  Señor(a) estudiante,
+</p>
+<p>
+  Su solicitud de movilidad estudiantil ha sido actualizada en
+  $SINFIN.  Ha pasado al estado <b>$nuevoestado</b>.
+</p>
+<p>
+  Para ver los detalles conéctese con su cuenta de usuario en el
+  sistema y
+  use <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">el
+  siguiente enlace para ver directamente la solicitud</a>.
+</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+M;
+  sendMail($email,$subject,$message,$EHEADERS);
+  statusMsg("Actualización de estado enviada a $email");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //Envia mensaje de acuerdo al cambio de estado
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if(0){
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //NUEVA SOLICITUD
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="pendiente_apoyo"){
+    //Send mail to profesor 
+    $urlapoyo="$SITEURL/movilidad.php?action=apoyo&resultado=apoyo&movilid=$movilid&codigo=$codigo";
+    $urldevol="$SITEURL/movilidad.php?action=apoyo&resultado=devol&movilid=$movilid&codigo=$codigo";
+    $urlmovil="$SITEURL/movilidad.php?mode=ver&movilid=$movilid";
+    
+    $subject="[SInfIn] La solicitud de movilidad estudiantil $movilid requiere su visto bueno";
+$message=<<<M
+<p>
+  Señor(a) Profesor(a),
+</p>
+<p>
+  Una solicitud de movilidad fue presentada por el estudiante del
+  programa de <b>$programa</b>, <b>$nombre</b> identificado con
+  documento <b>$documento</b> .  El estudiante lo eligió a usted como
+  profesor de apoyo.
+</p>
+<p>
+  Para continuar con el trámite es necesario que usted de visto bueno
+  a la solicitud.  Para ello lo único que tiene que hacer es dar click
+  en el siguiente enlace:
+</p>
+<center>
+  <a href="$urlapoyo" style="font-size:1.5em" target="_blank">
+    De click en este enlace para apoyar la solicitud
+  </a>
+</center>
+<p>
+  Si quiere conocer más a fondo la solicitud antes de dar su visto
+  bueno use <a href="$urlmovil">este enlace para ver los detalles</a>. Si
+  después de conocer la solicitud usted decide apoyarla vuelva a este
+  correo y de click en el enlace arriba.
+</p>
+<p>
+  Si no conoce al estudiante o la solicitud tiene un inconveniente de
+  click en el siguiente enlace:
+</p>
+<center>
+  <a href="$urldevol" style="font-size:1.5em" target="_blank">
+    De click en este enlace para devolver la solicitud.
+  </a>
+</center>
+<p>
+  En este último caso comuníquese con el estudiante en el
+  correo <a href="mailto:$email" target="_blank">$email</a> para
+  sugerirle cambios a la solicitud o para informarle de su decisión de
+  no apoyarla.
+</p>
+<p>Atentamente,</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+<p>
+  C.C. Vicedecanato FCEN
+</p>
+M;
+     sendMail($email_profesor,$subject,$message,$EHEADERS);
+     sendMail($EMAIL_ADMIN,"[Copia]".$subject,$message,$EHEADERS);
+     statusMsg("Mensaje enviado al profesor $email_profesor");
+     return $newestado;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //SOLICITUD CON VISTO BUENO
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="pendiente_aprobacion"){
+    $subject="[SInfIn] La solicitud de movilidad estudiantil $movilid ha recibido visto bueno";
+$message=<<<M
+<p>
+  Señores Comité de Currículo,
+</p>
+<p>
+  La solicitud de movilidad <b>$movilid</b> presentada por el estudiante del
+  programa de <b>$programa</b>, <b>$nombre</b>, identificado con
+  documento <b>$documento</b> ha recibido visto bueno del profesor.
+</p>
+<p>
+  Una vez conectado a $SINFIN puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  $SINFIN
+</p>
+M;
+    sendMail($EMAIL_ADMIN,$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //DEVUELTA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="devuelta"){
+     //PENDIENTE
+    $subject="[SInfIn] La solicitud de movilidad estudiantil $movilid ha sido devuelta";
+$message=<<<M
+<p>
+  Señores Comité de Currículo,
+</p>
+<p>
+  La solicitud de movilidad <b>$movilid</b> presentada por el estudiante del
+  programa de <b>$programa</b>, <b>$nombre</b>, identificado con
+  documento <b>$documento</b>, ha sido devuelta.
+</p>
+<p>
+  Puede verificar el estado de la solicitud y sus detalles conectándose a $SINFIN.
+  Una vez allí puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  $SINFIN
+</p>
+M;
+    sendMail($EMAIL_ADMIN,$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }  
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //RECHAZADA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="aprobada"){
+    //PENDIENTE
+    $subject="[SInfIn] Solicitud de movilidad estudiantil $movilid aprobada";
+$message=<<<M
+<p>
+  Apreciado(a) $nombre,
+</p>
+<p>
+  El Comité de Currículo se complace en informarle que su solicitud de
+  movilidad <b>$movilid</b> ha sido aprobada en el acto
+  administrativo <b>$acto</b>.
+</p>
+<p>
+  Después de estudiar su solicitud y teniendo en cuenta los topes
+  definidos por el Consejo de Facultad, el comité de currículo aprobó
+  un monto total de <b>$monto</b>.
+</p>
+<p>
+  Le recordamos al terminar la actividad, cumplir con
+  las <b>obligaciones adquiridas</b> al recibir este apoyo en un plazo
+  no mayor a un mes. Estas obligaciones deberán ser legalizadas usando
+  la plataforma $SINFIN, tal y como se explica en los tutoriales de la
+  misma.
+</p>
+<p>
+  Para conocer otros detalles de su solicitud conéctese a $SINFIN.
+  Una vez allí puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+<p>
+  C.C. Profesor de Apoyo, Comité de Currículo.
+</p>
+M;
+    sendMail($email,$subject,$message,$EHEADERS);
+    sendMail($email_profesor,"[Copia]".$subject,$message,$EHEADERS);
+    sendMail($EMAIL_ADMIN,"[Copia]".$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al estudiante $email, al profesor de apoyo $email_profesor y al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //RECHAZADA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="rechazada"){
+    //PENDIENTE
+    $subject="[SInfIn] Solicitud de movilidad estudiantil $movilid rechazada";
+$message=<<<M
+<p>
+  Señor(a) estudiante,
+</p>
+<p>
+  El Comité de Currículo lamenta informarle que su solicitud de
+  movilidad <b>$movilid</b> ha sido rechazada en el acto
+  administrativo <b>$acto</b>.
+</p>
+<p>
+  Las razones expresadas por el Comité fueron:
+  <blockquote style="font-style:italic">
+    $observacionesadmin
+  </blockquote>
+</p>
+<p>
+  Para conocer otros detalles de su solicitud conéctese a $SINFIN.
+  Una vez allí puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+<p>
+  C.C. Profesor de Apoyo, Comité de Currículo.
+</p>
+M;
+    sendMail($email,$subject,$message,$EHEADERS);
+    sendMail($email_profesor,"[Copia]".$subject,$message,$EHEADERS);
+    sendMail($EMAIL_ADMIN,"[Copia]".$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al estudiante $email, al profesor de apoyo $email_profesor y al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CUMPLIDA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="cumplida"){
+    //PENDIENTE
+    $subject="[SInfIn] Solicitud de movilidad estudiantil $movilid cumplida";
+$message=<<<M
+<p>
+  Señores Comité de Currículo,
+</p>
+<p>
+  La solicitud de movilidad <b>$movilid</b> presentada por el estudiante del
+  programa de <b>$programa</b>, <b>$nombre</b>, identificado con
+  documento <b>$documento</b>, ha sido cumplida exitosamente.
+</p>
+<p>
+  Puede verificar los cumplidos conéctese a $SINFIN.
+  Una vez allí puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  $SINFIN
+</p>
+M;
+    sendMail($EMAIL_ADMIN,$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //TERMINADA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($newestado=="terminada"){
+    //PENDIENTE
+    $subject="[SInfIn] Solicitud de movilidad estudiantil $movilid terminada";
+$message=<<<M
+<p>
+  Señores Comité de Currículo,
+</p>
+<p>
+  La solicitud de movilidad <b>$movilid</b> presentada por el
+  estudiante del programa de <b>$programa</b>, <b>$nombre</b>,
+  identificado con documento <b>$documento</b>, ha sido terminada
+  exitosamente. Se han entregado el cumplido y el compromiso
+  obligatorio.
+</p>
+<p>
+  Puede verificar los documentos respectivos conéctese a $SINFIN.  Una
+  vez allí puede editar la solicitud
+  usando <a href="$SITEURL/movilidad.php?mode=editar&movilid=$movilid&action=loadmovil">este
+  enlace</a>.
+</p>
+<p>Atentamente,</p>
+<p>
+  $SINFIN
+</p>
+<p>
+C.C. Estudiante.
+</p>
+M;
+    sendMail($EMAIL_ADMIN,$subject,$message,$EHEADERS);
+    sendMail($email,"[Copia]".$subject,$message,$EHEADERS);
+    statusMsg("Mensaje enviado al administrador $EMAIL_ADMIN");
+    return $newestado;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 //SUBMENU
 ////////////////////////////////////////////////////////////////////////
 $content.=<<<M
@@ -56,9 +387,47 @@ if(isset($action)){
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CONFIRMAR APOYO
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="apoyo"){
+    $movildir="data/movilidad/$movilid";
+    $codsave=rtrim(shell_exec("cat $movildir/.codigo"));
+
+    if($movil=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
+      foreach(array_keys($MOVILIDAD_FIELDS) as $field) $$field=$movil["$field"];
+      //CHECK CODIGO
+      if($codsave!=$codigo){
+	errorMsg("El código de la solicitud no coincide.");
+	goto endaction;
+      }
+      //VISTO BUENO
+      if($resultado=="apoyo"){
+	cambiaEstado($movilid,"pendiente_aprobacion");
+	mysqlCmd("update Movilidad set respuesta='1' where movilid='$movilid'");
+      }
+      //DEVOLUCION DEL PROFESOR
+      if($resultado=="devol"){
+	cambiaEstado($movilid,"devuelta");
+	mysqlCmd("update Movilidad set respuesta='0' where movilid='$movilid'");
+      }
+$content.=<<<C
+<p style="font-size:2em;text-align:center;">
+Hemos registrado su información. Gracias.
+</p>
+C;
+      $mode="empty";
+      header("Refresh:5;url=$SITEURL");
+    }else{
+      errorMsg("La solicitud $movilid ya no existe.");
+      goto endaction;
+    }
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //CARGAR SOLICITUD
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Cargar"){
+
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //UPLOAD FILE
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -73,7 +442,7 @@ if(isset($action)){
       shell_exec("cd $movildir;unzip $name");
       include("$movildir/movilidad.php");
       $movilid=$movilidnew;
-      $blankfields=array("nombre","cumplido","compromiso","fechapresenta","historia","apoyo","monto","respuesta","observacionesadmin","acto");
+      $blankfields=array("nombre","cumplido","compromiso","fechapresenta","historia","apoyo","monto","respuesta","observacionesadmin","acto","estado");
       foreach($blankfields as $field){unset($$field);}
       statusMsg("Solicitud cargada.");
     }else{
@@ -118,7 +487,7 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //ENVIAR
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="Guardar"){
+  if($action=="Guardar" or $action=="Enviar" or $action=="Cumplir"){
 
     $movildir="data/movilidad/$movilid";
     shell_exec("mkdir -p $movildir");
@@ -149,14 +518,6 @@ if(isset($action)){
       shell_exec("cp $tmp $movildir/'$filename'");
       $carta=$filename;
     }
-    $file_cumplido=$_FILES["cumplido"];
-    if($file_cumplido["size"]>0){
-      $name=$file_cumplido["name"];
-      $tmp=$file_cumplido["tmp_name"];
-      $filename="Cumplido_${suffix}_$name";
-      shell_exec("cp $tmp $movildir/'$filename'");
-      $cumplido=$filename;
-    }
     $file_compromiso=$_FILES["compromiso"];
     if($file_compromiso["size"]>0){
       $name=$file__compromiso["name"];
@@ -164,6 +525,66 @@ if(isset($action)){
       $filename="Compromiso_${suffix}_$name";
       shell_exec("cp $tmp $movildir/'$filename'");
       $compromiso=$filename;
+      if($estado=="aprobada" or $estado=="cumplida"){
+	$estado="terminada";
+      }
+    }
+    $file_cumplido=$_FILES["cumplido"];
+    if($file_cumplido["size"]>0){
+      $name=$file_cumplido["name"];
+      $tmp=$file_cumplido["tmp_name"];
+      $filename="Cumplido_${suffix}_$name";
+      shell_exec("cp $tmp $movildir/'$filename'");
+      $cumplido=$filename;
+      if($estado=="aprobada"){
+	$estado="cumplida";
+      }
+    }
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //READ PREVIOUS FIELDS
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    $movil=mysqlCmd("select * from Movilidad where movilid='$movilid'");
+    
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //CÓDIGO ÚNICO
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    $codigo=generateRandomString(20);
+    shell_exec("echo $codigo > $movildir/.codigo");
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //CHECK STATUS TO SEND MAILS
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    if($estado=="nueva" and $action="Guardar"){
+      $estado="guardada";
+    }
+    if(($estado=="nueva" or $estado=="guardada") and $action=="Enviar"){
+      $estado=cambiaEstado($movilid,"pendiente_apoyo");
+    }
+    if($estado=="aprobada" and $movil){
+      if($movil["estado"]!="aprobada"){
+	$estado=cambiaEstado($movilid,"aprobada");
+      }
+    }
+    if($estado=="devuelta" and $movil){
+      if($movil["estado"]!="devuelta"){
+	$estado=cambiaEstado($movilid,"devuelta");
+      }
+    }
+    if($estado=="rechazada" and $movil){
+      if($movil["estado"]!="rechazada"){
+	$estado=cambiaEstado($movilid,"rechazada");
+      }
+    }
+    if($estado=="terminada"){
+      if($movil["estado"]!="terminada"){
+	$estado=cambiaEstado($movilid,"terminada");
+      }
+    }
+    if($estado=="cumplida"){
+      if($movil["estado"]!="cumplida"){
+	$estado=cambiaEstado($movilid,"cumplida");
+      }
     }
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -233,6 +654,39 @@ C;
   if(0){}
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //VER DETALLES DE LA SOLICITUD DE MOVILIDAD
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($mode=="ver"){
+    //Leer información de la solicitud
+    if($movil=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
+      $movildir="data/movilidad/$movilid";
+$content.=<<<C
+<center>
+<h4>Solicitud de movilidad <b>$movilid</b></h4>
+<table border=1px width=60% cellspacing=0px>
+<tr>
+  <td width=20% style="padding:5px;background:lightgray"><b>Item</b></td>
+  <td width=80% style="padding:5px;background:lightgray"><b>Valor</b></td>
+</tr>
+C;
+      foreach(array_keys($MOVILIDAD_FIELDS) as $field){
+	$value=$movil["$field"];
+	if(isBlank($value)){continue;}
+	if(file_exists("$movildir/$value")){
+	  $value="<a href=$movildir/$value target=_blank>$value</a>";
+	}
+	if(isBlank($value)){continue;}
+	$content.="<tr><td style='background:lightgray;padding:10px'><b>$field</b>:</td><td>$value</td></tr>";
+      }
+$content.=<<<C
+</table>
+</center>
+C;
+    }
+
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //LISTA DE SOLICITUDES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="lista"){
@@ -240,9 +694,10 @@ C;
     ////////////////////////////////////////////////////
     //SEARCHING CRITERIA
     ////////////////////////////////////////////////////
-    //$search="";
     if(!isset($sort)){$sort="TIMESTAMP(fechaestado)";}
     if(!isset($order)){$order="asc";}
+    if(!isset($search)){$search="where movilid<>'' ";}
+    if($QPERMISO<=3){$search.="and email='$EMAIL' ";}
 
     ////////////////////////////////////////////////////
     //RECOVER INFO
@@ -396,14 +851,15 @@ T;
     }
     if(!isset($movilid)){$movilid=generateRandomString(5);}
     if(!isset($estado)){
-      $estado="presentada";
+      $estado="nueva";
     }
     if(!isset($fechapresenta)){
       $fechapresenta=$DATE;
       $fechaestado=$DATE;
+      $fechafin=$DATE;
     }
     if(!isset($respuesta)){$respuesta=0;}
-    if(!isset($monto) or $monto==0){
+    if(!isset($monto) or $monto==""){
       $montotxt="<i>No aprobado aún</i>";
       $actotxt="<i>No aprobado aún</i>";
     }else{
@@ -418,25 +874,103 @@ T;
     $fecharango_menu=fechaRango("fecharango",$fechaini,$fechafin);
 
     ////////////////////////////////////////////////////
-    //TIPO DE EVENTO
+    //BLOQUEO DEPENDIENDO DE PERMISOS Y ESTADO
+    ////////////////////////////////////////////////////
+    $perm1="";
+    $perm2="";
+    $restricciones="Restricciones:<br/><ul>";
+    if($QPERMISO<=3){
+      if($estado=="nueva" or
+	 $estado=="guardada" or
+	 $estado=="devuelta"){
+	$perm1="";
+      }else{
+	$restricciones.="<li>La solicitud esta en un estado en el que el estudiante no puede realizar cambios</li>";
+	$perm1="readonly";
+	$bperm1="disabled";
+      }
+    }
+    //CHECK TIME FOR CUMPLIDO
+    $fecha=$DATE;
+    //$fecha="2016-08-09 00:00:00";
+    $diferencia=(strtotime($fecha)-strtotime($fechafin))/86400.0;
+    //echo "Fecha: $fecha, Fecha fin: $fechafin, Diferencia:$diferencia<br/>";
+    if($diferencia<1.0){
+      $perm2="readonly";
+      $bperm2="disabled";
+      $restricciones.="<li>No se ha cumplido el tiempo de la actividad. No puede todavía subir el cumplido o el compromiso.</li>";
+      $backcumplido="";
+      $botoncumplir="";
+    }else{
+      $perm2="";
+      $backcumplido="background:pink;";
+      $botoncumplir="<input type='submit' name='action' value='Cumplir' class='boton'>";
+    }
+    if($QPERMISO<=3){
+      if($estado=="terminada" or $estado=="rechazada"){
+	$perm1="readonly";
+	$bperm1="disabled";
+	$perm2="readonly";
+	$bperm2="disabled";
+	$backcumplido="";
+	$botoncumplir="";
+      }
+    }
+    if($restricciones=="Restricciones:<br/><ul>"){$restricciones="";}
+
+    ////////////////////////////////////////////////////
+    //COLOR
+    ////////////////////////////////////////////////////
+    $color=$ESTADOS_COLOR["$estado"];
+
+    ////////////////////////////////////////////////////
+    //BOTON DE ENVIAR
+    ////////////////////////////////////////////////////
+    if($estado=="guardada" or $estado=="nueva"){
+      $enviar="<input $bperm1 type='submit' name='action' value='Enviar' class='boton'>";
+    }
+
+    ////////////////////////////////////////////////////
+    //SELECCION
     ////////////////////////////////////////////////////
     $estadotxt=$ESTADOS["$estado"];
     $respuestatxt=$BOOLEAN["$respuesta"];
-    $tiposel=generateSelection($TIPO_EVENTO,"tipoevento","$tipoevento");
-    $programasel=generateSelection($PROGRAMAS_FCEN,"programa","$programa");
-    $apoyosel=generateSelection($APOYOS,"apoyo","$apoyo");
-    $estadosel=generateSelection($ESTADOS,"estado","$estado");
     $helpicon="<a href='JavaScript:void(null)' onclick='toggleHelp(this)'><img src='img/help.png' width='15em'></a>";
+
+    $readonly=0;
+    if(!isBlank($perm1)){$readonly=1;}
+    $tiposel=generateSelection($TIPO_EVENTO,"tipoevento","$tipoevento","",$readonly);
+    $programasel=generateSelection($PROGRAMAS_FCEN,"programa","$programa","",$readonly);
+    $apoyosel=generateSelection($APOYOS,"apoyo","$apoyo","",$readonly);
+    $estadosel=generateSelection($ESTADOS,"estado","$estado","",$readonly);
+
 $botones=<<<B
 <tr class="field">
   <td colspan=2 class="botones">
-    <input type="submit" name="action" value="Guardar" class="boton">
-    <input type="submit" name="action" value="Salir" class="boton">
-    <input type="submit" name="action" value="Borrar" class="boton">
+    $botoncumplir
+    <input $bperm1 type="submit" name="action" value="Guardar" class="boton">
+    $enviar
+    <input $bperm1 type="submit" name="action" value="Salir" class="boton">
+    <input $bperm1 type="submit" name="action" value="Borrar" class="boton">
   </td>
 </tr>
 B;
+    if($estado=="nueva"){
+$cargar=<<<C
+<form action="movilidad.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+  <a href="JavaScript:void(null)" onclick="$('#cargamovil').toggle()" style="font-size:0.8em";>Cargar desde un archivo</a>
+  <div id="cargamovil">
+    <input $bperm1 type="file" name="movilfile">
+    <input type="submit" name="action" value="Cargar">
+    <input type="hidden" name="movilid" value="$movilid">
+</form>
+</div>
+C;
+    }else{$cargar="";}
 
+    ////////////////////////////////////////////////////
+    //FORMULARIO
+    ////////////////////////////////////////////////////
 $content.=<<<FORM
 <h3>Solicitud Bolsa de Movilidad Estudiantil FCEN</h3>
 
@@ -445,20 +979,16 @@ Complete o modifique el formulario a continuación para presentar una solicitud 
 </p>
 
 <center>
-<form action="movilidad.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-  <a href="JavaScript:void(null)" onclick="$('#cargamovil').toggle()" style="font-size:0.8em";>Cargar desde un archivo</a>
-  <div id="cargamovil">
-    <input type="file" name="movilfile">
-    <input type="submit" name="action" value="Cargar">
-    <input type="hidden" name="movilid" value="$movilid">
-</form>
-</div>
-
+$cargar
 <form action="movilidad.php?loadmovil" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 <input type="hidden" name="mode" value="editar">
-<table width=60% cellspacing=10px>
+<table width=60% cellspacing=10px style="background:$color">
 <tr><td width=20%></td></td width=60%></tr>
 
+<!---------------------------------------------------------------------->
+<tr><td colspan=2 style="font-size:0.7em;font-style:italic;">
+  $restricciones
+</td></tr>
 <!---------------------------------------------------------------------->
 $botones
 <!---------------------------------------------------------------------->
@@ -550,22 +1080,22 @@ $botones
   </td>
 </tr>
 <!---------------------------------------------------------------------->
-<tr><td colspan=2 class="header"><b>Cumplido</b></td></tr>
+<tr ><td colspan=2 class="header" style="$backcumplido"><b>Cumplido</b></td></tr>
 <!---------------------------------------------------------------------->
 <tr class="field">
-  <td class="campo" id="cumplido">Cumplido$helpicon:</td>
-  <td class="form">
-    <input type="file" name="cumplido" value="$cumplido"><br/>
+  <td class="campo" id="cumplido" style="$backcumplido">Cumplido$helpicon:</td>
+  <td class="form" style="$backcumplido">
+    <input $bperm2 type="file" name="cumplido" value="$cumplido"><br/>
     <span class="archivo">Archivo: $cumplido_archivo</span>
   </td>
 </tr>
-<tr class="ayuda" id="cumplido_help">
+<tr class="ayuda" id="cumplido_help" >
   <td colspan=2>Suba aquí el documento que certifique su participación en el evento.</td>
 </tr>
 <tr class="field">
-  <td class="campo" id="compromiso">Compromiso$helpicon:</td>
-  <td class="form">
-    <input type="file" name="compromiso" value="$compromiso"><br/>
+  <td class="campo" id="compromiso" style="$backcumplido">Compromiso$helpicon:</td>
+  <td class="form"  style="$backcumplido">
+    <input $bperm2 type="file" name="compromiso" value="$compromiso"><br/>
     <span class="archivo">Archivo: $compromiso_archivo</span>
   </td>
 </tr>
@@ -590,7 +1120,7 @@ $botones
 <tr class="field">
   <td class="campo" id="lugar">Lugar$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="lugar" placeholder="Ciudad (País)" value="$lugar">
+    <input $perm1 type="text" size=30 name="lugar" placeholder="Ciudad (País)" value="$lugar">
   </td>
 </tr>
 <tr class="ayuda" id="lugar_help">
@@ -600,7 +1130,7 @@ $botones
 <tr class="field">
   <td class="campo" id="idioma">Idioma$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="idioma" placeholder="Inglés" value="$idioma">
+    <input $perm1 type="text" size=30 name="idioma" placeholder="Inglés" value="$idioma">
   </td>
 </tr>
 <tr class="ayuda" id="idioma_help">
@@ -610,7 +1140,7 @@ $botones
 <tr class="field">
   <td class="campo" id="evento">Evento o Institución$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="evento" placeholder="Nombre del Evento" value="$evento">
+    <input $perm1 type="text" size=30 name="evento" placeholder="Nombre del Evento" value="$evento">
   </td>
 </tr>
 <tr class="ayuda" id="evento_help">
@@ -631,7 +1161,7 @@ $botones
 <tr class="field">
   <td class="campo" id="documento">Documento profesor$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="documento_profesor" placeholder="Documento de dentidad" value="$documento_profesor" onchange="fillProfesor(this)">
+    <input $perm1 type="text" size=30 name="documento_profesor" placeholder="Documento de dentidad" value="$documento_profesor" onchange="fillProfesor(this)">
   </td>
 </tr>
 <tr class="ayuda" id="documento_help">
@@ -641,7 +1171,7 @@ $botones
 <tr class="field">
   <td class="campo" id="profesor">Nombre profesor$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="profesor" placeholder="Se autocompletara" value="$profesor" readonly>
+    <input $perm1 type="text" size=30 name="profesor" placeholder="Se autocompletara" value="$profesor" readonly>
   </td>
 </tr>
 <tr class="ayuda" id="profesor_help">
@@ -651,7 +1181,7 @@ $botones
 <tr class="field">
   <td class="campo" id="email_profesor">E-mail del profesor$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="email_profesor" placeholder="Se autocompletara" value="$email_profesor" readonly>
+    <input $perm1 type="text" size=30 name="email_profesor" placeholder="Se autocompletara" value="$email_profesor" readonly>
   </td>
 </tr>
 <tr class="ayuda" id="email_profesor_help">
@@ -670,29 +1200,29 @@ $botones
 	<td>Fuente de financiación<br/><i style="font-size:0.8em">Si lo tiene</i></td>
       </tr>
       <tr>
-	<td><input type="text" size=30 name="item1" placeholder="Transporte" value="$item1"></td>
-	<td><input type="text" size=30 name="value1" placeholder="50,000" value="$value1" onchange="calcularTotal(this)"></td>
-	<td><input type="text" size=30 name="fuente1" placeholder="Grupo de Investigación" value="$fuente1"></td>
+	<td><input $perm1 type="text" size=30 name="item1" placeholder="Transporte" value="$item1"></td>
+	<td><input $perm1 type="text" size=30 name="value1" placeholder="50,000" value="$value1" onchange="calcularTotal(this)"></td>
+	<td><input $perm1 type="text" size=30 name="fuente1" placeholder="Grupo de Investigación" value="$fuente1"></td>
       </tr>
       <tr>
-	<td><input type="text" size=30 name="item2" placeholder="Inscripción" value="$item2"></td>
-	<td><input type="text" size=30 name="value2" placeholder="1'000,000" value="$value2" onchange="calcularTotal(this)"></td>
-	<td><input type="text" size=30 name="fuente2" placeholder="Grupo de Investigación" value="$fuente2"></td>
+	<td><input $perm1 type="text" size=30 name="item2" placeholder="" value="$item2"></td>
+	<td><input $perm1 type="text" size=30 name="value2" placeholder="" value="$value2" onchange="calcularTotal(this)"></td>
+	<td><input $perm1 type="text" size=30 name="fuente2" placeholder="" value="$fuente2"></td>
       </tr>
       <tr>
-	<td><input type="text" size=30 name="item3" placeholder="Alimentación" value="$item3"></td>
-	<td><input type="text" size=30 name="value3" placeholder="150,000" value="$value3" onchange="calcularTotal(this)"></td>
-	<td><input type="text" size=30 name="fuente3" placeholder="Grupo de Investigación" value="$fuente3"></td>
+	<td><input $perm1 type="text" size=30 name="item3" placeholder="" value="$item3"></td>
+	<td><input $perm1 type="text" size=30 name="value3" placeholder="" value="$value3" onchange="calcularTotal(this)"></td>
+	<td><input $perm1 type="text" size=30 name="fuente3" placeholder="" value="$fuente3"></td>
       </tr>
       <tr>
-	<td><input type="text" size=30 name="item4" placeholder="Gastos Visa" value="$item4"></td>
-	<td><input type="text" size=30 name="value4" placeholder="1'200,000" value="$value4" onchange="calcularTotal(this)"></td>
-	<td><input type="text" size=30 name="fuente4" placeholder="Grupo de Investigación" value="$fuente4"></td>
+	<td><input $perm1 type="text" size=30 name="item4" placeholder="" value="$item4"></td>
+	<td><input $perm1 type="text" size=30 name="value4" placeholder="" value="$value4" onchange="calcularTotal(this)"></td>
+	<td><input $perm1 type="text" size=30 name="fuente4" placeholder="" value="$fuente4"></td>
       </tr>
       <tr>
-	<td><input type="text" size=30 name="item5" placeholder="Materiales" value="$item5"></td>
-	<td><input type="text" size=30 name="value5" placeholder="10,000" value="$value5" onchange="calcularTotal(this)"></td>
-	<td><input type="text" size=30 name="fuente5" placeholder="Grupo de Investigación" value="$fuente5"></td>
+	<td><input $perm1 type="text" size=30 name="item5" placeholder="" value="$item5"></td>
+	<td><input $perm1 type="text" size=30 name="value5" placeholder="" value="$value5" onchange="calcularTotal(this)"></td>
+	<td><input $perm1 type="text" size=30 name="fuente5" placeholder="" value="$fuente5"></td>
       </tr>
       <tr><td colspan=3>
 	  Total: <span id="total">$total</span>
@@ -708,7 +1238,7 @@ $botones
 <tr class="field">
   <td class="campo" id="valor">Valor solicitado$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="valor" placeholder="50000" value="$valor" onchange="plainNumber($(this))">
+    <input $perm1 type="text" size=30 name="valor" placeholder="50000" value="$valor" onchange="plainNumber($(this))">
   </td>
 </tr>
 <tr class="ayuda" id="valor_help">
@@ -718,7 +1248,7 @@ $botones
 <tr class="field">
   <td class="campo" id="historia">Historia académica$helpicon:</td>
   <td class="form">
-    <input type="file" name="historia" value="$historia"><br/>
+    <input $bperm1 type="file" name="historia" value="$historia"><br/>
     <span class="archivo">Archivo: $historia_archivo</span>
   </td>
 </tr>
@@ -731,7 +1261,7 @@ $botones
 <tr class="field">
   <td class="campo" id="carta">Soporte de invitación o aceptación$helpicon:</td>
   <td class="form">
-    <input type="file" name="carta" value="$carta"><br/>
+    <input $bperm1 type="file" name="carta" value="$carta"><br/>
     <span class="archivo">Archivo: $carta_archivo</span>
   </td>
 </tr>
@@ -747,7 +1277,7 @@ $botones
 </tr>
 <tr class="field">
   <td class="form" colspan=2>
-    <textarea name="observaciones" cols=80 rows=10>$observaciones</textarea>
+    <textarea $perm1 name="observaciones" cols=80 rows=10>$observaciones</textarea>
   </td>
 </tr>
 <tr class="ayuda" id="observaciones_help">
@@ -755,6 +1285,10 @@ $botones
   si viaja en un grupo, entre otros detalles no contemplados en el
   formulario.</td>
 </tr>
+</table>
+
+<table width=60% cellspacing=10px class="level4">
+<tr><td width=20%></td></td width=60%></tr>
 <!---------------------------------------------------------------------->
 <tr><td colspan=2 class="header"><b>Reservado para la Administración</b></td></tr>
 <!---------------------------------------------------------------------->
@@ -779,7 +1313,7 @@ $botones
 <tr class="field">
   <td class="campo" id="monto">Monto aprobado$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="monto" placeholder="Valor" value="$monto" onchange="plainNumber($(this))">
+    <input $perm1 type="text" size=30 name="monto" placeholder="Valor" value="$monto" onchange="plainNumber($(this))">
   </td>
 </tr>
 <tr id="monto_help" class="ayuda">
@@ -789,7 +1323,7 @@ $botones
 <tr class="field">
   <td class="campo" id="acto">Acto Administrativo$helpicon:</td>
   <td class="form">
-    <input type="text" size=30 name="acto" placeholder="Número de acta, fecha" value="$acto">
+    <input $perm1 type="text" size=30 name="acto" placeholder="Número de acta, fecha" value="$acto">
   </td>
 </tr>
 <tr id="acto_help" class="ayuda">
@@ -801,7 +1335,7 @@ $botones
 </tr>
 <tr class="field">
   <td class="form" colspan=2>
-    <textarea name="observacionesadmin" cols=80 rows=10>$observacionesadmin</textarea>
+    <textarea $perm1 name="observacionesadmin" cols=80 rows=10>$observacionesadmin</textarea>
   </td>
 </tr>
 <tr id="observacionesadmin_help" class="ayuda">
@@ -825,6 +1359,13 @@ $botones
 </center>
 FORM;
 
+    goto end;
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //EMPTY
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($mode=="refresh"){
     goto end;
   }
 

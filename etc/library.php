@@ -16,6 +16,9 @@ $DATABASE="Sinfin";
 $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
+//COLOQUE AQUÍ EL E-MAIL DEL VICEDECANATO
+$EMAIL_ADMIN="pregradofisica@udea.edu.co";
+
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
     if(preg_match("/86_64/",$out)){$arch="64";}
@@ -111,23 +114,27 @@ $APOYOS=array("nalcorto"=>"Nacional Corto",
 	      "internalprolongado"=>"Internacional Prolongado"
 	      );
 
-$ESTADOS=array("presentada"=>"Presentada",
+$ESTADOS=array("nueva"=>"Nueva solicitud",
+	       "guardada"=>"Guardada",
 	       "pendiente_apoyo"=>"Pendiente confirmación profesor",
 	       "pendiente_aprobacion"=>"Pendiente aprobación FCEN",
 	       "aprobada"=>"Aprobada",
 	       "devuelta"=>"Devuelta",
 	       "realizada"=>"Realizada",
 	       "cumplida"=>"Cumplida",
+	       "rechazada"=>"Rechazada",
 	       "terminada"=>"Terminada");
 
-$ESTADOS_COLOR=array("presentada"=>"#ffffcc",
+$ESTADOS_COLOR=array("nueva"=>"white",
+		     "guardada"=>"#ffffcc",
 		     "pendiente_apoyo"=>"#ccffff",
 		     "pendiente_aprobacion"=>"#99ccff",
 		     "aprobada"=>"#ccffcc",
 		     "devuelta"=>"#ffccff",
 		     "realizada"=>"#d1d1e0",
 		     "cumplida"=>"#ffcccc",
-		     "terminada"=>"#f2f2f2");
+		     "rechazada"=>"#ff6666",
+		     "terminada"=>"#99ff99");
 
 $BOOLEAN=array("0"=>"No",
 	       "1"=>"Si");
@@ -155,7 +162,11 @@ $FILENAME=$_SERVER["SCRIPT_NAME"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
 $SITEURL="http://$HOST$BASEDIR/";
-$REFERER=$_SERVER["HTTP_REFERER"];
+if(isset($_SERVER["HTTP_REFERER"])){
+  $REFERER=$_SERVER["HTTP_REFERER"];
+}else{
+  $REFERER=$SITEURL;
+}
 
 $WIDTHVID=400;
 $HEIGHTVID=$WIDTHVID/1.4;
@@ -214,7 +225,7 @@ function generateSelection($values,$name,$value,$options="",$readonly=0)
     $selection.=$value;
     return $selection;
   }
-  $selection.="<select name='$name'>";
+  $selection.="<select $options name='$name'>";
   foreach(array_keys($parts) as $part){
     $show=$parts[$part];
     $selected="";
@@ -801,7 +812,7 @@ $menu=<<<M
     <a href="reconoce.php">Reconocimientos</a>
   | <a href="planes.php">Planes de Estudio</a> 
   | <a href="asignaturas.php">Planes de Asignatura</a> 
-  <span class="level4">
+  <span class="level1">
   | <a href="movilidad.php">Bolsa de Movilidad</a> 
   </span>
   </span>
