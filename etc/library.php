@@ -651,6 +651,7 @@ function getHeaders()
 		"4"=>"pink");
   if($QPERMISO>0){
     $color=$colors[$QPERMISO];
+    $color="white";
     $style.=".menuperm{background:$color;}\n";
   }else{
     $style.=".menuperm{}\n";
@@ -786,34 +787,29 @@ H;
 
 function getMainMenu()
 {
-  global $QPERMISO,$NOMBRE,$PERMISOS;
-  $permiso=$PERMISOS["$QPERMISO"];
   $urlref=urlencode($_SERVER["REQUEST_URI"]);
 $menu=<<<M
 <div class="mainmenu menuperm">
-  <a href="index.php">Principal</a>
+  <a href="index.php"><img src="img/iPrincipal.png" class="icon"></a>
 
-  <span class="level0">| <a href="usuarios.php?urlref=$urlref">Usuarios</a></span>
+  <span class="level0"><a href="usuarios.php?urlref=$urlref"><img src="img/iUsuario.png" class="icon"></a></span>
 
   <span class="level1">
-  | Sesión de <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso) - <a href="actions.php?action=Cerrar">Cerrar</a>
-  <br/>
+  <a href="actions.php?action=Cerrar"><img src="img/iCerrar.png" class="icon"></a>
   </span>
 
   <span class="level1">
-  <b>Información:</b> 
-    <a href="comite.php">Comité de Curriculo</a>
-  | <a href="documentos.php">Documentos</a>
-  | <a href="ayuda.php">Ayuda</a>
-  </span><br/>
+    <a href="comite.php"><img src="img/iComite.png" class="icon"></a>
+    <a href="documentos.php"><img src="img/iDocs.png" class="icon"></a>
+    <a href="ayuda.php"><img src="img/iAyuda.png" class="icon"></a>
+  </span>
 
   <span class="level1">
-  <b>Módulos</b>:
-    <a href="reconoce.php">Reconocimientos</a>
-  | <a href="planes.php">Planes de Estudio</a> 
-  | <a href="asignaturas.php">Planes de Asignatura</a> 
+    <a href="reconoce.php"><img src="img/iReconoce.png" class="icon"></a>
+    <a href="planes.php"><img src="img/iPensums.png" class="icon"></a> 
+    <a href="asignaturas.php"><img src="img/iCursos.png" class="icon"></a> 
   <span class="level1">
-  | <a href="movilidad.php">Bolsa de Movilidad</a> 
+    <a href="movilidad.php"><img src="img/iMovilidad.png" class="icon"></a> 
   </span>
   </span>
 </div>
@@ -823,10 +819,14 @@ M;
 
 function getFooter()
 {
-  global $_SERVER;
+  global $_SERVER,$NOMBRE,$QPERMISO,$PERMISOS;
+  $permiso=$PERMISOS["$QPERMISO"];
 $filetime=date(DATE_RFC2822,filemtime($_SERVER["SCRIPT_FILENAME"]));
 $menu=<<<M
 <div class="footer">
+  <span class="level1">
+  Esta conectado como <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso)<br/>
+  </span>
   Última actualización: $filetime - 
   <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2016
 </div>
