@@ -643,11 +643,6 @@ Movilidad Estudiantil de la FCEN.
 </p>
 
 $MANATWORK
-
-<p>
-Mientras implementamos este módulo puede ver los Planes de Estudio en
-este enlace: <a href=http://bit.ly/fcen-planes-asignatura>http://bit.ly/fcen-planes-asignatura</a>
-</p>
 C;
 
 }else{
