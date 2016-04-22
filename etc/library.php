@@ -790,26 +790,26 @@ function getMainMenu()
   $urlref=urlencode($_SERVER["REQUEST_URI"]);
 $menu=<<<M
 <div class="mainmenu menuperm">
-  <a href="index.php"><img src="img/iPrincipal.png" class="icon"></a>
+  <a href="index.php"><img src="img/iPrincipal-green.png" class="icon"></a>
 
-  <span class="level0"><a href="usuarios.php?urlref=$urlref"><img src="img/iUsuario.png" class="icon"></a></span>
+  <span class="level0"><a href="usuarios.php?urlref=$urlref"><img src="img/iUsuario-green.png" class="icon"></a></span>
 
   <span class="level1">
-  <a href="actions.php?action=Cerrar"><img src="img/iCerrar.png" class="icon"></a>
+  <a href="actions.php?action=Cerrar"><img src="img/iCerrar-green.png" class="icon"></a>
   </span>
 
   <span class="level1">
-    <a href="comite.php"><img src="img/iComite.png" class="icon"></a>
-    <a href="documentos.php"><img src="img/iDocs.png" class="icon"></a>
-    <a href="ayuda.php"><img src="img/iAyuda.png" class="icon"></a>
+    <a href="comite.php"><img src="img/iComite-green.png" class="icon"></a>
+    <a href="documentos.php"><img src="img/iDocs-green.png" class="icon"></a>
+    <a href="ayuda.php"><img src="img/iAyuda-green.png" class="icon"></a>
   </span>
 
   <span class="level1">
-    <a href="reconoce.php"><img src="img/iReconoce.png" class="icon"></a>
-    <a href="planes.php"><img src="img/iPensums.png" class="icon"></a> 
-    <a href="asignaturas.php"><img src="img/iCursos.png" class="icon"></a> 
+    <a href="reconoce.php"><img src="img/iReconoce-green.png" class="icon"></a>
+    <a href="planes.php"><img src="img/iPensums-green.png" class="icon"></a> 
+    <a href="asignaturas.php"><img src="img/iCursos-green.png" class="icon"></a> 
   <span class="level1">
-    <a href="movilidad.php"><img src="img/iMovilidad.png" class="icon"></a> 
+    <a href="movilidad.php"><img src="img/iMovilidad-green.png" class="icon"></a> 
   </span>
   </span>
 </div>
