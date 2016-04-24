@@ -25,7 +25,8 @@ alter table Usuarios add column activada varchar(2) default '0';
 /*alter table Movilidad modify column estado varchar(50) after movilid;*/
 /*alter table Movilidad modify column idioma varchar(50) after evento;*/
 /*alter table Movilidad modify column duracion varchar(4) after fechafin;*/
-alter table Movilidad add column programa varchar(50);
+/*alter table Movilidad add column programa varchar(50);*/
+
 
 /*
 alter table Usuarios drop column permisos;
@@ -45,6 +46,7 @@ alter table Cursos add fechaacuerdo varchar(3);
 alter table Cursos add semanas varchar(3);
 alter table Programas add codigo varchar(5);
 */
+alter table Cursos add posicion_s varchar(3);
 
 /*
 alter table misiones add cumplido1 varchar(255);
