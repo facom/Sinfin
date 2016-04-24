@@ -27,7 +27,7 @@ def loadDatabase(server='localhost',
                  user=USER,
                  password=PASSWORD,
                  database=DATABASE):
-    con=mdb.connect(server,user,password,database)
+    con=mdb.connect(server,user,password,database,charset="utf8")
     with con:
         dbdict=dict()
         db=con.cursor()
