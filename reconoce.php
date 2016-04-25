@@ -136,14 +136,14 @@ if(isset($action)){
       $versions.="$ver;";
     }
   }
-  $selprogramas=generateSelection($programas,"planid",$planid);
+  $selprogramas=generateSelectionOptions($programas,"planid",$planid);
   $programas["other"]="Otro";
-  $cselprogramas=generateSelection($programas,"planid",$cplanid);
+  $cselprogramas=generateSelectionOptions($programas,"planid",$cplanid);
 
   //////////////////////////////////////////
   //INSTITUTO
   //////////////////////////////////////////
-  $selinstituto=generateSelection($INSTITUTOS,"instituto",$instituto);
+  $selinstituto=generateSelectionOptions($INSTITUTOS,"instituto",$instituto);
 
   //////////////////////////////////////////
   //GET COURSES THAT CHANGED
@@ -220,12 +220,12 @@ if(isset($action)){
       $ncred="creditos_${section}_${ncourse}";
       //$$ncred=$parts[1];
       $nsel="selasignatura_${section}_${ncourse}";
-      $$nsel=generateSelection($cursos,"$asignatura",$scurso);
+      $$nsel=generateSelectionOptions($cursos,"$asignatura",$scurso);
     }
     else{
       $scurso="--";
       $nsel="selasignatura_${section}_${ncourse}";
-      $$nsel=generateSelection($cursos,"$asignatura",$scurso);
+      $$nsel=generateSelectionOptions($cursos,"$asignatura",$scurso);
     }
   }
 
@@ -242,13 +242,13 @@ if(isset($action)){
 	$name="s".$materia;
 	$smateria=$$name;
 	$nsel="selmateria_${section}_${ncourse}";
-	$$nsel=generateSelection($ccursos,"$name",$smateria);
+	$$nsel=generateSelectionOptions($ccursos,"$name",$smateria);
       }
       else{
 	$name="s".$materia;
 	$smateria="--";
 	$nsel="selmateria_${section}_${ncourse}";
-	$$nsel=generateSelection($ccursos,"$name",$smateria);
+	$$nsel=generateSelectionOptions($ccursos,"$name",$smateria);
       }
     }
   }
