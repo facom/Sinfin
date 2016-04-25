@@ -8,6 +8,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import offset_copy
 from matplotlib import patches
 from numpy import *
+import re
 
 # ############################################################
 # CONNECT TO DATABASE
@@ -18,6 +19,84 @@ db=connection.cursor()
 # ############################################################
 # ROUTINES
 # ############################################################
+def stepMatrix(n,m,nt,mt,Matrix,tstep="pre",verbose=0):
+    msgn=sign(mt-m) or +1
+    nsgn=sign(nt-n) or -1
+
+    if tstep=="co":
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # VERTICAL FIRST
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        m+=msgn
+        if verbose:print "\t"*4,"Trying step to:",n,m
+
+        qvert=False
+
+        # If you are in a course box
+        if (n%2 and m%2) and distMatrix(n,m,nt,mt):
+            if verbose:print "\t"*4,"This is a course box"
+            qvert=True
+
+        if -msgn*(m-mt)<=0 and distMatrix(n,m,nt,mt):
+            if verbose:print "\t"*4,"I went too far"
+            qvert=True
+
+        if qvert:
+            if verbose:print "\t"*4,"Better horizontal"
+            m-=msgn
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            # THEN VERTICAL
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            n+=nsgn
+        else:
+            if verbose:print "\t"*4,"Step accepted."
+            
+    else:
+
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # HORIZONTAL FIRST
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        n+=nsgn
+        if verbose:print "\t"*4,"Trying step to:",n,m
+
+        qvert=False
+        # If you are in a course box
+        if (n%2 and m%2) and distMatrix(n,m,nt,mt):
+            if verbose:print "\t"*4,"This is a course box"
+            qvert=True
+
+        if n<=nt and distMatrix(n,m,nt,mt):
+            if verbose:print "\t"*4,"I went too far"
+            qvert=True
+
+        if qvert:
+            if verbose:print "\t"*4,"Better vertical"
+            n-=nsgn
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            # THEN VERTICAL
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            m+=msgn
+        else:
+            if verbose:print "\t"*4,"Step accepted."
+            
+
+    return n,m
+
+def distMatrix(n,m,nt,mt):
+    return abs(n-nt)+abs(m-mt)
+
+def splitField(field):
+    values=field.split(";")
+    splits=dict()
+    for value in values:
+        if value=='':continue
+        parts=value.split(":")
+        if re.match("\w",parts[1]):
+            lista=parts[1].strip(",")
+            elements=lista.split(",")
+            splits[parts[0]]=elements
+    return splits
+
 def splitName(name):
     words=name.split(" ")
     nwords=len(words)
@@ -69,7 +148,7 @@ S=11.0
 
 # Number of course boxes
 Nsem=10 # Number of semesters
-Nasi=5 # Number of courses
+Nasi=6 # Number of courses
 hspace=10 # Horizontal space between boxes
 vspace=5 # Vertical space between boxes
 
@@ -99,7 +178,7 @@ rows=db.fetchall()
 # ========================================
 # Build the Pensum matrix
 # ========================================
-semnums=[0]*(Nsem+1)
+semnums=[1]*(Nsem+1)
 for row in rows:
     codigo=row[0]
     curso=sinfin["Cursos"]["rows"][codigo]
@@ -132,26 +211,6 @@ drawRectangle(ax,(L,B),WC,HC,**rect)
 wbox=WC/Nsem # Boxes width
 hbox=HC/Nasi # Boxes height
 
-"""
-# Matrix of tree vertices
-Nx=2*Nsem+1
-Ny=2*Nasi+1
-Matrix=[]
-for i in xrange(Nx):
-    linea=[]
-    for j in xrange(Ny):
-        linea+=[dict()]
-    Matrix+=[linea]
-
-wvert=WC/(Nx-1)
-hvert=HC/(Ny-1)
-for i in xrange(Nx):
-    x=L+i*wvert
-    for j in xrange(Ny):
-        y=B+(HC-j*hvert)
-        ax.text(x,y,"%d,%d"%(i,j),ha='center',va='center')
-"""
-
 # ////////////////////////////////////////////////////////////
 # Size of course box
 # ////////////////////////////////////////////////////////////
@@ -164,6 +223,7 @@ rect=dict(ec='k',fc='w',lw=0.5)
 # FILL COURSE BOXES
 # ========================================
 Boxes=[]
+Locations=dict()
 n=1
 for i in xrange(1,Nsem+1):
     x=L+(i-1)*wbox
@@ -174,8 +234,9 @@ for i in xrange(1,Nsem+1):
         if "cursoid" in curso.keys():
             cursoid=curso["cursoid"]
             codigo=cursoid.split("-")[0]
-            nombre=curso["nombre"]
+            nombre=curso["nombre"].strip()
             nombre=splitName(nombre)
+            Locations[cursoid]=[i,j]
         else:
             codigo=""
             cursoid=""
@@ -203,27 +264,114 @@ for i in xrange(Nsem):
         box=Boxes[i][j]
         rect=box[0]
         text=box[1].get_text()
-        if text=='':
+        if not re.match(r"\w",text):
             box[1].remove()
             rect.set_ec('none')
             ax.add_artist(rect)
-"""
-b=bcursos[0][0]
-r=b[0]
-t=b[1]
-r.set_fc('y')
-ax.add_artist(r)
-"""
-#t.remove()
 
 # ========================================
-# FIND PREREQUISITES
+# PATH TO PREREQUISITES AND CORREQUISITES
 # ========================================
-for i in arange(Nsem)[::-1]:
-    for j in arange(Nasi)[::-1]:
+Nx=2*Nsem+1
+Ny=2*Nasi+1
+wvert=WC/(Nx-1)
+hvert=HC/(Ny-1)
+for i in xrange(Nx):
+    x=L+i*wvert
+    for j in xrange(Ny):
+        y=B+(HC-j*hvert)
+        ax.text(x,y,"%d,%d"%(i,j),ha='center',va='center')
+
+Vertices=multiList(Nx,Ny)
+verbose=0
+for i in arange(Nsem+1)[::-1]:
+    for j in arange(Nasi+1)[::-1]:
         curso=Pensum[i][j]
         if 'cursoid' in curso.keys():
-            print curso['prerrequisito_s']
+            cursoid=curso["cursoid"]
+            it,jt=Locations[cursoid]
+            
+            # Where do we need to start
+            nt=2*it-1
+            mt=2*jt-1
+
+            if verbose:print "Starting from:",cursoid,curso["nombre"],nt,mt
+
+            # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+            # PRERREQUISTES
+            # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+            if verbose:print "\t","Prerrequisitos:",curso['prerrequisito_s']
+            pres=splitField(curso['prerrequisito_s'])
+            if not plan in pres.keys():continue
+            if verbose:print "\t","For plan:",pres[plan]
+            
+            for pre in pres[plan]:
+                steps=[]
+                if re.match(r"^c\d+",pre):
+                    if verbose:print "\t","Skipping"
+                    continue
+                ib,jb=Locations[pre]
+
+                # Where do we need to arrive
+                nb=2*ib-1
+                mb=2*jb-1
+
+                if verbose:print "\t","Arriving to:",pre,nb,mb
+
+                # Where are we now
+                na=nt
+                ma=mt
+                steps+=[[na,ma]]
+                if verbose:print "\t"*2+"Step: (",na,ma,")"
+                k=0
+                while distMatrix(na,ma,nb,mb)!=0:
+                    na,ma=stepMatrix(na,ma,nb,mb,Vertices,tstep="pre",verbose=verbose)
+                    steps+=[[na,ma]]
+                    if verbose:print "\t"*2+"Step: (",na,ma,")"
+                    k+=1
+                    if k>15:break
+
+                if verbose:print "\t"*2,"Full steps:",steps
+
+            # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+            # CORREQUISTES
+            # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+            if verbose:print "\t","Correquisitos:",curso['correquisito_s']
+            cos=splitField(curso['correquisito_s'])
+            if not plan in cos.keys():continue
+            if verbose:print "\t","For plan:",cos[plan]
+            
+            for co in cos[plan]:
+                steps=[]
+                if re.match(r"^c\d+",co):
+                    if verbose:print "\t","Skipping"
+                    continue
+                ib,jb=Locations[co]
+
+                # Where do we need to arrive
+                nb=2*ib-1
+                mb=2*jb-1
+
+                if verbose:print "\t","Arriving to:",co,nb,mb
+
+                # Where are we now
+                na=nt
+                ma=mt
+                steps+=[[na,ma]]
+                if verbose:print "\t"*2+"Step: (",na,ma,")"
+                k=0
+                while distMatrix(na,ma,nb,mb)!=0:
+                    na,ma=stepMatrix(na,ma,nb,mb,Vertices,tstep="co",verbose=verbose)
+                    steps+=[[na,ma]]
+                    if verbose:print "\t"*2+"Step: (",na,ma,")"
+                    k+=1
+                    if k>15:break
+
+                if verbose:print "\t"*2,"Full steps:",steps
+
+    if i<=0:break
+
 
 # ############################################################
 # SAVE FIGURE
