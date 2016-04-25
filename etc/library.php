@@ -236,6 +236,24 @@ function generateSelection($values,$name,$value,$options="",$readonly=0)
   return $selection;
 }
 
+function generateSelectionOptions($values,$name,$value,$options="",$readonly=0)
+{
+  $parts=$values;
+  $selection="";
+  if($readonly){
+    $selection.="<input type='hidden' name='$name' value='$value'>";
+    $selection.=$value;
+    return $selection;
+  }
+  foreach(array_keys($parts) as $part){
+    $show=$parts[$part];
+    $selected="";
+    if($part==$value){$selected="selected";}
+    $selection.="<option value='$part' $selected>$show";
+  }
+  return $selection;
+}
+
 function mysqlCmd($sql,$qout=0)
 {
   global $DB,$DATE;
