@@ -70,7 +70,7 @@ S=11.0
 # Number of course boxes
 Nsem=10 # Number of semesters
 Nasi=5 # Number of courses
-hspace=15 # Horizontal space between boxes
+hspace=10 # Horizontal space between boxes
 vspace=5 # Vertical space between boxes
 
 # Dimensions of canvas
@@ -155,16 +155,14 @@ for i in xrange(Nx):
 # ////////////////////////////////////////////////////////////
 # Size of course box
 # ////////////////////////////////////////////////////////////
-"""
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
-"""
 scur=min(wbox-2*hspace,hbox-2*vspace)
 
 fp=FontProperties(style='normal',size=8)
 rect=dict(ec='k',fc='w',lw=0.5)
 
+# ========================================
+# FILL COURSE BOXES
+# ========================================
 Boxes=[]
 n=1
 for i in xrange(1,Nsem+1):
@@ -172,15 +170,17 @@ for i in xrange(1,Nsem+1):
     xc=x+wbox/2.0
     lcursos=[]
     for j in xrange(1,Nasi+1):
-
         curso=Pensum[i][j]
         if "cursoid" in curso.keys():
             cursoid=curso["cursoid"]
+            codigo=cursoid.split("-")[0]
             nombre=curso["nombre"]
             nombre=splitName(nombre)
         else:
+            codigo=""
             cursoid=""
             nombre=""
+        texto=u"%s\n%s"%(nombre,codigo)
         
         y=B+(HC-j*hbox)
         rect["ls"]="dotted"
@@ -188,15 +188,16 @@ for i in xrange(1,Nsem+1):
 
         yc=y+hbox/2.0
         rect["ls"]="solid"
-        #t=textBox(ax,"i,j\n%d = %d,%d\nMiddle"%(n,i,j),
-        t=textBox(ax,u"%s"%nombre,
+        t=textBox(ax,texto,
                   (xc-scur/2,yc-scur/2),
                   scur,scur,fp,**rect)
         lcursos+=[t]
         n+=1
     Boxes+=[lcursos]
 
+# ========================================
 # REMOVE EMPTY BOXES
+# ========================================
 for i in xrange(Nsem):
     for j in xrange(Nasi):
         box=Boxes[i][j]
@@ -214,6 +215,15 @@ r.set_fc('y')
 ax.add_artist(r)
 """
 #t.remove()
+
+# ========================================
+# FIND PREREQUISITES
+# ========================================
+for i in arange(Nsem)[::-1]:
+    for j in arange(Nasi)[::-1]:
+        curso=Pensum[i][j]
+        if 'cursoid' in curso.keys():
+            print curso['prerrequisito_s']
 
 # ############################################################
 # SAVE FIGURE
