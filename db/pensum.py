@@ -19,7 +19,31 @@ db=connection.cursor()
 # ############################################################
 # ROUTINES
 # ############################################################
-def stepMatrix(n,m,nt,mt,Matrix,tstep="pre",verbose=0):
+def vertexSlot(vertex,iv=0,jv=0,dn=0,dm=0,nc=999):
+    """
+    Use: 
+         i=0,j=0,dn=0,dm=-1 for starting in a course as prerrequisite
+         i=0,j=0,dn=+/-1,dm=0 for starting in a course as correquisite
+    """
+    n,m=vertex.shape
+
+    if dn==0:
+        i=jv
+        j=jv
+        if vertex[i,j]!=0:
+            for i in xrange(n):
+                if vertex[i,j]==0:break
+    if dm==0:
+        i=iv
+        j=iv
+        if vertex[i,j]!=0:
+            for j in xrange(n):
+                if vertex[i,j]==0:break
+
+    vertex[i,j]=nc
+    return i,j
+
+def stepMatrix(n,m,nt,mt,Matrix=[],tstep="pre",verbose=0):
     msgn=sign(mt-m) or +1
     nsgn=sign(nt-n) or -1
 
@@ -79,6 +103,7 @@ def stepMatrix(n,m,nt,mt,Matrix,tstep="pre",verbose=0):
         else:
             if verbose:print "\t"*4,"Step accepted."
             
+    if verbose:print "\t"*4,"Final step:",n,m
 
     return n,m
 
@@ -149,6 +174,8 @@ S=11.0
 # Number of course boxes
 Nsem=10 # Number of semesters
 Nasi=6 # Number of courses
+Nx=2*Nsem+1
+Ny=2*Nasi+1
 hspace=10 # Horizontal space between boxes
 vspace=5 # Vertical space between boxes
 
@@ -169,14 +196,14 @@ HC=H-B-T
 Pensum=multiList(Nsem,Nasi)
 
 # ========================================
-# Get the list of courses
+# GET THE LIST OF COURSES
 # ========================================
 sql="select cursoid from Cursos where Planes_planid_s like '%s%%'"%plan
 db.execute(sql)
 rows=db.fetchall()
 
 # ========================================
-# Build the Pensum matrix
+# BUILD THE PENSUM MATRIX
 # ========================================
 semnums=[1]*(Nsem+1)
 for row in rows:
@@ -270,25 +297,27 @@ for i in xrange(Nsem):
             ax.add_artist(rect)
 
 # ========================================
+# VERTICES GRID
+# ========================================
+Vertices=multiList(Nx+1,Ny+1)
+for i in xrange(1,Nx+1):
+    for j in xrange(1,Ny+1):
+        Vertices[i][j]=zeros((5,5))
+
+# ========================================
 # PATH TO PREREQUISITES AND CORREQUISITES
 # ========================================
-Nx=2*Nsem+1
-Ny=2*Nasi+1
-wvert=WC/(Nx-1)
-hvert=HC/(Ny-1)
-for i in xrange(Nx):
-    x=L+i*wvert
-    for j in xrange(Ny):
-        y=B+(HC-j*hvert)
-        ax.text(x,y,"%d,%d"%(i,j),ha='center',va='center')
+verbose=1
 
-Vertices=multiList(Nx,Ny)
-verbose=0
+# Numbering of conectores
+nc=1
+Conectores=[dict()]
 for i in arange(Nsem+1)[::-1]:
     for j in arange(Nasi+1)[::-1]:
         curso=Pensum[i][j]
         if 'cursoid' in curso.keys():
             cursoid=curso["cursoid"]
+            curso["conectores"]=[]
             it,jt=Locations[cursoid]
             
             # Where do we need to start
@@ -307,11 +336,17 @@ for i in arange(Nsem+1)[::-1]:
             if verbose:print "\t","For plan:",pres[plan]
             
             for pre in pres[plan]:
+
+                # Check if credit
                 steps=[]
                 if re.match(r"^c\d+",pre):
                     if verbose:print "\t","Skipping"
                     continue
                 ib,jb=Locations[pre]
+
+                # Vertex initialization
+                iv,jv=vertexSlot(Vertices[it][jt],iv=0,jv=2,dn=0,dm=-1,nc=nc)
+                if verbose:print "\t"*2,"Vertice:",iv,jv
 
                 # Where do we need to arrive
                 nb=2*ib-1
@@ -325,15 +360,26 @@ for i in arange(Nsem+1)[::-1]:
                 steps+=[[na,ma]]
                 if verbose:print "\t"*2+"Step: (",na,ma,")"
                 k=0
+                nao=na;mao=ma
                 while distMatrix(na,ma,nb,mb)!=0:
-                    na,ma=stepMatrix(na,ma,nb,mb,Vertices,tstep="pre",verbose=verbose)
+                    na,ma=stepMatrix(na,ma,nb,mb,tstep="pre",verbose=verbose)
                     steps+=[[na,ma]]
+
+                    # New vertex
+                    iv,jv=vertexSlot(Vertices[na][ma],iv=iv,jv=jv,dn=na-nao,dm=ma-mao)
+                    if verbose:print "\t"*4,"Source: (iv=%d,jv=%d;dn=%d,dm=%d); Vertice:"%(iv,jv,na-nao,ma-mao),iv,jv
+                    nao=na;mao=ma
+
                     if verbose:print "\t"*2+"Step: (",na,ma,")"
                     k+=1
                     if k>15:break
 
+                nc+=1
                 if verbose:print "\t"*2,"Full steps:",steps
-
+                conector=dict(tipo='pre',steps=steps)
+                curso["conectores"]+=[conector]
+                Conectores+=[conector]
+                
             # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
             # CORREQUISTES
             # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -343,11 +389,16 @@ for i in arange(Nsem+1)[::-1]:
             if verbose:print "\t","For plan:",cos[plan]
             
             for co in cos[plan]:
+
                 steps=[]
                 if re.match(r"^c\d+",co):
                     if verbose:print "\t","Skipping"
                     continue
                 ib,jb=Locations[co]
+
+                # Vertex initialization
+                iv,jv=vertexSlot(Vertices[it][jt],iv=3,jv=0,dn=0,dm=-1)
+                if verbose:print "\t"*4,"Vertice:",iv,jv
 
                 # Where do we need to arrive
                 nb=2*ib-1
@@ -361,17 +412,50 @@ for i in arange(Nsem+1)[::-1]:
                 steps+=[[na,ma]]
                 if verbose:print "\t"*2+"Step: (",na,ma,")"
                 k=0
+
+                nao=na;mao=ma
                 while distMatrix(na,ma,nb,mb)!=0:
-                    na,ma=stepMatrix(na,ma,nb,mb,Vertices,tstep="co",verbose=verbose)
+                    na,ma=stepMatrix(na,ma,nb,mb,tstep="co",verbose=verbose)
                     steps+=[[na,ma]]
+                    
+                    # New vertex
+                    iv,jv=vertexSlot(Vertices[na][ma],iv=iv,jv=jv,dn=na-nao,dm=ma-mao)
+                    if verbose:print "\t"*2,"Vertice:",iv,jv
+                    nao=na;mao=ma
+
                     if verbose:print "\t"*2+"Step: (",na,ma,")"
                     k+=1
                     if k>15:break
 
                 if verbose:print "\t"*2,"Full steps:",steps
+                curso["conectores"]+=[dict(tipo='co',steps=steps)]
 
-    if i<=0:break
+# ========================================
+# JOINING POINTS
+# ========================================
+"""
+for i in arange(Nsem+1)[::-1]:
+    for j in arange(Nasi+1)[::-1]:
+        curso=Pensum[i][j]
+        if 'cursoid' in curso.keys():
+            cursoid=curso["cursoid"]
+            conectores=curso["conectores"]
+            print "Curso:",cursoid
+            for conector in conectores:
+                print conector,
+            print
+"""
 
+# ========================================
+# TEXT ON GRID
+# ========================================
+wvert=WC/(Nx-1)
+hvert=HC/(Ny-1)
+for i in xrange(Nx):
+    x=L+i*wvert
+    for j in xrange(Ny):
+        y=B+(HC-j*hvert)
+        ax.text(x,y,"%d,%d"%(i,j),ha='center',va='center')
 
 # ############################################################
 # SAVE FIGURE
