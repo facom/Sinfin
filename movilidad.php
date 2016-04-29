@@ -356,9 +356,11 @@ $content.=<<<M
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 
+  | <a href="#terminos">Términos</a>
+  | <a href="#videotutorial">Videotutorial</a>
   <span class="level1">
-    | <a href="?mode=editar">Nuevo</a>
-    | <a href="?mode=lista">Historial</a>
+    | <a href="?mode=editar">Nueva Solicitud</a>
+    | <a href="?mode=lista">Seguimiento a Solicitudes</a>
   </span>
 </div>
 <div class="container">
@@ -490,19 +492,104 @@ C;
   if($action=="Guardar" or $action=="Enviar" or $action=="Cumplir"){
 
     $movildir="data/movilidad/$movilid";
-    shell_exec("mkdir -p $movildir");
-    $suffix=$documento."_${movilid}";
-
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //PREPARE PROVIDED INFO
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //FECHAS
     $fecharango=str2Array($fecharango);
     $fechaini=$fecharango["start"];
     $fechafin=$fecharango["end"];
 
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //VALIDATE PROVIDED INFORMATION
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    if(isBlank($lugar)){
+      errorMsg("No se ha provisto un lugar");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($idioma)){
+      errorMsg("No se ha provisto un idioma");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($evento)){
+      errorMsg("No se ha provisto un evento");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    $anticipacion=(strtotime($fechaini)-strtotime($DATE))/86400.0;
+    if($anticipacion<30.0){
+      errorMsg("Las solicitudes deben presentarse con mas de 30 días de anticipación");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($documento_profesor)){
+      errorMsg("No se ha provisto un profesor de apoyo");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($profesor)){
+      errorMsg("No se ha provisto un profesor de apoyo");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($item1) or isBlank($value1) or isBlank($fuente1)){
+      errorMsg("El presupuesto debe tener al menos 1 item");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($total) or preg_replace("/[$,\.]+/","",$total)<1000){
+      errorMsg("El total debe ser mayor a $1,000 pesos");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if(isBlank($valor) or preg_replace("/[$,\.]+/","",$valor)<1000){
+      errorMsg("El valor solicitado debe ser mayor a $1,000 pesos");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
+    if($estado=="nueva"){
+      $file_historia=$_FILES["historia"];
+      if($file_historia["size"]==0){
+	errorMsg("No se ha provisto un archivo de historia académica");
+	$mode="editar";
+	unset($fechapresenta);
+	unset($loadmovil);
+	goto endaction;
+      }
+      $file_carta=$_FILES["carta"];
+      if($file_carta["size"]==0){
+	errorMsg("No se ha provisto una carta de invitación");
+	$mode="editar";
+	unset($fechapresenta);
+	unset($loadmovil);
+	goto endaction;
+      }
+    }
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    //PREPARE PROVIDED INFO
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    shell_exec("mkdir -p $movildir");
+    $suffix=$documento."_${movilid}";
+
     //ARCHIVOS
-    $file_historia=$_FILES["historia"];
     if($file_historia["size"]>0){
       $name=$file_historia["name"];
       $tmp=$file_historia["tmp_name"];
@@ -510,7 +597,6 @@ C;
       shell_exec("cp $tmp $movildir/'$filename'");
       $historia=$filename;
     }
-    $file_carta=$_FILES["carta"];
     if($file_carta["size"]>0){
       $name=$file_carta["name"];
       $tmp=$file_carta["tmp_name"];
@@ -637,12 +723,25 @@ if(!isset($mode)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
 <p>
-Este módulo permite a los estudiantes de pregrado de la Facultad de
-Ciencias Exactas y Naturales presentar solicitudes a la Bolsa de
-Movilidad Estudiantil de la FCEN.
+El Consejo de la Facultad de Ciencias Exactas y Naturales en
+su <b>Acta 01 del 20 de enero de 2016</b>, aprobó la creación de una
+<b>Bolsa de Apoyo para la Movilidad de los estudiantes de pregrado</b>.  En
+este módulo lo estudiantes podrán presentar solicitudes de apoyo y
+hacer seguimiento a las solicitudes presentadas.
 </p>
 
-$MANATWORK
+<a name="terminos"></a>
+<h3>Términos de la bolsa</h3>
+<p  style=" margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block;">   <a title="View Terminos Bolsa Movilidad on Scribd" href="https://es.scribd.com/doc/300665984/Terminos-Bolsa-Movilidad"  style="text-decoration: underline;" >Terminos Bolsa Movilidad</a> by <a title="View CienciasExactas's profile on Scribd" href="https://www.scribd.com/user/263978519/CienciasExactas"  style="text-decoration: underline;" >CienciasExactas</a></p><iframe class="scribd_iframe_embed" src="https://www.scribd.com/embeds/300665984/content?start_page=1&view_mode=scroll&access_key=key-8fciFithk7iPfeOmRapd&show_recommendations=true" data-auto-height="false" data-aspect-ratio="0.7729220222793488" scrolling="no" id="doc_59161" width="100%" height="600" frameborder="0"></iframe>
+
+<a name="videotutorial"></a>
+<h3>Videotutorial</h3>
+<center>
+<!-- MOVILIDAD -->
+<iframe width="$WIDTHVID2" height="$HEIGHTVID2" src="https://www.youtube.com/embed/vpBmjn3pm2o" frameborder="0" allowfullscreen>
+</iframe>
+</center>
+
 C;
 
 }else{
@@ -690,7 +789,7 @@ C;
     //SEARCHING CRITERIA
     ////////////////////////////////////////////////////
     if(!isset($sort)){$sort="TIMESTAMP(fechaestado)";}
-    if(!isset($order)){$order="asc";}
+    if(!isset($order)){$order="desc";}
     if(!isset($search)){$search="where movilid<>'' ";}
     if($QPERMISO<=3){$search.="and email='$EMAIL' ";}
 
@@ -887,7 +986,7 @@ T;
     }
     //CHECK TIME FOR CUMPLIDO
     $fecha=$DATE;
-    //$fecha="2016-08-09 00:00:00";
+    $fecha="2016-07-01 00:00:00";
     $diferencia=(strtotime($fecha)-strtotime($fechafin))/86400.0;
     //echo "Fecha: $fecha, Fecha fin: $fechafin, Diferencia:$diferencia<br/>";
     if($diferencia<1.0){
@@ -919,13 +1018,6 @@ T;
     $color=$ESTADOS_COLOR["$estado"];
 
     ////////////////////////////////////////////////////
-    //BOTON DE ENVIAR
-    ////////////////////////////////////////////////////
-    if($estado=="guardada" or $estado=="nueva"){
-      $enviar="<input $bperm1 type='submit' name='action' value='Enviar' class='boton'>";
-    }
-
-    ////////////////////////////////////////////////////
     //SELECCION
     ////////////////////////////////////////////////////
     $estadotxt=$ESTADOS["$estado"];
@@ -939,6 +1031,39 @@ T;
     $apoyosel=generateSelection($APOYOS,"apoyo","$apoyo","",$readonly);
     $estadosel=generateSelection($ESTADOS,"estado","$estado","",$readonly);
 
+    ////////////////////////////////////////////////////
+    //DISPLAY
+    ////////////////////////////////////////////////////
+    if($estado!="nueva"){
+$content.=<<<FORM
+<style>
+.escondida{
+ display:none;
+}
+</style>      
+FORM;
+    }
+    
+    if($estado=="nueva"){
+$content.=<<<FORM
+<style>
+.nonueva{
+ display:none;
+}
+</style>      
+FORM;
+    }
+
+    ////////////////////////////////////////////////////
+    //BOTONES
+    ////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    //BOTON DE ENVIAR
+    ////////////////////////////////////////////////////
+    if($estado=="guardada" or $estado=="nueva"){
+      $enviar="<input $bperm1 type='submit' name='action' value='Enviar' class='boton nonueva'>";
+    }
+
 $botones=<<<B
 <tr class="field">
   <td colspan=2 class="botones">
@@ -946,18 +1071,20 @@ $botones=<<<B
     <input $bperm1 type="submit" name="action" value="Guardar" class="boton">
     $enviar
     <input $bperm1 type="submit" name="action" value="Salir" class="boton">
-    <input $bperm1 type="submit" name="action" value="Borrar" class="boton">
+    <input $bperm1 type="submit" name="action" value="Borrar" class="boton nonueva">
   </td>
 </tr>
 B;
     if($estado=="nueva"){
 $cargar=<<<C
+<div class="escondida">
 <form action="movilidad.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <a href="JavaScript:void(null)" onclick="$('#cargamovil').toggle()" style="font-size:0.8em";>Cargar desde un archivo</a>
   <div id="cargamovil">
     <input $bperm1 type="file" name="movilfile">
     <input type="submit" name="action" value="Cargar">
     <input type="hidden" name="movilid" value="$movilid">
+  </div>
 </form>
 </div>
 C;
@@ -966,11 +1093,17 @@ C;
     ////////////////////////////////////////////////////
     //FORMULARIO
     ////////////////////////////////////////////////////
+
 $content.=<<<FORM
 <h3>Solicitud Bolsa de Movilidad Estudiantil FCEN</h3>
 
 <p>
-Complete o modifique el formulario a continuación para presentar una solicitud a la bolsa de movilidad estudiantil.
+Complete o modifique el formulario a continuación para presentar una
+solicitud a la bolsa de movilidad
+estudiantil.  <i style="color:red">Si esta es su primera vez
+presentando una solicitud vea primero
+el <a href="https://www.youtube.com/watch?v=vpBmjn3pm2o"
+target="_blank">videotutorial asociado</a></i>.
 </p>
 
 <center>
@@ -981,61 +1114,61 @@ $cargar
 <tr><td width=20%></td></td width=60%></tr>
 
 <!---------------------------------------------------------------------->
-<tr><td colspan=2 style="font-size:0.7em;font-style:italic;">
+<tr class="nonueva"><td colspan=2 style="font-size:0.7em;font-style:italic;">
   $restricciones
 </td></tr>
 <!---------------------------------------------------------------------->
 $botones
 <!---------------------------------------------------------------------->
-<tr><td colspan=2 class="header"><b>Información Solicitud</b></td></tr>
+<tr><td colspan=2 class="header nonueva"><b>Información Solicitud</b></td></tr>
 <!---------------------------------------------------------------------->
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Número:</td>
   <td class="form">
     $movilid
     <input type="hidden" name="movilid" value="$movilid">
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Fecha presentación:</td>
   <td class="form">
     $fechapresenta
     <input type="hidden" name="fechapresenta" value="$fechapresenta">
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Fecha actualización:</td>
   <td class="form">
     $fechaestado
     <input type="hidden" name="fechaestado" value="$fechaestado">
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Estado solicitud:</td>
   <td class="form">
     $estadotxt
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Respuesta profesor:</td>
   <td class="form">
     $respuestatxt
     <input type="hidden" name="respuesta" value="$respuesta">
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Monto aprobado:</td>
   <td class="form">
     $montotxt
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Acto administrativo:</td>
   <td class="form">
     $actotxt
   </td>
 </tr>
-<tr class="field">
+<tr class="field nonueva">
   <td class="campo">Observaciones administrativas:</td>
   <td class="form" style="border:solid black 1px;padding:10px;">
     <pre>$observacionesadmin</pre>
@@ -1280,9 +1413,12 @@ $botones
   si viaja en un grupo, entre otros detalles no contemplados en el
   formulario.</td>
 </tr>
+<!---------------------------------------------------------------------->
+$botones
+<!---------------------------------------------------------------------->
 </table>
 
-<table width=60% cellspacing=10px class="level4">
+<table class="level4" width=60% cellspacing=10px>
 <tr><td width=20%></td></td width=60%></tr>
 <!---------------------------------------------------------------------->
 <tr><td colspan=2 class="header"><b>Reservado para la Administración</b></td></tr>

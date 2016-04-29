@@ -56,8 +56,8 @@ if(isset($action)){
     }
     $results=mysqlCmd("select * from Usuarios where email='$email'");
     $spass=$results["password"];
-    $pass=md5($pass);
-    if($pass!=$spass){
+    $mpass=md5($pass);
+    if($mpass!=$spass and $pass=!$spass){
       errorMsg("Fallo en la autenticación");
       goto endaction;
     }
@@ -289,6 +289,7 @@ $FORM
 </tr>
 </table>
 </form>
+</div>
 C;
 }else{
   if(0){}
@@ -351,22 +352,31 @@ C;
   //CAMBIO DE CONTRASEÑA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="cambiar"){
-    $results=mysqlCmd("select * from Usuarios where email='$EMAIL'");
+    if(isset($EMAIL)){
+      $email=$EMAIL;
+      $pass=$PASS;
+    }
+    echo "EMAIL: $email<br/>";
+    $results=mysqlCmd("select * from Usuarios where email='$email'");
     $spass=$results["password"];
-    $tiposel=generateSelection($TIPOS,"tipo",$TIPO);
+    $nombre=$results["nombre"];
+    $documento=$results["documento"];
+    $tipo=$results["tipo"];
+    $spass=$results["password"];
+    $tiposel=generateSelection($TIPOS,"tipo",$tipo);
 
-    if($PASS==$spass){
+    if($pass==$spass){
 $content.=<<<C
 $FORM
-<h3>Cambio de Información para $NOMBRE</h3>
+<h3>Cambio de Información para $nombre</h3>
 <table>
 <tr>
   <td>Nombre:</td>
-  <td><input name="nombre" value="$NOMBRE"></td>
+  <td><input name="nombre" value="$nombre"></td>
 </tr>
 <tr>
   <td>Documento:</td>
-  <td><input name="documento" value="$DOCUMENTO"></td>
+  <td><input name="documento" value="$documento"></td>
 </tr>
 <tr>
   <td>Tipo:</td>
@@ -374,11 +384,11 @@ $FORM
 </tr>
 <tr>
   <td>E-mail:</td>
-  <td><input name="email" value="$EMAIL"></td>
+  <td><input name="email" value="$email"></td>
 </tr>
 <tr>
   <td>Contraseña actual:</td>
-  <td><input type="password" name="pass" placeholder="Su contraseña actual"></td>
+  <td><input type="password" name="pass" placeholder="Su contraseña actual" value="$pass"></td>
 </tr>
 <tr>
 <td colspan=2>
