@@ -17,7 +17,7 @@ $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
 //COLOQUE AQUÍ EL E-MAIL DEL VICEDECANATO
-$EMAIL_ADMIN="pregradofisica@udea.edu.co";
+$EMAIL_ADMIN="sandra.perez@udea.edu.co";
 
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
@@ -129,7 +129,7 @@ $ESTADOS_COLOR=array("nueva"=>"white",
 		     "guardada"=>"#ffffcc",
 		     "pendiente_apoyo"=>"#ccffff",
 		     "pendiente_aprobacion"=>"#99ccff",
-		     "aprobada"=>"#ccffcc",
+		     "aprobada"=>"yellow",
 		     "devuelta"=>"#ffccff",
 		     "realizada"=>"#d1d1e0",
 		     "cumplida"=>"#ffcccc",
@@ -170,6 +170,8 @@ if(isset($_SERVER["HTTP_REFERER"])){
 
 $WIDTHVID=400;
 $HEIGHTVID=$WIDTHVID/1.4;
+$WIDTHVID2=$WIDTHVID*2;
+$HEIGHTVID2=$WIDTHVID2/1.4;
 
 /*
 echo "COOKIES:";
@@ -809,7 +811,7 @@ function getMainMenu()
 $menu=<<<M
 <div class="mainmenu menuperm">
   <a href="index.php"><img src="img/iPrincipal-green.png" class="icon"></a>
-
+  <a href="ayuda.php"><img src="img/iAyuda-green.png" class="icon"></a>
   <span class="level0"><a href="usuarios.php?urlref=$urlref"><img src="img/iUsuario-green.png" class="icon"></a></span>
 
   <span class="level1">
@@ -819,7 +821,6 @@ $menu=<<<M
   <span class="level1">
     <a href="comite.php"><img src="img/iComite-green.png" class="icon"></a>
     <a href="documentos.php"><img src="img/iDocs-green.png" class="icon"></a>
-    <a href="ayuda.php"><img src="img/iAyuda-green.png" class="icon"></a>
   </span>
 
   <span class="level1">
