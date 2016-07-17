@@ -51,6 +51,7 @@ if($action=="updatestudent"){
      $html.="0";
    }
 }
+else
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //FILL PROFESOR
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,7 +67,6 @@ if($action=="fillProfesor"){
      $html.="0";
    }
 }
-
 else{
   $html.="Option not recognized";
 }

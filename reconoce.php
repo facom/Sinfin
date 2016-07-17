@@ -265,6 +265,7 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Guardar" or
      $action=="Revisado" or
+     $action=="Realizado" or
      $action=="Aprobado" or
      $action=="Solicitar" or
      $action=="Rechazado"
@@ -380,7 +381,6 @@ M;
       sendMail($EMAIL_USERNAME,$subject,$message,$EHEADERS);
       statusMsg("Notificación de solicitud enviada a la coordinación");
     }
-      
 
     $_POST["status"]=$status;
     if(strlen($ERRORS)==0){
@@ -786,6 +786,7 @@ $buttons.=<<<B
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
 	<input class="level3" type="submit" name="action" value="Aprobado">
+	<input class="level3" type="submit" name="action" value="Realizado">
 	<input class="level3" type="submit" name="action" value="Rechazado">
 	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Guardar">

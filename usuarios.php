@@ -289,7 +289,6 @@ $FORM
 </tr>
 </table>
 </form>
-</div>
 C;
 }else{
   if(0){}
@@ -299,9 +298,15 @@ C;
   else if($mode=="nuevo"){
 $content.=<<<C
 <form>
+<center>
 <h3>Nuevo usuario</h3>
 <input type="hidden" name="mode" value="nuevo">
-<table>
+<style>
+td{
+padding:10px;
+}
+</style>
+<table width="30%">
 <tr>
   <td>Nombre:</td>
   <td><input type="text" name="nombre" placeholder="Nombre completo" value="$nombre"></td>
@@ -314,6 +319,7 @@ $content.=<<<C
   <td>E-mail:</td>
   <td><input type="text" name="email" placeholder="Su e-mail" value="$email"></td>
 </tr>
+<tr><td colspan=2><i style="color:red;font-size:0.8em">Algunos servicios pueden estar restringidos a usuarios con correo institucional (udea.edu.co)</i></td></tr>
 <tr>
   <td>Password:</td>
   <td><input type="password" name="password" placeholder="Su password"></td>
@@ -324,6 +330,7 @@ $content.=<<<C
   </td>
 </tr>
 </table>
+</center>
 </form>
 C;
   }
@@ -356,7 +363,6 @@ C;
       $email=$EMAIL;
       $pass=$PASS;
     }
-    echo "EMAIL: $email<br/>";
     $results=mysqlCmd("select * from Usuarios where email='$email'");
     $spass=$results["password"];
     $nombre=$results["nombre"];
@@ -384,7 +390,7 @@ $FORM
 </tr>
 <tr>
   <td>E-mail:</td>
-  <td><input name="email" value="$email"></td>
+  <td><input name="email" value="$email" readonly></td>
 </tr>
 <tr>
   <td>Contraseña actual:</td>
