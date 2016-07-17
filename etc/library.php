@@ -831,6 +831,9 @@ $menu=<<<M
   <span class="level1">
     <a href="movilidad.php"><img src="img/iMovilidad-green.png" class="icon"></a> 
   </span>
+  <span class="level1">
+    <a href="comaca.php"><img src="img/iComunidad-green.png" class="icon"></a> 
+  </span>
   </span>
 </div>
 M;
