@@ -17,7 +17,8 @@ $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
 
 //COLOQUE AQUÍ EL E-MAIL DEL VICEDECANATO
-$EMAIL_ADMIN="sandra.perez@udea.edu.co";
+$EMAIL_ADMIN="vicedecacen@udea.edu.co";
+//$EMAIL_ADMIN="pregradofisica@udea.edu.co";
 
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
@@ -847,7 +848,7 @@ $menu=<<<M
   Esta conectado como <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso)<br/>
   </span>
   Última actualización: $filetime - 
-  <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2016
+  Desarrollado por <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2016
 </div>
 </body>
 M;

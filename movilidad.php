@@ -500,6 +500,13 @@ C;
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //VALIDATE PROVIDED INFORMATION
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    if(!preg_match("/udea\.edu\.co/",$email)){
+      errorMsg("Para hacer una solicitud de movilidad debes estar registrado con tu correo institucional");
+      $mode="editar";
+      unset($fechapresenta);
+      unset($loadmovil);
+      goto endaction;
+    }
     if(isBlank($lugar)){
       errorMsg("No se ha provisto un lugar");
       $mode="editar";
@@ -524,10 +531,12 @@ C;
     $anticipacion=(strtotime($fechaini)-strtotime($DATE))/86400.0;
     if($anticipacion<30.0){
       errorMsg("Las solicitudes deben presentarse con mas de 30 días de anticipación");
+      /*
       $mode="editar";
       unset($fechapresenta);
       unset($loadmovil);
       goto endaction;
+      */
     }
     if(isBlank($documento_profesor)){
       errorMsg("No se ha provisto un profesor de apoyo");
@@ -986,7 +995,7 @@ T;
     }
     //CHECK TIME FOR CUMPLIDO
     $fecha=$DATE;
-    $fecha="2016-07-01 00:00:00";
+    //$fecha="2016-07-01 00:00:00";
     $diferencia=(strtotime($fecha)-strtotime($fechafin))/86400.0;
     //echo "Fecha: $fecha, Fecha fin: $fechafin, Diferencia:$diferencia<br/>";
     if($diferencia<1.0){
@@ -1034,18 +1043,15 @@ T;
     ////////////////////////////////////////////////////
     //DISPLAY
     ////////////////////////////////////////////////////
-    if($estado!="nueva"){
+    echo "Estado: $estado<br/>";
+
+    if($estado=="nueva"){
 $content.=<<<FORM
 <style>
 .escondida{
  display:none;
 }
 </style>      
-FORM;
-    }
-    
-    if($estado=="nueva"){
-$content.=<<<FORM
 <style>
 .nonueva{
  display:none;
