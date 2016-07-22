@@ -30,8 +30,8 @@ $content.=<<<M
 <div class="submenu">
   <a href="?">Inicio</a> 
   | <a href="#agenda">Agenda</a>
-  | <a href="#registrar">Registrar asistencia</a>
-  | <a href="#consultar">Consultar asistencia</a>
+  | <a href="?mode=registrar">Registrar asistencia</a>
+  | <a href="?mode=consultar">Consultar asistencia</a>
   <span class="level1">
     | <a href="?mode=agregar">Agregar</a>
   </span>
@@ -405,24 +405,22 @@ if(!isset($mode)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
 <p>
-El Consejo de la Facultad de Ciencias Exactas y Naturales en
-su <b>Acta 01 del 20 de enero de 2016</b>, aprobó la creación de una
-<b>Bolsa de Apoyo para la Movilidad de los estudiantes de pregrado</b>.  En
-este módulo lo estudiantes podrán presentar solicitudes de apoyo y
-hacer seguimiento a las solicitudes presentadas.
+
+La <b>Comunidad Académica</b> alrededor de los programas de pregrado y
+posgrado de la Facultad de Ciencias Exactas y Naturales es una de las
+fuentes más ricas y menos convencionales de <b>formación
+científica</b> para los estudiantes de la Facultad.  La participación
+de todos en las actividades organizadas en el seno de esta comunidad
+(seminarios, ciclos de conferencias, actividades divulgativas, etc.)
+es parte integral del currículo.
+
 </p>
 
-<a name="terminos"></a>
-<h3>Términos de la bolsa</h3>
-<p  style=" margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block;">   <a title="View Terminos Bolsa Movilidad on Scribd" href="https://es.scribd.com/doc/300665984/Terminos-Bolsa-Movilidad"  style="text-decoration: underline;" >Terminos Bolsa Movilidad</a> by <a title="View CienciasExactas's profile on Scribd" href="https://www.scribd.com/user/263978519/CienciasExactas"  style="text-decoration: underline;" >CienciasExactas</a></p><iframe class="scribd_iframe_embed" src="https://www.scribd.com/embeds/300665984/content?start_page=1&view_mode=scroll&access_key=key-8fciFithk7iPfeOmRapd&show_recommendations=true" data-auto-height="false" data-aspect-ratio="0.7729220222793488" scrolling="no" id="doc_59161" width="100%" height="600" frameborder="0"></iframe>
+<p>
 
-<a name="videotutorial"></a>
-<h3>Videotutorial</h3>
-<center>
-<!-- MOVILIDAD -->
-<iframe width="$WIDTHVID2" height="$HEIGHTVID2" src="https://www.youtube.com/embed/vpBmjn3pm2o" frameborder="0" allowfullscreen>
-</iframe>
-</center>
+En este módulo se ofrece información sobre la agenda de actividades de la comunidad académica y acceso a los mecanismos utilizados en algunos programas para hacer seguimiento a la participación en dichas actividades.
+
+</p>
 
 C;
 
