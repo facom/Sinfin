@@ -155,7 +155,8 @@ $TCOLD=$TWIDTH/2;
 $ERRORS="";
 $STATUS="";
 $RECONDIR="data/recon";
-$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado","Rechazado");
+//		   0		1	   2		3	4		5	6
+$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado","Rechazado","Entregado","Confirmado");
 $SINFIN="<b>SInfIn</b>";
 
 $HOST=$_SERVER["HTTP_HOST"];
@@ -487,7 +488,8 @@ $reconocimientos.=<<<RECON
 		</td></tr>
 
 		<tr class="ccursos_input">
-		  <td class="field">Semestre:</td><td class="input">
+		  <td class="field">Semestre:<br/>
+		    <span class="help">Año-Semestre. Ej. 2008-2</span></td><td class="input">
 		    <input type="text" name="semestre_${ir}_${im}" value="$vsemestre">
 		  </td>
 		</tr>

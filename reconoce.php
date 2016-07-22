@@ -265,7 +265,8 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Guardar" or
      $action=="Revisado" or
-     $action=="Realizado" or
+     $action=="Entregado" or
+     $action=="Confirmado" or
      $action=="Aprobado" or
      $action=="Solicitar" or
      $action=="Rechazado"
@@ -316,7 +317,7 @@ if(isset($action)){
 	$status=1;
       }
     }
-    if($action=="Aprobado"){
+    if($action=="Aprobado" or $action=="Entregado" or $action=="Confirmado"){
       if(isBlank($acto)){
 	errorMsg("Debe proveer un acto administrativo");
 	$mode="edit";
@@ -444,6 +445,9 @@ M;
 	  $qnotificado=1;
 	}
       }
+      if($action=="Entregado"){$status=5;}
+      if($action=="Confirmado"){$status=6;}
+
       if(!isset($notificado)){
 	$notificado="";
       }
@@ -499,9 +503,15 @@ $message=<<<M
   <a href="$recurl" target="_blank">Formato de reconocimientos diligenciado</a>.
 </p>
 <p>
+  Estas son algunas observaciones adicionales que realizó el comité a su solicitud:
+</p>
+<blockquote style="color:red;font-style:italic">
+  $observaciones
+</blockquote>
+<p>
   Su solicitud ha sido entregada al Departamento de Admisiones y
-  Registro para que la procesen.  En este momento el trámite esta en
-  manos de ellos. Solo a través suyo usted puede personalmente
+  Registro para que la procesen.  En este momento <b>el trámite esta
+  en manos de ellos</b>. Solo a través suyo usted puede personalmente
   averiguar el estado del proceso a partir de ahora.
 </p>
 <p>
@@ -610,7 +620,10 @@ C;
 
     $qtable=0;
 
-    $where="";
+    if(!isset($search)){$search="recid<>''";}
+    if(!isset($sort)){$sort="status,fechahora asc,Estudiantes_documento asc";}
+
+    $where="where (";
     if($QPERMISO>=1){
       $seleccion="<p class='level1'><b>Selección</b>: ";
     }else{
@@ -619,30 +632,54 @@ C;
     if(isset($DOCUMENTO)){
       //REGULAR USER
       if($QPERMISO<=1){
-	$where="where Estudiantes_documento='$DOCUMENTO'";
-	$seleccion.="documento $DOCUMENTO<br/>";
+	$where.="Estudiantes_documento='$DOCUMENTO'";
+	$seleccion.="documento $DOCUMENTO<br/></p>";
       }else
       //COORDINADOR
       if($QPERMISO==3){
 	if(preg_match("/instituto=(\w+);/",$PARAMETROS,$matches)){
 	  $instituto=$matches[1];
-	  $where="where instituto='$instituto'";
-	  $seleccion.="instituto $instituto<br/>";
+	  $where.="instituto='$instituto'";
+	  $seleccion.="instituto $instituto<br/></p>";
 	}else{
-	  $where="Estudiantes_documento=''";
-	  $seleccion.="<i>No parametros</i><br/>";
+	  $where.="Estudiantes_documento=''";
+	  $seleccion.="<i>No parametros</i><br/></p>";
 	}
       }
       //ADMINISTRADOR
       if($QPERMISO==4){
-	$where="";
-	$seleccion.="<i>Todos</i>";
+	$where.="status<>''";
+
+$seleccion.=<<<SEL
+<form>
+  <input type=hidden name=mode value=lista>
+  Condición: <input type=text name=search value="$search" size=100><br/>
+  Orden: <input type=text name=sort value="$sort" size=100><br/>
+  <input type=submit name=selecciona value="selecciona">
+</form>
+<p>
+Predefinidos:
+<a href=?mode=lista&search=status='5'>Entregados</a>, 
+<a href=?mode=lista&search=status='0'>Solicitados</a>, 
+<a href=?mode=lista&search=status='1'>Revisados</a>, 
+<a href=?mode=lista&search=status='4'>Rechazados</a>, 
+<a href=?mode=lista&search=status='6'>Confirmados</a>, 
+<a href="?mode=lista&search=status<>''">Todos</a>
+</p>
+<p>
+Ordenes predefinidos:
+<a href="?mode=lista&search=$search&sort=Estudiantes_documento">Documento</a>, 
+<a href="?mode=lista&search=$search&sort=fechahora%20desc">Recientes</a>, 
+<a href="?mode=lista&search=$search&sort=fechahora%20asc">Antiguos</a>
+SEL;
       }
     }
     $seleccion.="</p>";
     $content.="$seleccion";
+    $where.=") and $search";
+    $sql="select * from Reconocimientos $where order by $sort";
 
-    $results=mysqlCmd("select * from Reconocimientos $where order by status,fechahora desc,Estudiantes_documento asc",$qout=1);
+    $results=mysqlCmd($sql,$qout=1);
 
     if($results){
       $qtable=1;
@@ -671,6 +708,8 @@ C;
 	if($lstatus=="Revisado"){$color="pink";}
 	if($lstatus=="Solicitado"){$color="yellow";}
 	if($lstatus=="Rechazado"){$color="white";}
+	if($lstatus=="Entregado"){$color="lightblue";}
+	if($lstatus=="Confirmado"){$color="lightyellow";}
 	if($lstatus=="Aprobado"){
 	  $color="lightblue";
 	  if(!isBlank($lnotificado)){
@@ -697,10 +736,10 @@ C;
 	$recurl=preg_replace("/^\/.+\/data/","data",$recbase);
 
 	if(file_exists("$recbase.pdf")){
-	  if($lstatus=="Revisado" or $lstatus=="Aprobado" or $lstatus=="Notificado"){
-	    $view="<a href=$recurl.pdf target=_blank>Ver</a><br/>";
+	  if($lstatus=="Revisado" or $lstatus=="Aprobado" or $lstatus=="Notificado" or $lstatus=="Entregado" or $lstatus=="Confirmado"){
+	    $view="<a href=$recurl.pdf target=_blank>Ver</a><br/>$lstatus<br/>";
 	  }else{
-	    $view="Solicitado<br/>";
+	    $view="$lstatus<br/>";
 	  }
 	}else{
 	  $view="No disponible<br/>";
@@ -786,7 +825,8 @@ $buttons.=<<<B
       <td colspan=2>
 	<input class="level3" type="submit" name="action" value="Revisado">
 	<input class="level3" type="submit" name="action" value="Aprobado">
-	<input class="level3" type="submit" name="action" value="Realizado">
+	<input class="level3" type="submit" name="action" value="Entregado">
+	<input class="level3" type="submit" name="action" value="Confirmado">
 	<input class="level3" type="submit" name="action" value="Rechazado">
 	<input type="submit" name="action" value="Solicitar">
 	<input type="submit" name="action" value="Guardar">
