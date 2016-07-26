@@ -73,7 +73,8 @@ $PERMISOS=array("0"=>"Anónimo",
 $INSTITUTOS=array("fisica"=>"Instituto de Física",
 		  "biologia"=>"Instituto de Biología",
 		  "quimica"=>"Instituto de Química",
-		  "matematicas"=>"Instituto de Matemáticas");
+		  "matematicas"=>"Instituto de Matemáticas",
+		  "facultad"=>"Toda la Facultad");
 
 $TIPOS=array("visitante"=>"Visitante",
 	     "estudiante"=>"Estudiante activo",
@@ -180,7 +181,7 @@ echo "COOKIES:";
 print_r($_COOKIES);
 echo "<br/>SESSION:";
 print_r($_SESSION);
-*/
+//*/
 //phpinfo();
 
 $EHEADERS="";
@@ -996,7 +997,7 @@ C;
   }else{
 $code.=<<<C
   var today = moment().toDate();
-  var tomorrow = moment().add('days', 1).startOf('day').toDate();
+  var tomorrow = today;//moment().add('days', 1).startOf('day').toDate();
   $("#$id").daterangepicker({
     onOpen: $("#$id").daterangepicker("setRange",{start: today,end: tomorrow})
     });
@@ -1005,6 +1006,25 @@ C;
     
   $code.="</script>";
   return $code;
+}
+
+function get_client_ip() {
+  $ipaddress = '';
+  if (getenv('HTTP_CLIENT_IP'))
+    $ipaddress = getenv('HTTP_CLIENT_IP');
+  else if(getenv('HTTP_X_FORWARDED_FOR'))
+    $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+  else if(getenv('HTTP_X_FORWARDED'))
+    $ipaddress = getenv('HTTP_X_FORWARDED');
+  else if(getenv('HTTP_FORWARDED_FOR'))
+    $ipaddress = getenv('HTTP_FORWARDED_FOR');
+  else if(getenv('HTTP_FORWARDED'))
+    $ipaddress = getenv('HTTP_FORWARDED');
+  else if(getenv('REMOTE_ADDR'))
+    $ipaddress = getenv('REMOTE_ADDR');
+  else
+    $ipaddress = 'UNKNOWN';
+  return $ipaddress;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1020,6 +1040,7 @@ $DATE_ARRAY=preg_split("/ /",$DATE);
 ////////////////////////////////////////////////////////////////////////
 //TABLE FIELDS
 ////////////////////////////////////////////////////////////////////////
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //MOVILIDAD
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1028,5 +1049,22 @@ $MOVILIDAD_FIELDS=array();
 foreach($results as $field){
   $fieldname=$field[0];
   $MOVILIDAD_FIELDS["$fieldname"]=$fieldname;
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//COMACA
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$results=mysqlCmd("describe Actividades;",$qout=1);
+$ACTIVIDADES_FIELDS=array();
+foreach($results as $field){
+  $fieldname=$field[0];
+  $ACTIVIDADES_FIELDS["$fieldname"]=$fieldname;
+}
+
+$results=mysqlCmd("describe Boletas;",$qout=1);
+$BOLETAS_FIELDS=array();
+foreach($results as $field){
+  $fieldname=$field[0];
+  $BOLETAS_FIELDS["$fieldname"]=$fieldname;
 }
 ?>

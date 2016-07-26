@@ -17,6 +17,26 @@ $content.=getHead();
 $content.=getMainMenu();
 
 ////////////////////////////////////////////////////////////////////////
+//GLOBAL VARIABLES
+////////////////////////////////////////////////////////////////////////
+$TIPOS_ACTIVIDAD=array(
+   "seminario"=>"Seminario",
+   "divulgacion"=>"Actividad divulgativa",
+   "reunion"=>"Reunión comunidad",
+   "clubrevistas"=>"Club de Revistas"
+		       );
+
+$UMBRALES_ACTIVIDAD=array(
+   "seminario"=>3,
+   "divulgacion"=>3,
+   "reunion"=>1,
+   "clubrevistas"=>3
+);
+
+$HELPICON="<a href='JavaScript:void(null)' onclick='toggleHelp(this)'><img src='img/help.png' width='15em'></a>";
+$PLAZO=24; //PLAZO EN HORAS PARA REGISTRAR UNA BOLETA
+
+////////////////////////////////////////////////////////////////////////
 //ROUTINES
 ////////////////////////////////////////////////////////////////////////
 
@@ -29,13 +49,13 @@ $content.=<<<M
 </div>
 <div class="submenu">
   <a href="?">Inicio</a> 
-  | <a href="#agenda">Agenda</a>
+  | <a href="?mode=agenda">Agenda</a>
   <span class="level1">
     | <a href="?mode=registrar">Registrar asistencia</a>
     | <a href="?mode=consultar">Consultar asistencia</a>
   </span>
   <span class="level2">
-    | <a href="?mode=agregar">Agregar</a>
+    | <a href="?mode=agregar">Agregar actividad</a>
   </span>
 </div>
 <div class="container">
@@ -59,342 +79,163 @@ if(isset($action)){
   //SALIR DE LA EDICION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Salir"){
-    $mode="lista";
+    unset($mode);
     goto endaction;
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //CONFIRMAR APOYO
+  //CREAR ACTIVIDADES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="apoyo"){
-    $movildir="data/movilidad/$movilid";
-    $codsave=rtrim(shell_exec("cat $movildir/.codigo"));
+  if($action=="Guardar"){
+    $mode="agregar";
 
-    if($movil=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
-      foreach(array_keys($MOVILIDAD_FIELDS) as $field) $$field=$movil["$field"];
-      //CHECK CODIGO
-      if($codsave!=$codigo){
-	errorMsg("El código de la solicitud no coincide.");
-	goto endaction;
-      }
-      //VISTO BUENO
-      if($resultado=="apoyo"){
-	cambiaEstado($movilid,"pendiente_aprobacion");
-	mysqlCmd("update Movilidad set respuesta='1' where movilid='$movilid'");
-      }
-      //DEVOLUCION DEL PROFESOR
-      if($resultado=="devol"){
-	cambiaEstado($movilid,"devuelta");
-	mysqlCmd("update Movilidad set respuesta='0' where movilid='$movilid'");
-      }
-$content.=<<<C
-<p style="font-size:2em;text-align:center;">
-Hemos registrado su información. Gracias.
-</p>
-C;
-      $mode="empty";
-      header("Refresh:5;url=$SITEURL");
-    }else{
-      errorMsg("La solicitud $movilid ya no existe.");
-      goto endaction;
-    }
-  }
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //CARGAR SOLICITUD
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="Cargar"){
-
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //UPLOAD FILE
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    $movilfile=$_FILES["movilfile"];
-    if($movilfile["size"]>0){
-      $movilidnew=$movilid;
-      $movildir="data/movilidad/$movilid";
-      shell_exec("mkdir -p $movildir");
-      $name=$movilfile["name"];
-      $tmp=$movilfile["tmp_name"];
-      shell_exec("cp $tmp $movildir/$name");
-      shell_exec("cd $movildir;unzip $name");
-      include("$movildir/movilidad.php");
-      $movilid=$movilidnew;
-      $blankfields=array("nombre","cumplido","compromiso","fechapresenta","historia","apoyo","monto","respuesta","observacionesadmin","acto","estado");
-      foreach($blankfields as $field){unset($$field);}
-      statusMsg("Solicitud cargada.");
-    }else{
-      errorMsg("Ningún archivo fue provisto.");
-    }
-    $mode="editar";
-  }
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //DESCARGAR
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="descargar"){
-
-    if($movil=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
-      $movildir="data/movilidad/$movilid";
-
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      //CREATE DOWNLOADABLE FILE
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      $fl=fopen("$movildir/movilidad.php","w");
-      fwrite($fl,"<?php\n");
-      foreach(array_keys($MOVILIDAD_FIELDS) as $field){
-	fwrite($fl,"\$$field='".$movil["$field"]."';\n");
-      }
-      fwrite($fl,"?>\n");
-      fclose($fl);
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      //ZIP FILES
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      shell_exec("cd $movildir;zip -r ../../../tmp/movilidad_$movilid.zip *.*");
-      header("Refresh:0;url=tmp/movilidad_$movilid.zip");
-      $mode="lista";
-      statusMsg("Solicitud descargada.");
-      goto endaction;
-    }else{
-      errorMsg("La solicitud no existe");
-      $mode="lista";
-      goto endaction;
-    }
-  }
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //ENVIAR
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="Guardar" or $action=="Enviar" or $action=="Cumplir"){
-
-    $movildir="data/movilidad/$movilid";
     //FECHAS
-    $fecharango=str2Array($fecharango);
+    $fecharango=str2Array($fecha_actividad);
     $fechaini=$fecharango["start"];
     $fechafin=$fecharango["end"];
-
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //VALIDATE PROVIDED INFORMATION
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    if(!preg_match("/udea\.edu\.co/",$email)){
-      errorMsg("Para hacer una solicitud de movilidad debes estar registrado con tu correo institucional");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($lugar)){
-      errorMsg("No se ha provisto un lugar");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($idioma)){
-      errorMsg("No se ha provisto un idioma");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($evento)){
-      errorMsg("No se ha provisto un evento");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    $anticipacion=(strtotime($fechaini)-strtotime($DATE))/86400.0;
-    if($anticipacion<30.0){
-      errorMsg("Las solicitudes deben presentarse con mas de 30 días de anticipación");
-      /*
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-      */
-    }
-    if(isBlank($documento_profesor)){
-      errorMsg("No se ha provisto un profesor de apoyo");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($profesor)){
-      errorMsg("No se ha provisto un profesor de apoyo");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($item1) or isBlank($value1) or isBlank($fuente1)){
-      errorMsg("El presupuesto debe tener al menos 1 item");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($total) or preg_replace("/[$,\.]+/","",$total)<1000){
-      errorMsg("El total debe ser mayor a $1,000 pesos");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if(isBlank($valor) or preg_replace("/[$,\.]+/","",$valor)<1000){
-      errorMsg("El valor solicitado debe ser mayor a $1,000 pesos");
-      $mode="editar";
-      unset($fechapresenta);
-      unset($loadmovil);
-      goto endaction;
-    }
-    if($estado=="nueva"){
-      $file_historia=$_FILES["historia"];
-      if($file_historia["size"]==0){
-	errorMsg("No se ha provisto un archivo de historia académica");
-	$mode="editar";
-	unset($fechapresenta);
-	unset($loadmovil);
-	goto endaction;
-      }
-      $file_carta=$_FILES["carta"];
-      if($file_carta["size"]==0){
-	errorMsg("No se ha provisto una carta de invitación");
-	$mode="editar";
-	unset($fechapresenta);
-	unset($loadmovil);
-	goto endaction;
-      }
-    }
-
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //PREPARE PROVIDED INFO
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    shell_exec("mkdir -p $movildir");
-    $suffix=$documento."_${movilid}";
-
-    //ARCHIVOS
-    if($file_historia["size"]>0){
-      $name=$file_historia["name"];
-      $tmp=$file_historia["tmp_name"];
-      $filename="Historia_${suffix}_$name";
-      shell_exec("cp $tmp $movildir/'$filename'");
-      $historia=$filename;
-    }
-    if($file_carta["size"]>0){
-      $name=$file_carta["name"];
-      $tmp=$file_carta["tmp_name"];
-      $filename="Carta_${suffix}_$name";
-      shell_exec("cp $tmp $movildir/'$filename'");
-      $carta=$filename;
-    }
-    $file_compromiso=$_FILES["compromiso"];
-    if($file_compromiso["size"]>0){
-      $name=$file__compromiso["name"];
-      $tmp=$file__compromiso["tmp_name"];
-      $filename="Compromiso_${suffix}_$name";
-      shell_exec("cp $tmp $movildir/'$filename'");
-      $compromiso=$filename;
-      if($estado=="aprobada" or $estado=="cumplida"){
-	$estado="terminada";
-      }
-    }
-    $file_cumplido=$_FILES["cumplido"];
-    if($file_cumplido["size"]>0){
-      $name=$file_cumplido["name"];
-      $tmp=$file_cumplido["tmp_name"];
-      $filename="Cumplido_${suffix}_$name";
-      shell_exec("cp $tmp $movildir/'$filename'");
-      $cumplido=$filename;
-      if($estado=="aprobada"){
-	$estado="cumplida";
-      }
-    }
-
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //READ PREVIOUS FIELDS
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    $movil=mysqlCmd("select * from Movilidad where movilid='$movilid'");
     
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //CÓDIGO ÚNICO
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    $codigo=generateRandomString(20);
-    shell_exec("echo $codigo > $movildir/.codigo");
+    //VALIDAR
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //CHECK STATUS TO SEND MAILS
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    if($estado=="nueva" and $action="Guardar"){
-      $estado="guardada";
-    }
-    if(($estado=="nueva" or $estado=="guardada") and $action=="Enviar"){
-      $estado=cambiaEstado($movilid,"pendiente_apoyo");
-    }
-    if($estado=="aprobada" and $movil){
-      if($movil["estado"]!="aprobada"){
-	$estado=cambiaEstado($movilid,"aprobada");
-      }
-    }
-    if($estado=="devuelta" and $movil){
-      if($movil["estado"]!="devuelta"){
-	$estado=cambiaEstado($movilid,"devuelta");
-      }
-    }
-    if($estado=="rechazada" and $movil){
-      if($movil["estado"]!="rechazada"){
-	$estado=cambiaEstado($movilid,"rechazada");
-      }
-    }
-    if($estado=="terminada"){
-      if($movil["estado"]!="terminada"){
-	$estado=cambiaEstado($movilid,"terminada");
-      }
-    }
-    if($estado=="cumplida"){
-      if($movil["estado"]!="cumplida"){
-	$estado=cambiaEstado($movilid,"cumplida");
-      }
-    }
+    //GUARDAR
+    insertSql("Actividades",$ACTIVIDADES_FIELDS);
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    //STORE INFORMATION IN DATABASE
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    insertSql("Movilidad",$MOVILIDAD_FIELDS);
-    insertSql("Usuarios",array("email"=>"","programa"=>""));
+    statusMsg("Actividad $actid guardada");
+ }
 
-    statusMsg("Solicitud guardada.");
-    //errorMsg("Cargado");
-    //goto endaction;
-  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CREAR ACTIVIDADES
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Registrar"){
 
-  if($action=="Borrar"){
-    mysqlCmd("delete from Movilidad where movilid='$movilid'");
-    $movildir="data/movilidad/$movilid";
-    if(is_dir($movildir)){
-      shell_exec("rm -r $movildir");
-      statusMsg("Solicitud '$movilid' borrada.");
+    $mode="resultado";
+
+    //OBTENER INFORMACIÓN SOBRE LA ACTIVIDAD
+    $actividad=mysqlCmd("select * from Actividades where actid='$Actividades_actid'");
+
+    //VALIDAR
+    if(isBlank($boletaid)){
+      $mode="registrar";
+      errorMsg("Debe proveer un código de boleta no nulo");
+      goto endaction;
+    }
+    if(isBlank($numero)){
+      $mode="registrar";
+      errorMsg("Debe proveer un número de boleta no nulo");
+      goto endaction;
+    }
+    if(!($boleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero'"))){
+      $mode="registrar";
+      errorMsg("El código de la boleta y su número no coinciden");
+      goto endaction;
+    }
+    if($actividad["tipo"]!=$boleta["tipo"]){
+      $mode="registrar";
+      errorMsg("El tipo de actividad no coincide con la boleta");
+      goto endaction;
+    }
+    //VALIDA QUE NO HAYA SIDO REGISTRADA
+    if($nboleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero' and Usuarios_documento<>''")){
+      $mode="registrar";
+      $fechahora=$nboleta["fechahora"];
+      errorMsg("La boleta ya ha sido registrada (hora de registro: $fechahora)");
+      goto endaction;
+    }
+    //VALIDA RANGO
+    $rango=preg_split("/-/",$actividad["Boletas_rango"]);
+    if($numero<$rango[0] or $numero>$rango[1]){
+      $mode="registrar";
+      errorMsg("La boleta no fue distribuida en esta actividad");
+      goto endaction;
+    }
+    
+    //VALIDA TIEMPO TRANSCURRIDO
+    $fechafin=$actividad["fechafin"]." ".$actividad["horafin"].":00";
+    $date1=date_create($DATE." UTC-5");
+    $date2=date_create($fechafin." UTC-5");
+    $dif=date_diff($date1,$date2);
+    $hours=$dif->format("%h");
+    if($hours>$PLAZO){
+      $resultado="<i style='color:red'>Boleta registrada después del plazo reglamentario ($PLAZO horas)</i>";
     }else{
-      errorMsg("La solicitud '$movilid' no existe");
+      $resultado="Boleta registrada exitosamente.";
     }
-    $mode="lista";
+
+
+    //GUARDAR
+    $semestre=$actividad["semestre"];
+    $IP=get_client_ip();
+    $result=mysqlCmd("select now();",$qout=0);
+    $fechahora=$result[0];
+    insertSql("Boletas",array("boletaid"=>"",
+			      "Usuarios_documento"=>"",
+			      "Actividades_actid"=>"",
+			      "fechahora"=>"",
+			      "IP"=>"",
+			      "semestre"=>""));
+ }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CREAR ACTIVIDADES
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Consultar"){
+    $mode="consultar";
+
+    if(isBlank($semestre)){
+      errorMsg("Debe proveer el semestre");
+      goto endaction;
+    }
+    if(isBlank($documentos)){
+      errorMsg("Debe proveer al menos un documento");
+      goto endaction;
+    }
+
+    //SPLIT DOCUMENTOS
+    $documentos=preg_split("/\s*,\s*/",$documentos);
+    $asistencias=array();
+    $numasistencias=array();
+
+    //GET INFORMATION ABOUT EACH USER
+    foreach($documentos as $documento){
+      if(!($result=mysqlCmd("select * from Boletas where Usuarios_documento='$documento' and semestre='$semestre'",$qout=true))){
+	$asistencias["$documento"]="<i>No ha asistido</i>";
+      }else{
+	$asistencias["$documento"]=$result;
+	$numasistencias["$documento"]=array();
+	foreach(array_keys($TIPOS_ACTIVIDAD) as $tipo){
+	  $result=mysqlCmd("select count(boletaid) from Boletas where Usuarios_documento='$documento' and tipo='$tipo'");
+	  $numasistencias["$documento"]["$tipo"]=$result[0];
+	}
+      }
+    }
+
+    //GET INFORMATION ABOUT EACH ACTIVITY
+    $result=mysqlCmd("select * from Actividades where semestre='$semestre'",$qout=1);
+    $actividades=array();
+    foreach($result as $actividad){
+      $actid=$actividad["actid"];
+      $actividades["$actid"]=$actividad;
+    }
+
+    $mode="consultado";
+    goto endaction;
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //LOAD DATA
+  //CARGAR ACTIVIDADES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if($action=="loadmovil"){
-
-    if($result=mysqlCmd("select * from Movilidad where movilid='$movilid'")){
-      foreach(array_keys($MOVILIDAD_FIELDS) as $field) $$field=$result["$field"];
-      statusMsg("Cargado");
+  if($action=="loadact"){
+    if($result=mysqlCmd("select * from Actividades where actid='$actid'")){
+      foreach(array_keys($ACTIVIDADES_FIELDS) as $field) $$field=$result["$field"];
+      statusMsg("Actividad $actid cargada");
+      $mode="agregar";
     }else{
       $mode="lista";
-      errorMsg("La solicitud no existe");
+      errorMsg("La actividad no existe");
     }
     goto endaction;
   }
-  
+
+
  endaction:
 }else{}
 
@@ -445,33 +286,49 @@ C;
   else if($mode=="agregar"){
     if(!isset($actid)){$actid=generateRandomString(5);}
     else{}
-    if(!isset($fecha)){$fecha="";}
+    if(!isset($fecha_actividad)){$fechaini="";$fechafin="";}
     else{}
-    $helpicon="<a href='JavaScript:void(null)' onclick='toggleHelp(this)'><img src='img/help.png' width='15em'></a>";
-    $fecha_menu=fechaRango("fecha",$fecha,$fecha);
+    if(!isset($Boletas_rango)){$Boletas_rango="1-100000";}
+    else{}
 
-  
+    $fecha_menu=fechaRango("fecha_actividad",$fechaini,$fechafin);
+    $tiposel=generateSelection($TIPOS_ACTIVIDAD,
+			       "tipo","$tipo");
+    $institutosel=generateSelection($INSTITUTOS,
+				    "instituto","$instituto");
+
 $content.=<<<C
 
+<center>
 <h4>Registro de actividad $actid</h4>
 
 <form action="comaca.php?loadact" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+<input type="hidden" name="actid" value="$actid">
 
 <table border=0px width=60% cellspacing=0px>
 
 <tr class="field">
-  <td class="campo" id="actid">Identificador$helpicon</td>
+  <td class="campo" id="instituto">Instituto$HELPICON</td>
   <td class="form">
-    $actid
-    <input type="hidden" name="actid" value="$actid">
+    $institutosel
   </td>
 </tr>
-<tr class="ayuda" id="actid_help">
-  <td colspan=2>Identificador único de la actividad.</td>
+<tr class="ayuda" id="instituto_help" >
+  <td colspan=2>Instituto al que esta adscrita la actividad.</td>
 </tr>
 
 <tr class="field">
-  <td class="campo" id="nombre">Nombre de la actividad$helpicon</td>
+  <td class="campo" id="tipo">Tipo de actividad$HELPICON</td>
+  <td class="form">
+    $tiposel
+  </td>
+</tr>
+<tr class="ayuda" id="tipo_help" >
+  <td colspan=2>Tipo de actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="nombre">Nombre de la actividad$HELPICON</td>
   <td class="form">
     <input type="text" name="nombre" value="$nombre">
   </td>
@@ -481,7 +338,7 @@ $content.=<<<C
 </tr>
 
 <tr class="field">
-  <td class="campo" id="lugar">Lugar de la actividad$helpicon</td>
+  <td class="campo" id="lugar">Lugar de la actividad$HELPICON</td>
   <td class="form">
     <input type="text" name="lugar" value="$lugar">
   </td>
@@ -491,16 +348,74 @@ $content.=<<<C
 </tr>
 
 <tr class="field">
-  <td class="campo" id="fecha">Fecha de la actividad$helpicon</td>
+  <td class="campo" id="fecha">Fecha de la actividad$HELPICON</td>
   <td class="form">
   $fecha_menu
   </td>
 </tr>
-<tr class="ayuda" id="lugar_help" >
-  <td colspan=2>Lugar de la actividad.</td>
+<tr class="ayuda" id="fecha_help" >
+  <td colspan=2>Fecha de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="horaini">Hora inicial de la actividad$HELPICON</td>
+  <td class="form">
+    <input type="text" name="horaini" value="$horaini" placeholder="HH:MM" size="8">
+  </td>
+</tr>
+<tr class="ayuda" id="horaini_help" >
+  <td colspan=2>Hora inicial de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="horafin">Hora final de la actividad$HELPICON</td>
+  <td class="form">
+    <input type="text" name="horafin" value="$horafin" placeholder="HH:MM" size="8">
+  </td>
+</tr>
+<tr class="ayuda" id="hora_help" >
+  <td colspan=2>Hora final de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="semestre">Período académico$HELPICON</td>
+  <td class="form">
+    <input type="text" name="semestre" value="$semestre" placeholder="2016-2">
+  </td>
+</tr>
+<tr class="ayuda" id="semestre_help" >
+  <td colspan=2>Período académico al que esta asociada la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="resumen">Resumen de la actividad$HELPICON</td>
+  <td class="form">
+    <textarea name="resumen" rows="10" cols="50">$resumen</textarea>
+  </td>
+</tr>
+<tr class="ayuda" id="resumen_help" >
+  <td colspan=2>Resumen de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="rango">Rango de boletas$HELPICON</td>
+  <td class="form">
+    <input type="text" name="Boletas_rango" value="$Boletas_rango" placeholder="121-143">
+  </td>
+</tr>
+<tr class="ayuda" id="rango_help" >
+  <td colspan=2>Indique el rango numérico de las boletas distribuidas en la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td colspan=2 class="botones_simple">
+    <input type="submit" name="action" value="Guardar">
+    <input type="submit" name="action" value="Salir">
+  </td>
 </tr>
 
 </table>
+</center>
 
 </form>
 C;
@@ -508,16 +423,436 @@ C;
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  //REGISTRAR ACTIVIDAD
+  //AGENDA DE ACTIVIDADES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  else if($mode=="registrar"){
+  else if($mode=="agenda"){
+    
+    if(!isset($sort)){$sort="TIMESTAMP(fechaini)";}
+    if(!isset($order)){$order="desc";}
+    if(!isset($search)){$search="where actid<>'' ";}
+
+    //LEER TODAS LAS ACTIVIDADES
+    $sql="select * from Actividades $search order by $sort $order";
+    if(!($results=mysqlCmd($sql,$qout=1))){
+      $content.="<i>No hay actividades con el criterio de búsqueda provisto.</i>";
+      goto end;
+    }
+    if($order=="asc"){$order="desc";}
+    else{$order="asc";}
+
+$table=<<<T
+<center>
+<table border=1px style='font-size:0.8em' cellspacing:0px>
+<thead>
+<tr>
+  <td width=5% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=actid">
+      Id.
+    </a>
+  </td>
+  <td width=5% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=semestre">
+      Período
+    </a>
+  </td>
+  <td width=10% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=fechaini">
+      Fechas
+    </a>
+  </td>
+  <td width=10% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=lugar">
+      Lugar
+    </a>
+  </td>
+  <td width=10% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=instituto">
+      Instituto
+    </a>
+  </td>
+  <td width=10% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=instituto">
+      Tipo
+    </a>
+  </td>
+  <td width=50% style="background:lightgray">
+    <a href="?mode=agenda&order=$order&sort=titulo">
+      Actividad
+    </a>
+  </td>
+</tr>
+</thead>
+T;
+
+$agenda=<<<A
+<table border=1px width=100%>
+A;
+
+    foreach($results as $actividad){
+      foreach(array_keys($ACTIVIDADES_FIELDS) as $field){
+	$$field=$actividad["$field"];
+      }
+
+      if($fechaini==$fechafin){$fechas="$fechaini, $horaini-$horafin";}
+      else{$fechas="$fechaini a $fechafin, $horaini-$horafin";}
+
+      $Instituto=$INSTITUTOS["$instituto"];
+      $Tipo=$TIPOS_ACTIVIDAD["$tipo"];
+
+      $fechagoogle="";
+      $fechagoogle.=preg_replace("/-/","",$fechaini);
+      $fechagoogle.="T";
+      $fechaparts=preg_split("/:/",$horaini);
+      $hora=$fechaparts[0]+5;
+      $fechagoogle.=$hora.$fechaparts[1]."00Z";
+      $fechagoogle.="/";
+      $fechagoogle.=preg_replace("/-/","",$fechafin);
+      $fechagoogle.="T";
+      $fechaparts=preg_split("/:/",$horafin);
+      $hora=$fechaparts[0]+5;
+      $fechagoogle.=$hora.$fechaparts[1]."00Z";
+      //echo "Fecha: $fechagoogle</br>";
+      
+$link.=<<<L
+<a href="http://www.google.com/calendar/event?
+action=TEMPLATE
+&text=$nombre
+&dates=$fechagoogle
+&details=$resumen
+&location=$lugar
+&trp=false
+&sprop=
+&sprop=name:"
+target="_blank" rel="nofollow">$fechas</a>
+L;
+
+$table.=<<<T
+<tr>
+  <td>
+    <a href=?mode=agregar&action=loadact&actid=$actid>
+      $actid
+    </a>
+  </td>
+  <td>
+    $semestre
+  </td>
+  <td>
+    $link
+  </td>
+  <td>
+    $lugar
+  </td>
+  <td>
+    $Instituto
+  </td>
+  <td>
+    $Tipo
+  </td>
+  <td>
+    <b>$nombre</b><br/>
+    <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
+      Resumen
+    </a><br/>
+    <div id="resumen_$actid" style="display:none;padding:10px">
+      $resumen
+    </div>
+  </td>
+</tr>
+T;
+
+
+$agenda.=<<<A
+<tr>
+  <td>
+    <a href=?mode=agregar&action=loadact&actid=$actid>
+      $actid
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>$fechas</td>
+</tr>
+<tr>
+  <td>$lugar, $Instituto</td>
+</tr>
+<tr>
+  <td>$Tipo<br/>$nombre</td>
+</tr>
+<tr>
+  <td>
+  <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
+    Resumen
+  </a>
+  <div id="resumen_$actid" style="display:none;padding:10px;">
+    $resumen
+  </div>
+  </td>
+</tr>
+A;
+
+    }
+    
+$agenda.=<<<A
+</table>
+A;
+
+$table.=<<<T
+</table>
+</center>
+T;
+
+$content.=<<<C
+<h4>Agenda de actividades</h4>
+$table
+<!--$agenda-->
+C;
+    goto end;
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //REGISTRAR ASISTENCIA
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  else if($mode=="registrar" or $mode=="resultado"){
+
+$content.=<<<C
+<center>
+<h4>Registro de asistencia</h4>
+C;
+
+ if($mode=="resultado"){
+$content.=<<<C
+<div style="width:80%;background:lightgray;padding:20px">
+$resultado
+</div>
+C;
+ }
+ 
+ if($mode=="registrar"){
+    $sql="select * from Actividades order by TIMESTAMP(fechaini) desc";
+    if(!($results=mysqlCmd($sql,$qout=1))){
+      $content.="<i>No hay actividades con el criterio de búsqueda provisto.</i>";
+      goto end;
+    }
+
+    $Usuarios_documento=$_SESSION["documento"];
+    $nombre=$_SESSION["nombre"];
+    $email=$_SESSION["email"];
+    
+    $actividades=array();
+    $i=0;
+    foreach($results as $actividad){
+      foreach(array_keys($ACTIVIDADES_FIELDS) as $field){
+	$name="act_$field";
+	$$name=$actividad["$field"];
+      }
+      if($i==0 and !isset($Actividades_actid)){
+	$Actividades_actid=$act_actid;
+      }
+      $act_tipo=$TIPOS_ACTIVIDAD["$act_tipo"];
+      $act_nombre=substr($act_nombre,0,20)."...";
+      $actividades["$act_actid"]="$act_tipo : $act_nombre / $act_fechaini,$act_horaini";
+      $i++;
+    }
+    $actsel=generateSelection($actividades,"Actividades_actid","$Actividades_actid");
+
+$content.=<<<C
+<form action="comaca.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+
+<table border=0px width=60% cellspacing=0px>
+
+<tr class="field">
+  <td class="campo" id="documento">Documento del asistente$HELPICON</td>
+  <td class="form">
+  <input type="text" name="Usuarios_documento" value="$Usuarios_documento" onchange="updateStudentForm(this)">
+  </td>
+</tr>
+<tr class="ayuda" id="documento_help" >
+  <td colspan=2>Documento de identidad del asistente.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo">Nombre del asistente</td>
+  <td class="form">
+  <input type="text" name="nombre" value="$nombre" disabled>
+  </td>
+</tr>
+
+<tr class="field">
+  <td class="campo">E-mail</td>
+  <td class="form">
+  <input type="text" name="email" value="$email" disabled>
+  </td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="actividad">Actividad$HELPICON</td>
+  <td class="form">
+    $actsel
+  </td>
+</tr>
+<tr class="ayuda" id="actividad_help" >
+  <td colspan=2>Actividad a la que asistió.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="boletaid">Código de la boleta$HELPICON</td>
+  <td class="form">
+    <input type="text" name="boletaid" value="$boletaid">
+  </td>
+</tr>
+<tr class="ayuda" id="boletaid_help" >
+  <td colspan=2>Identificador alfanumérico de la boleta.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="numero">Número de la boleta$HELPICON</td>
+  <td class="form">
+    <input type="text" name="numero" value="$numero">
+  </td>
+</tr>
+<tr class="ayuda" id="numero_help" >
+  <td colspan=2>Número de la boleta.</td>
+</tr>
+
+<tr class="field">
+  <td colspan=2 class="botones_simple">
+    <input type="submit" name="action" value="Registrar">
+    <input type="submit" name="action" value="Salir">
+  </td>
+</tr>
+
+</table>
+</center>
+C;
+
+    }
     goto end;
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //CONSULTAR ASISTENCIA
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  else if($mode=="consultar"){
+  else if($mode=="consultar" or $mode=="consultado"){
+    
+$content.=<<<C
+<h4>Consulta de Asistencias</h4>
+C;
+
+    if($mode=="consultar"){
+
+$content.=<<<C
+<form action="comaca.php?loadact" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+
+<table border=0px cellspacing=0px>
+
+<tr class="field">
+  <td class="campo" id="semestre">Semestre$HELPICON</td>
+  <td class="form">
+    <input type="text" name="semestre" value="$semestre">
+  </td>
+</tr>
+<tr class="ayuda" id="semestre_help" >
+  <td colspan=2>Semestre en el que se realiza la consulta.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="documentos">Documento(s)$HELPICON</td>
+  <td class="form">
+    <input type="text" name="documentos" value="$documentos">
+  </td>
+</tr>
+<tr class="ayuda" id="documentos_help" >
+  <td colspan=2>Indique los documentos de los estudiantes que quiere consultar separados por ",".</td>
+</tr>
+
+<tr class="field">
+  <td colspan=2 class="botones_simple">
+    <input type="submit" name="action" value="Consultar">
+    <input type="submit" name="action" value="Salir">
+  </td>
+</tr>
+</table>
+
+</form>
+C;
+
+    }
+    if($mode=="consultado"){
+
+$content.=<<<C
+  <h5>Semestre $semestre</h5>
+  <table border=1px cellspacing=0>
+    <thead>
+      <tr>
+	<td>Documento</td>
+C;
+
+       foreach($TIPOS_ACTIVIDAD as $Tipo){
+	 
+$content.=<<<C
+        <td>$Tipo</td>
+C;
+       }
+$content.=<<<C
+	<td>Total</td>
+	<td>Umbrales</td>
+	<td>Nota</td>
+    </tr></thead>
+C;
+
+       foreach($documentos as $documento){
+    
+         //GENERATE DETAILS
+	 $detalles="";
+	 foreach($asistencias["$documento"] as $asistencia){
+	   $actid=$asistencia["Actividades_actid"];
+	   $actividad=$actividades["$actid"];
+	   $info=$actividad["fechafin"].",".$actividad["horafin"].": ".$actividad["tipo"]." '".$actividad["nombre"]."'";
+	   $detalles.=$info."<br/>";
+	 }
+
+$content.=<<<C
+    <tr>
+      <td>
+	<a href="JavaScript:void(null)" onclick="$('#detalles_$documento').toggle()">
+	  $documento
+	</a>
+	<div id="detalles_$documento" style="display:none">
+	  $detalles
+	</div>
+      </td>
+C;
+
+            $tot=0;
+            $numbrales=0;
+            foreach(array_keys($TIPOS_ACTIVIDAD) as $tipo){
+	        $n=$numasistencias["$documento"]["$tipo"];
+                if($n>=$UMBRALES_ACTIVIDAD["$tipo"]){
+	           $numbrales++;
+	        }
+		$tot+=$n;
+$content.=<<<C
+      <td>
+	$n
+      </td>
+C;
+	     }
+
+             $nota=($numbrales/4)*5;
+      
+$content.=<<<C
+      <td>$tot</td>
+      <td>$numbrales</td>
+      <td>$nota</td>
+    </tr>
+C;
+       }
+
+$content.=<<<C
+  </table>
+C;
+    }
+
     goto end;
   }
 

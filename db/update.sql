@@ -1,8 +1,30 @@
 use Sinfin;
 
+alter table Boletas add column tarde varchar(2);
+/*
+alter table Boletas add column semestre varchar(255);
+alter table Boletas add column IP varchar(255);
+alter table Boletas add column fechahora datetime;
+alter table Boletas add column nombre varchar(255);
+alter table Boletas add column email varchar(255);
+*/
+/*
+alter table Actividades add column Boletas_rango varchar(50);
+alter table Boletas add column instituto varchar(50);
+alter table Actividades modify column horaini varchar(5);
+alter table Actividades modify column horafin varchar(5);
+alter table Actividades modify column semestre varchar(10);
+alter table Actividades drop column hora;
+alter table Actividades add column horaini varchar(255);
+alter table Actividades add column horafin varchar(255);
+alter table Actividades add column semestre varchar(50);
+alter table Actividades add column instituto varchar(50);
+alter table Actividades drop column fechahora;
+alter table Actividades add column fechaini varchar(255);
+alter table Actividades add column fechafin varchar(255);
+alter table Actividades add column hora varchar(100);
 alter table Actividades drop column lugar;
 alter table Actividades add column lugar varchar(255);
-/*
 alter table Usuarios add column documento varchar(50);
 alter table Usuarios drop column nivel;
 alter table Usuarios add column permisos varchar(2);
@@ -47,8 +69,8 @@ alter table Usuarios add column activada varchar(2) default '0';
 alter table Cursos add fechaacuerdo varchar(3);
 alter table Cursos add semanas varchar(3);
 alter table Programas add codigo varchar(5);
-*/
 alter table Cursos add posicion_s varchar(3);
+*/
 
 /*
 alter table misiones add cumplido1 varchar(255);

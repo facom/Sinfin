@@ -163,6 +163,10 @@ td.botones{
     padding:20px;
     background:lightgray;
 }
+td.botones_simple{
+    text-align:center;
+    padding:10px;
+}
 span.archivo{
     font-size:0.8em;
 }
