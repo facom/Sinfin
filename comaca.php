@@ -140,6 +140,12 @@ if(isset($action)){
       errorMsg("La boleta ya ha sido registrada (hora de registro: $fechahora)");
       goto endaction;
     }
+    //VALIDA QUE NO HAYA SIDO REGISTRADA
+    if($nboleta=mysqlCmd("select * from Boletas where Actividades_actid='$Actividades_actid' and Usuarios_documento='$Usuarios_documento'")){
+      $mode="registrar";
+      errorMsg("Usted ya registro una boleta para esta actividad");
+      goto endaction;
+    }
     //VALIDA RANGO
     $rango=preg_split("/-/",$actividad["Boletas_rango"]);
     if($numero<$rango[0] or $numero>$rango[1]){
