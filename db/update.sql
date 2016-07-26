@@ -1,5 +1,7 @@
 use Sinfin;
 
+alter table Actividades drop column lugar;
+alter table Actividades add column lugar varchar(255);
 /*
 alter table Usuarios add column documento varchar(50);
 alter table Usuarios drop column nivel;
@@ -127,3 +129,4 @@ create table Usuarios (
 /*
 insert ignore into Usuarios (email,nombre,password,nivel) values ('pregradofisica@udea.edu.co','Pregrado Fisica',MD5('123'),'4');
 */
+
