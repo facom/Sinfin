@@ -444,22 +444,65 @@ C;
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="agregar"){
     if(!isset($actid)){$actid=generateRandomString(5);}
-    else{
-      
-    }
+    else{}
+    if(!isset($fecha)){$fecha="";}
+    else{}
+    $helpicon="<a href='JavaScript:void(null)' onclick='toggleHelp(this)'><img src='img/help.png' width='15em'></a>";
+    $fecha_menu=fechaRango("fecha",$fecha,$fecha);
 
+  
 $content.=<<<C
+
 <h4>Registro de actividad $actid</h4>
+
 <form action="comaca.php?loadact" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-<table border=1px width=60% cellspacing=0px>
+
+<table border=0px width=60% cellspacing=0px>
+
 <tr class="field">
-  <td class="campo">Nombre del solicitante:</td>
+  <td class="campo" id="actid">Identificador$helpicon</td>
   <td class="form">
-    $nombre
-    <input type="hidden" name="nombre" value="$nombre">
+    $actid
+    <input type="hidden" name="actid" value="$actid">
   </td>
 </tr>
+<tr class="ayuda" id="actid_help">
+  <td colspan=2>Identificador único de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="nombre">Nombre de la actividad$helpicon</td>
+  <td class="form">
+    <input type="text" name="nombre" value="$nombre">
+  </td>
+</tr>
+<tr class="ayuda" id="nombre_help" >
+  <td colspan=2>Nombre de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="lugar">Lugar de la actividad$helpicon</td>
+  <td class="form">
+    <input type="text" name="lugar" value="$lugar">
+  </td>
+</tr>
+<tr class="ayuda" id="lugar_help" >
+  <td colspan=2>Lugar de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="fecha">Fecha de la actividad$helpicon</td>
+  <td class="form">
+  $fecha_menu
+  </td>
+</tr>
+<tr class="ayuda" id="lugar_help" >
+  <td colspan=2>Lugar de la actividad.</td>
+</tr>
+
 </table>
+
+</form>
 C;
 
   }

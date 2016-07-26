@@ -932,8 +932,9 @@ function getRecdir($recid)
 }
 
 function fechaRango($id,$start="",$end=""){
+
 $code=<<<C
-<input type="hidden" id="fecharango" name="fecharango">
+<input type="hidden" id="$id" name="$id">
 <script>
     $("#$id").daterangepicker({
         presetRanges: [{
