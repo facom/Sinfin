@@ -950,9 +950,13 @@ $code=<<<C
             text: 'La próxima semana',
             dateStart: function() { return moment().add('weeks', 1).startOf('week') },
             dateEnd: function() { return moment().add('weeks', 1).endOf('week') }
+	}, {
+            text: 'La semana anterior',
+            dateStart: function() { return moment().add('weeks',-1).startOf('week') },
+            dateEnd: function() { return moment().add('weeks',-1).endOf('week') }
 	}],
 	datepickerOptions: {
-            minDate: 0,
+            minDate: null,
             maxDate: null
         },
 	applyOnMenuSelect: false,

@@ -134,16 +134,16 @@ if(isset($action)){
       goto endaction;
     }
     //VALIDA QUE NO HAYA SIDO REGISTRADA
-    if($nboleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero' and Usuarios_documento<>''")){
-      $mode="registrar";
-      $fechahora=$nboleta["fechahora"];
-      errorMsg("La boleta ya ha sido registrada (hora de registro: $fechahora)");
-      goto endaction;
-    }
-    //VALIDA QUE NO HAYA SIDO REGISTRADA
     if($nboleta=mysqlCmd("select * from Boletas where Actividades_actid='$Actividades_actid' and Usuarios_documento='$Usuarios_documento'")){
       $mode="registrar";
       errorMsg("Usted ya registro una boleta para esta actividad");
+      goto endaction;
+    }
+    //VALIDA QUE NO HAYA SIDO REGISTRADA
+    if($nboleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero' and Usuarios_documento<>''")){
+      $mode="registrar";
+      $fechahora=$nboleta["fechahora"];
+      errorMsg("La boleta $boletaid ya ha sido registrada por otro estudiante (hora de registro: $fechahora). Si usted tiene la boleta consigo reporte esta irregularidad al coordinador");
       goto endaction;
     }
     //VALIDA RANGO
@@ -446,7 +446,7 @@ C;
     
     if(!isset($sort)){$sort="TIMESTAMP(fechaini)";}
     if(!isset($order)){$order="asc";}
-    if(!isset($search)){$search="where actid<>'' ";}
+    if(!isset($search)){$search="where TIMESTAMP(fechafin)>Now() and actid<>'' ";}
 
     //LEER TODAS LAS ACTIVIDADES
     $sql="select * from Actividades $search order by $sort $order";
@@ -657,7 +657,7 @@ C;
  }
  
  if($mode=="registrar"){
-    $sql="select * from Actividades order by TIMESTAMP(fechaini) desc";
+    $sql="select * from Actividades where TIMESTAMP(fechafin)<Now() order by TIMESTAMP(fechaini) desc";
     if(!($results=mysqlCmd($sql,$qout=1))){
       $content.="<i>No hay actividades con el criterio de búsqueda provisto.</i>";
       goto end;

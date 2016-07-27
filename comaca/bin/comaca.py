@@ -9,6 +9,11 @@ import random,string
 import numpy as np
 
 #########################################
+# NUMBER OF ITEMS
+#########################################
+ntot=10
+
+#########################################
 # ROUTINES
 #########################################
 def randomStr(N):
@@ -48,8 +53,6 @@ offs=3
 #########################################
 # INFO
 #########################################
-ntot=1
-
 # Nombre, Numero de hojas
 activities=[
     [u"Reunion",0,ntot,1],
@@ -73,6 +76,7 @@ strings=readFile("strings.dat",)
 #SHEETS
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 p=1
+maxnum=0
 for n in xrange(ntot):
     
     fig=plt.figure(figsize=(W,H),dpi=300)
@@ -124,7 +128,9 @@ for n in xrange(ntot):
             fontid.set_weight("bold")
             
             num="%05d"%(ns+counter)
-            
+            if int(num)>maxnum:
+                maxnum=int(num)
+
             fontnum=FontProperties()
             fontnum.set_size(fsize-2*f)
             
@@ -193,7 +199,7 @@ for line in lines:
 ft.close()
 
 fn=open("numbers.dat","w")
-fn.write(u"%d\n"%(activities[0][1]+1))
+fn.write(u"%d\n"%(maxnum+1))
 fn.close()
 
 print "Joining talonarios..."
