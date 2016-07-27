@@ -8,7 +8,9 @@ mysqldump -u root -p $database > $backdir/$database.sql
 
 echo "Compressing..."
 tar cf $backdir/$database.tar $backdir/$database.sql $datadir
-p7zip $backdir/$database.tar
+cd $backdir
+p7zip $database.tar
+cd - &> /dev/null
 
 echo "Splitting..."
 cd $backdir

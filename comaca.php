@@ -87,7 +87,7 @@ if(isset($action)){
   //CREAR ACTIVIDADES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Guardar"){
-    $mode="agregar";
+    $mode="agenda";
 
     //FECHAS
     $fecharango=str2Array($fecha_actividad);
@@ -232,6 +232,7 @@ if(isset($action)){
   if($action=="loadact"){
     if($result=mysqlCmd("select * from Actividades where actid='$actid'")){
       foreach(array_keys($ACTIVIDADES_FIELDS) as $field) $$field=$result["$field"];
+      $fecha_actividad=array("start"=>$fechaini,"end"=>$fechafin);
       statusMsg("Actividad $actid cargada");
       $mode="agregar";
     }else{
@@ -290,7 +291,7 @@ C;
   //AGREGAR ACTIVIDAD
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="agregar"){
-    if(!isset($actid)){$actid=generateRandomString(5);}
+    if(!isset($actid) or isset($submode)){$actid=generateRandomString(5);}
     else{}
     if(!isset($fecha_actividad)){$fechaini="";$fechafin="";}
     else{}
@@ -308,7 +309,7 @@ $content.=<<<C
 <center>
 <h4>Registro de actividad $actid</h4>
 
-<form action="comaca.php?loadact" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+<form action="comaca.php" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 <input type="hidden" name="actid" value="$actid">
 
 <table border=0px width=60% cellspacing=0px>
@@ -341,6 +342,16 @@ $content.=<<<C
 </tr>
 <tr class="ayuda" id="nombre_help" >
   <td colspan=2>Nombre de la actividad.</td>
+</tr>
+
+<tr class="field">
+  <td class="campo" id="encargado">A cargo de$HELPICON</td>
+  <td class="form">
+    <input type="text" name="encargado" value="$encargado">
+  </td>
+</tr>
+<tr class="ayuda" id="nombre_help" >
+  <td colspan=2>Nombre de la persona que realizará la actividad.</td>
 </tr>
 
 <tr class="field">
@@ -434,7 +445,7 @@ C;
   else if($mode=="agenda"){
     
     if(!isset($sort)){$sort="TIMESTAMP(fechaini)";}
-    if(!isset($order)){$order="desc";}
+    if(!isset($order)){$order="asc";}
     if(!isset($search)){$search="where actid<>'' ";}
 
     //LEER TODAS LAS ACTIVIDADES
@@ -448,40 +459,41 @@ C;
 
 $table=<<<T
 <center>
-<table border=1px style='font-size:0.8em' cellspacing:0px>
+<table border=0px style='font-size:0.8em' cellspacing:0px>
 <thead>
-<tr>
-  <td width=5% style="background:lightgray">
+<tr style="background:lightgray;padding:5px">
+  <td width=5% class="field level3">
     <a href="?mode=agenda&order=$order&sort=actid">
       Id.
     </a>
   </td>
-  <td width=5% style="background:lightgray">
+  </span>
+  <td width=5% class="field">
     <a href="?mode=agenda&order=$order&sort=semestre">
       Período
     </a>
   </td>
-  <td width=10% style="background:lightgray">
+  <td width=10% class="field">
     <a href="?mode=agenda&order=$order&sort=fechaini">
       Fechas
     </a>
   </td>
-  <td width=10% style="background:lightgray">
+  <td width=10% class="field">
     <a href="?mode=agenda&order=$order&sort=lugar">
       Lugar
     </a>
   </td>
-  <td width=10% style="background:lightgray">
+  <td width=10% class="field">
     <a href="?mode=agenda&order=$order&sort=instituto">
       Instituto
     </a>
   </td>
-  <td width=10% style="background:lightgray">
-    <a href="?mode=agenda&order=$order&sort=instituto">
+  <td width=10% class="field">
+    <a href="?mode=agenda&order=$order&sort=tipo">
       Tipo
     </a>
   </td>
-  <td width=50% style="background:lightgray">
+  <td width=50% class="field">
     <a href="?mode=agenda&order=$order&sort=titulo">
       Actividad
     </a>
@@ -498,7 +510,6 @@ A;
       foreach(array_keys($ACTIVIDADES_FIELDS) as $field){
 	$$field=$actividad["$field"];
       }
-
       if($fechaini==$fechafin){$fechas="$fechaini, $horaini-$horafin";}
       else{$fechas="$fechaini a $fechafin, $horaini-$horafin";}
 
@@ -519,12 +530,12 @@ A;
       $fechagoogle.=$hora.$fechaparts[1]."00Z";
       //echo "Fecha: $fechagoogle</br>";
       
-$link.=<<<L
+$link=<<<L
 <a href="http://www.google.com/calendar/event?
 action=TEMPLATE
 &text=$nombre
 &dates=$fechagoogle
-&details=$resumen
+&details=A cargo de $encargado%0A%0A$resumen
 &location=$lugar
 &trp=false
 &sprop=
@@ -532,30 +543,39 @@ action=TEMPLATE
 target="_blank" rel="nofollow">$fechas</a>
 L;
 
+    if($rowcolor=="white"){$rowcolor="lightgray";}
+    else{$rowcolor="white";}
+
 $table.=<<<T
-<tr>
-  <td>
+<tr style="background:$rowcolor">
+  <td class="field level3">
+  <center>
     <a href=?mode=agregar&action=loadact&actid=$actid>
       $actid
     </a>
+    <a href=?mode=agregar&action=loadact&actid=$actid&submode=duplicar style=font-size:8px>
+      Duplicar
+    </a>
+  </center>
   </td>
-  <td>
+  <td class="field">
     $semestre
   </td>
-  <td>
+  <td class="field">
     $link
   </td>
-  <td>
+  <td class="field">
     $lugar
   </td>
-  <td>
+  <td class="field">
     $Instituto
   </td>
-  <td>
+  <td class="field">
     $Tipo
   </td>
-  <td>
+  <td class="field">
     <b>$nombre</b><br/>
+    A cargo de <i>$encargado</i><br/>
     <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
       Resumen
     </a><br/>
@@ -656,7 +676,8 @@ C;
       }
       $act_tipo=$TIPOS_ACTIVIDAD["$act_tipo"];
       $act_nombre=substr($act_nombre,0,20)."...";
-      $actividades["$act_actid"]="$act_tipo : $act_nombre / $act_fechaini,$act_horaini";
+      $act_encargado=substr($act_encargado,0,10)."...";
+      $actividades["$act_actid"]="$act_tipo : $act_nombre / $act_encargado / $act_fechaini,$act_horaini";
       $i++;
     }
     $actsel=generateSelection($actividades,"Actividades_actid","$Actividades_actid");
