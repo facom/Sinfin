@@ -629,6 +629,9 @@ T;
 
 $content.=<<<C
 <h4>Agenda de actividades</h4>
+<p>
+Esta es la agenda de actividades de la <b>Comunidad Académica</b>.  Haga click en el nombre de cada columna para cambiar el orden en el que se listan las actividades.  Puede hacer click en "Resumen" para desplegar información detallada sobre cada actividad.  También puede hacer click en la fecha del evento para agregarlo a su calendario en Google.
+</p>
 $table
 <!--$agenda-->
 C;

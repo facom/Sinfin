@@ -1,7 +1,10 @@
 use Sinfin;
 
-alter table Actividades add column encargado varchar(255);
+alter table Boletas add column tarde varchar(2);
+alter table Boletas add column semestre varchar(255);
+alter table Boletas add column IP varchar(255);
 /*
+alter table Actividades add column encargado varchar(255);
 alter table Actividades drop column intituto;
 alter table Actividades add column instituto varchar(50);
 alter table Boletas add column tarde varchar(2);
