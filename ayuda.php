@@ -77,6 +77,11 @@ recuperación de contraseñas, etc.</p>
         src="https://www.youtube.com/embed/O85cGBINggU"
         frameborder="0" allowfullscreen>
 </iframe>
+<!-- COMACA: REGISTRO DE ASISTENCIA -->
+<iframe width="$WIDTHVID" height="$HEIGHTVID"
+        src="https://www.youtube.com/embed/-f5j4er-484"
+        frameborder="0" allowfullscreen>
+</iframe>
 </center>
 </div>
 

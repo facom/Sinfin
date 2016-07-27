@@ -632,6 +632,9 @@ $content.=<<<C
 <p>
 Esta es la agenda de actividades de la <b>Comunidad Académica</b>.  Haga click en el nombre de cada columna para cambiar el orden en el que se listan las actividades.  Puede hacer click en "Resumen" para desplegar información detallada sobre cada actividad.  También puede hacer click en la fecha del evento para agregarlo a su calendario en Google.
 </p>
+<p>
+Puede ver la agenda también en Google Calendar: <a href=http://bit.ly/fcen-comaca-calendario target=_blank>http://bit.ly/fcen-comaca-calendario</a>
+</p>
 $table
 <!--$agenda-->
 C;
@@ -646,6 +649,11 @@ C;
 $content.=<<<C
 <center>
 <h4>Registro de asistencia</h4>
+
+<p style=font-size:0.8em;font-style:italic>
+Para un tutorial sobre como realizar el registro de asistencia vaya a la <a href=$SITEURL/ayuda.php>página de ayuda</a>.
+</p>
+
 C;
 
  if($mode=="resultado"){
@@ -693,7 +701,7 @@ $content.=<<<C
 <tr class="field">
   <td class="campo" id="documento">Documento del asistente$HELPICON</td>
   <td class="form">
-  <input type="text" name="Usuarios_documento" value="$Usuarios_documento" onchange="updateStudentForm(this)">
+  <input type="text" name="Usuarios_documento" value="$Usuarios_documento" onchange="updateStudentForm(this)" readonly>
   </td>
 </tr>
 <tr class="ayuda" id="documento_help" >
