@@ -1,7 +1,7 @@
 DATABASE=Sinfin
 USERDB=sinfin
 TABLE="Reconocimientos"
-BACKDIR="data/dump"
+BACKDIR=data/dump
 
 clean:
 	touch delete.pyc delete~
@@ -35,6 +35,7 @@ backup:
 
 restore:
 	@echo "Restoring table $TABLE..."
+	@-cat $(BACKDIR)/$(DATABASE)*-* > $(BACKDIR)/$(DATABASE).tar.7z
 	@-p7zip -d $(BACKDIR)/$(DATABASE).tar.7z
 	@-tar xf $(BACKDIR)/$(DATABASE).tar
 	@echo -n "Enter root mysql password: "
