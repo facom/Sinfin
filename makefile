@@ -1,6 +1,5 @@
 DATABASE=Sinfin
 USERDB=sinfin
-TABLE="Reconocimientos"
 BACKDIR=data/dump
 
 clean:
@@ -34,11 +33,11 @@ backup:
 	@bash backup.sh 
 
 restore:
-	@echo "Restoring table $TABLE..."
+	@echo "Restoring SINGIN..."
 	@-cat $(BACKDIR)/$(DATABASE)*-* > $(BACKDIR)/$(DATABASE).tar.7z
 	@-p7zip -d $(BACKDIR)/$(DATABASE).tar.7z
-	@-tar xf $(BACKDIR)/$(DATABASE).tar
-	@echo -n "Enter root mysql password: "
+	@-tar xf $(DATABASE).tar
+	@echo "Enter root mysql password: "
 	@mysql -u root -p $(DATABASE) < $(BACKDIR)/$(DATABASE).sql
 	@p7zip $(BACKDIR)/$(DATABASE).tar
 
