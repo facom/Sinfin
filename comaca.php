@@ -108,6 +108,7 @@ if(isset($action)){
   if($action=="Registrar"){
 
     $mode="resultado";
+    $numero=$numero+0;
 
     //OBTENER INFORMACIÓN SOBRE LA ACTIVIDAD
     $actividad=mysqlCmd("select * from Actividades where actid='$Actividades_actid'");
@@ -123,7 +124,7 @@ if(isset($action)){
       errorMsg("Debe proveer un número de boleta no nulo");
       goto endaction;
     }
-    if(!($boleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero'"))){
+    if(!($boleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero+0=$numero"))){
       $mode="registrar";
       errorMsg("El código de la boleta y su número no coinciden");
       goto endaction;
@@ -140,7 +141,7 @@ if(isset($action)){
       goto endaction;
     }
     //VALIDA QUE NO HAYA SIDO REGISTRADA
-    if($nboleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero='$numero' and Usuarios_documento<>''")){
+    if($nboleta=mysqlCmd("select * from Boletas where boletaid='$boletaid' and numero+0=$numero and Usuarios_documento<>''")){
       $mode="registrar";
       $fechahora=$nboleta["fechahora"];
       errorMsg("La boleta $boletaid ya ha sido registrada por otro estudiante (hora de registro: $fechahora). Si usted tiene la boleta consigo reporte esta irregularidad al coordinador");
@@ -444,9 +445,9 @@ C;
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="agenda"){
     
-    if(!isset($sort)){$sort="TIMESTAMP(fechaini)";}
+    if(!isset($sort)){$sort="TIMESTAMP(fechaini) asc, horafin ";}
     if(!isset($order)){$order="asc";}
-    if(!isset($search)){$search="where TIMESTAMP(fechafin)>Now() and actid<>'' ";}
+    if(!isset($search)){$search="where TIMESTAMP(fechafin)>=TIMESTAMP(CURDATE()) and actid<>'' ";}
 
     //LEER TODAS LAS ACTIVIDADES
     $sql="select * from Actividades $search order by $sort $order";
@@ -552,7 +553,7 @@ $table.=<<<T
   <center>
     <a href=?mode=agregar&action=loadact&actid=$actid>
       $actid
-    </a>
+    </a><br/>
     <a href=?mode=agregar&action=loadact&actid=$actid&submode=duplicar style=font-size:8px>
       Duplicar
     </a>
