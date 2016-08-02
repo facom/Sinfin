@@ -7,6 +7,7 @@ echo "Dumping..."
 mysqldump -u root -p $database > $backdir/$database.sql
 
 echo "Compressing..."
+rm $backdir/$database.tar
 tar cf $backdir/$database.tar $backdir/$database.sql $datadir
 cd $backdir
 p7zip $database.tar
