@@ -9,11 +9,6 @@ import random,string
 import numpy as np
 
 #########################################
-# NUMBER OF ITEMS
-#########################################
-ntot=10
-
-#########################################
 # ROUTINES
 #########################################
 def randomStr(N):
@@ -53,6 +48,8 @@ offs=3
 #########################################
 # INFO
 #########################################
+ntot=500
+
 # Nombre, Numero de hojas
 activities=[
     [u"Reunion",0,ntot,1],
@@ -66,7 +63,10 @@ Nstr=6
 # GRID
 #########################################
 directory="talonarios"
-nsheets=250
+
+#BACKUP CRITICAL FILES
+system("cp numbers.dat numbers.dat.save")
+system("cp strings.dat strings.dat.save")
 
 lines=[]
 counter=int(readFile("numbers.dat")[0])
@@ -127,10 +127,9 @@ for n in xrange(ntot):
             fontid.set_size(fsize+2*f)
             fontid.set_weight("bold")
             
+            if (ns+counter)>maxnum:maxnum=ns+counter
             num="%05d"%(ns+counter)
-            if int(num)>maxnum:
-                maxnum=int(num)
-
+            
             fontnum=FontProperties()
             fontnum.set_size(fsize-2*f)
             
