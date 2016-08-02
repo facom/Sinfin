@@ -448,6 +448,7 @@ C;
     if(!isset($sort)){$sort="TIMESTAMP(fechaini) asc, horafin ";}
     if(!isset($order)){$order="asc";}
     if(!isset($search)){$search="where TIMESTAMP(fechafin)>=TIMESTAMP(CURDATE()) and actid<>'' ";}
+    if($QPERMISO>3){$search="where actid<>'' ";}
 
     //LEER TODAS LAS ACTIVIDADES
     $sql="select * from Actividades $search order by $sort $order";
