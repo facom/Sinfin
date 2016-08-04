@@ -34,7 +34,7 @@ $UMBRALES_ACTIVIDAD=array(
 );
 
 $HELPICON="<a href='JavaScript:void(null)' onclick='toggleHelp(this)'><img src='img/help.png' width='15em'></a>";
-$PLAZO=24; //PLAZO EN HORAS PARA REGISTRAR UNA BOLETA
+$PLAZO=48; //PLAZO EN HORAS PARA REGISTRAR UNA BOLETA
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -79,7 +79,28 @@ if(isset($action)){
   //SALIR DE LA EDICION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Salir"){
-    unset($mode);
+    $mode="agenda";
+    goto endaction;
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //CREAR ACTIVIDADES
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Borrar"){
+    $mode="agenda";
+
+    if(mysqlCmd("select * from Boletas where Actividades_actid='$actid'")){
+      errorMsg("Hay al menos una boleta registrada de esta actividad");
+      goto endaction;
+    }
+
+    if(!($result=mysqlCmd("select * from Actividades where actid='$actid'"))){
+      errorMsg("Actividad no existe");
+      goto endaction;
+    }
+
+    mysqlCmd("delete from Actividades where actid='$actid'");
+    statusMsg("Actividad $actid borrada");
     goto endaction;
   }
 
@@ -160,13 +181,14 @@ if(isset($action)){
     $date1=date_create($DATE." UTC-5");
     $date2=date_create($fechafin." UTC-5");
     $dif=date_diff($date1,$date2);
-    $hours=$dif->format("%h");
+    $hours=24*$dif->format("%d")+$dif->format("%h");
     if($hours>$PLAZO){
-      $resultado="<i style='color:red'>Boleta registrada después del plazo reglamentario ($PLAZO horas)</i>";
+      $resultado="<i style='color:red'>Boleta registrada después del plazo reglamentario. La actividad ocurrió hace $hours horas y el plazo era de $PLAZO horas.</i>";
+      $tarde=1;
     }else{
       $resultado="Boleta registrada exitosamente.";
+      $tarde=0;
     }
-
 
     //GUARDAR
     $semestre=$actividad["semestre"];
@@ -178,6 +200,7 @@ if(isset($action)){
 			      "Actividades_actid"=>"",
 			      "fechahora"=>"",
 			      "IP"=>"",
+			      "tarde"=>"",
 			      "semestre"=>""));
  }
 
@@ -209,7 +232,7 @@ if(isset($action)){
 	$asistencias["$documento"]=$result;
 	$numasistencias["$documento"]=array();
 	foreach(array_keys($TIPOS_ACTIVIDAD) as $tipo){
-	  $result=mysqlCmd("select count(boletaid) from Boletas where Usuarios_documento='$documento' and tipo='$tipo'");
+	  $result=mysqlCmd("select count(boletaid) from Boletas where Usuarios_documento='$documento' and tipo='$tipo' and tarde='0'");
 	  $numasistencias["$documento"]["$tipo"]=$result[0];
 	}
       }
@@ -428,6 +451,7 @@ $content.=<<<C
 <tr class="field">
   <td colspan=2 class="botones_simple">
     <input type="submit" name="action" value="Guardar">
+    <input type="submit" name="action" value="Borrar">
     <input type="submit" name="action" value="Salir">
   </td>
 </tr>
@@ -788,7 +812,7 @@ $content.=<<<C
 <tr class="field">
   <td class="campo" id="semestre">Semestre$HELPICON</td>
   <td class="form">
-    <input type="text" name="semestre" value="$semestre">
+    <input type="text" name="semestre" value="2016-2">
   </td>
 </tr>
 <tr class="ayuda" id="semestre_help" >
@@ -798,7 +822,7 @@ $content.=<<<C
 <tr class="field">
   <td class="campo" id="documentos">Documento(s)$HELPICON</td>
   <td class="form">
-    <input type="text" name="documentos" value="$documentos">
+    <input type="text" name="documentos" value="$DOCUMENTO">
   </td>
 </tr>
 <tr class="ayuda" id="documentos_help" >
@@ -847,7 +871,9 @@ C;
 	 foreach($asistencias["$documento"] as $asistencia){
 	   $actid=$asistencia["Actividades_actid"];
 	   $actividad=$actividades["$actid"];
-	   $info=$actividad["fechafin"].",".$actividad["horafin"].": ".$actividad["tipo"]." '".$actividad["nombre"]."'";
+	   if($asistencia["tarde"]>0){$tardetxt="(reportada tarde)";}
+	   else{$tardetxt="";}
+	   $info=$actividad["fechafin"].",".$actividad["horafin"].": ".$actividad["tipo"]." '".$actividad["nombre"]."' ".$tardetxt;
 	   $detalles.=$info."<br/>";
 	 }
 
