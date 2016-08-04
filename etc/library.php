@@ -756,6 +756,9 @@ $header=<<<H
   <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
   <link href="lib/daterangepicker/jquery.comiseo.daterangepicker.css" rel="stylesheet">
   <link rel="stylesheet" href="css/sinfin.css" />
+  <meta name="google-signin-scope" content="profile email">
+  <meta name="google-signin-client_id" content="182980586400-sp8ds3i2bkpgjia6pn8fhjdnncs9rb7l.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery-ui.min.js"></script>
