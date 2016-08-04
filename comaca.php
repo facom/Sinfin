@@ -539,6 +539,11 @@ A;
       if($fechaini==$fechafin){$fechas="$fechaini, $horaini-$horafin";}
       else{$fechas="$fechaini a $fechafin, $horaini-$horafin";}
 
+      $fechaend=$actividad["fechafin"]." ".$actividad["horafin"].":00";
+      $dif=strtotime($fechaend)-strtotime('now');
+      if($dif<0){$pasadost="style=color:lightgray";}
+      else{$pasadost="";}
+
       $Instituto=$INSTITUTOS["$instituto"];
       $Tipo=$TIPOS_ACTIVIDAD["$tipo"];
 
@@ -574,7 +579,7 @@ L;
 
 $table.=<<<T
 <tr style="background:$rowcolor">
-  <td class="field level3">
+  <td class="field level3" $pasadost>
   <center>
     <a href=?mode=agregar&action=loadact&actid=$actid>
       $actid
@@ -584,22 +589,22 @@ $table.=<<<T
     </a>
   </center>
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     $semestre
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     $link
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     $lugar
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     $Instituto
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     $Tipo
   </td>
-  <td class="field">
+  <td class="field" $pasadost>
     <b>$nombre</b><br/>
     A cargo de <i>$encargado</i><br/>
     <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
