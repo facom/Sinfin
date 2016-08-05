@@ -182,3 +182,8 @@ input.boton{
 img.icon{
     height:100px;
 }
+
+div.usuariomsg{
+    padding:10px;
+    color:gray;
+}

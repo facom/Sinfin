@@ -472,7 +472,6 @@ C;
     if(!isset($sort)){$sort="TIMESTAMP(fechaini) asc, horafin ";}
     if(!isset($order)){$order="asc";}
     if(!isset($search)){$search="where TIMESTAMP(fechafin)>=TIMESTAMP(CURDATE()) and actid<>'' ";}
-    if($QPERMISO>3){$search="where actid<>'' ";}
 
     //LEER TODAS LAS ACTIVIDADES
     $sql="select * from Actividades $search order by $sort $order";
@@ -482,6 +481,9 @@ C;
     }
     if($order=="asc"){$order="desc";}
     else{$order="asc";}
+
+    $sql="select * from Actividades where TIMESTAMP(fechafin)<TIMESTAMP(CURDATE()) and actid<>'' order by $sort $order";
+    $resultspasadas=mysqlCmd($sql,$qout=1);
 
 $table=<<<T
 <center>
@@ -527,6 +529,7 @@ $table=<<<T
 </tr>
 </thead>
 T;
+$table_pasadas="".$table;
 
 $agenda=<<<A
 <table border=1px width=100%>
@@ -616,44 +619,125 @@ $table.=<<<T
   </td>
 </tr>
 T;
+    }
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //ASISTENCIAS PASADAS
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    foreach($resultspasadas as $actividad){
+      foreach(array_keys($ACTIVIDADES_FIELDS) as $field){
+	$$field=$actividad["$field"];
+      }
+      if($fechaini==$fechafin){$fechas="$fechaini, $horaini-$horafin";}
+      else{$fechas="$fechaini a $fechafin, $horaini-$horafin";}
+
+      $fechaend=$actividad["fechafin"]." ".$actividad["horafin"].":00";
+      $dif=strtotime($fechaend)-strtotime('now');
+      if($dif<0){$pasadost="style=color:lightgray";}
+      else{}
+      $pasadost="";
+
+      $Instituto=$INSTITUTOS["$instituto"];
+      $Tipo=$TIPOS_ACTIVIDAD["$tipo"];
+
+      //CHECK ASISTENCIAS
+      if($QPERMISO<3){
+	//USUARIO REGULAR
+	$sql="select * from Boletas where Actividades_actid='$actid' and Usuarios_documento='$DOCUMENTO'";
+	$resultado=mysqlCmd($sql);
+	//echo "$actid,".print_r($resultado,true)."<br/>";
+	if($resultado==0){
+	  $numero="No";
+	}else{
+	  $numero="Si";
+	  if($resultado["tarde"]>0){$numero.=" <i style=color:red>(tarde)</i>";}
+	}
 
 
-$agenda.=<<<A
-<tr>
-  <td>
+      }else{
+	//USUARIO ADMINISTRADOR
+	$sql="select count(boletaid) from Boletas where Actividades_actid='$actid' and Usuarios_documento<>''";
+	$numero=mysqlCmd($sql)[0];
+      }
+
+
+      $fechagoogle="";
+      $fechagoogle.=preg_replace("/-/","",$fechaini);
+      $fechagoogle.="T";
+      $fechaparts=preg_split("/:/",$horaini);
+      $hora=$fechaparts[0]+5;
+      $fechagoogle.=$hora.$fechaparts[1]."00Z";
+      $fechagoogle.="/";
+      $fechagoogle.=preg_replace("/-/","",$fechafin);
+      $fechagoogle.="T";
+      $fechaparts=preg_split("/:/",$horafin);
+      $hora=$fechaparts[0]+5;
+      $fechagoogle.=$hora.$fechaparts[1]."00Z";
+      //echo "Fecha: $fechagoogle</br>";
+      
+$link=<<<L
+<a href="http://www.google.com/calendar/event?
+action=TEMPLATE
+&text=$nombre
+&dates=$fechagoogle
+&details=A cargo de $encargado%0A%0A$resumen
+&location=$lugar
+&trp=false
+&sprop=
+&sprop=name:"
+target="_blank" rel="nofollow">$fechas</a>
+L;
+
+    if($rowcolor=="white"){$rowcolor="lightgray";}
+    else{$rowcolor="white";}
+
+$table_pasadas.=<<<T
+<tr style="background:$rowcolor">
+  <td class="field level3" $pasadost>
+  <center>
     <a href=?mode=agregar&action=loadact&actid=$actid>
       $actid
+    </a><br/>
+    <a href=?mode=agregar&action=loadact&actid=$actid&submode=duplicar style=font-size:8px>
+      Duplicar
     </a>
+  </center>
+  </td>
+  <td class="field" $pasadost>
+    $semestre
+  </td>
+  <td class="field" $pasadost>
+    $link
+  </td>
+  <td class="field" $pasadost>
+    $lugar
+  </td>
+  <td class="field" $pasadost>
+    $Instituto
+  </td>
+  <td class="field" $pasadost>
+    $Tipo
+  </td>
+  <td class="field" $pasadost>
+    <b>$nombre</b><br/>
+    A cargo de <i>$encargado</i><br/>
+    <span class="level1" style="color:green">Asistencia: $numero<br/></span>
+    <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
+      Resumen
+    </a><br/>
+    <div id="resumen_$actid" style="display:none;padding:10px">
+      $resumen
+    </div>
   </td>
 </tr>
-<tr>
-  <td>$fechas</td>
-</tr>
-<tr>
-  <td>$lugar, $Instituto</td>
-</tr>
-<tr>
-  <td>$Tipo<br/>$nombre</td>
-</tr>
-<tr>
-  <td>
-  <a href="JavaScript:void(null)" onclick="$('#resumen_$actid').toggle()">
-    Resumen
-  </a>
-  <div id="resumen_$actid" style="display:none;padding:10px;">
-    $resumen
-  </div>
-  </td>
-</tr>
-A;
-
+T;
     }
     
-$agenda.=<<<A
-</table>
-A;
-
 $table.=<<<T
+</table>
+</center>
+T;
+$table_pasadas.=<<<T
 </table>
 </center>
 T;
@@ -667,7 +751,12 @@ Esta es la agenda de actividades de la <b>Comunidad Académica</b>.  Haga click 
 Puede ver la agenda también en Google Calendar: <a href=http://bit.ly/fcen-comaca-calendario target=_blank>http://bit.ly/fcen-comaca-calendario</a>
 </p>
 $table
-<!--$agenda-->
+
+<h4>Actividades pasadas</h4>
+<p>
+Estas son las actividades pasadas:
+</p>
+$table_pasadas
 C;
     goto end;
   }

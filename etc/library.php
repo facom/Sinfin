@@ -15,6 +15,8 @@ $PASSWORD="123";
 $DATABASE="Sinfin";
 $EMAIL_USERNAME="pregradofisica@udea.edu.co";
 $EMAIL_PASSWORD="Gmunu-Tmunu=0";
+//$VERSION="Alpha 1.0";
+$VERSION="Beta 1.0";
 
 //COLOQUE AQUÍ EL E-MAIL DEL VICEDECANATO
 $EMAIL_ADMIN="vicedecacen@udea.edu.co";
@@ -660,9 +662,9 @@ function statusMsg($msg)
   $STATUS.="".$msg."<br/>";
 }
 
-function getHeaders()
+function getHeaders($diagonal=true)
 {
-  global $PERMCSS,$QPERMISO;
+  global $PERMCSS,$QPERMISO,$VERSION;
   
   //STYLES
   $style="<style>\n";
@@ -699,7 +701,7 @@ $style.=<<<S
     height:100%;
     color:#000;
     text-decoration:none;
-    background: green;
+    background: blue;//green;
     }
 
     #diagonal_label span {
@@ -758,29 +760,36 @@ $header=<<<H
   <link rel="stylesheet" href="css/sinfin.css" />
   <meta name="google-signin-scope" content="profile email">
   <meta name="google-signin-client_id" content="182980586400-sp8ds3i2bkpgjia6pn8fhjdnncs9rb7l.apps.googleusercontent.com">
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery-ui.min.js"></script>
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="lib/daterangepicker/jquery.comiseo.daterangepicker.js"></script>
   <script src="js/sinfin.js"></script>
+  <script src="https://apis.google.com/js/platform.js"></script>
   $style
   
   <script>
   </script>
 </head>
 <body>
+H;
 
+ if($diagonal){
+
+$header.=<<<H
 <div id="diagonal_label">
-  <a href="?" target="_blank">
+  <a href="novedades.php" target="_blank">
     <span><b>&nbsp;</b></span><br/>
-    <span>Versión Alpha 1.0</span><br id='break' />
+    <span>Versión $VERSION</span><br id='break' />
     <span></span>
   </a>
 </div>
-
 H;
+
+ }
+  
+
  return $header;
 }
 

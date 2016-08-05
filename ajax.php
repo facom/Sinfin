@@ -3,7 +3,8 @@
 //LOAD LIBRARY
 ////////////////////////////////////////////////////////////////////////
 require("etc/library.php");
-$html="";
+$html=getHeaders(false);
+
 ////////////////////////////////////////////////////////////////////////
 //ACTIONS
 ////////////////////////////////////////////////////////////////////////
@@ -11,6 +12,51 @@ if($action=="test"){
   $ps=parseParams($params);
   print_r($ps);
   $html.="Test";
+}
+else
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//UPDATE COURSE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if($action=="login"){
+  $ps=parseParams($params);
+  $email=$ps["email"];
+  $nombre=$ps["fullname"];
+
+  //IF USER EXIST
+  if(($results=mysqlCmd("select * from Usuarios where email='$email'"))){
+      session_start();
+      foreach(array_keys($results) as $key){
+	  if(preg_match("/^\d$/",$key)){continue;}
+	  $_SESSION["$key"]=$results[$key];
+      }
+      $urlref="$SITEURL?yes";
+  }
+  //IF USER DOES NOT EXIST
+  else{
+    $html.="<div id='msg'>El usuario no ha sido creado en nuestra base de datos...</div>";
+    $urlref="$SITEURL/usuarios2.php?mode=nuevo&nombre=$nombre&email=$email&new";
+  }
+
+$html.=<<<V
+
+<div class="g-signin2" data-onsuccess="onVerify" data-theme="dark" data-width="0" data-height="0">
+</div>
+<script>
+function onVerify(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    var email=profile.getEmail();
+    var \$msg=$("#msg");
+    if(email!="$email"){
+	\$msg.html("El usuario no es reconocido...");
+	setTimeout(function(){document.location="$SITEURL/actions.php?action=Cerrar";},1000);
+    }else{
+      //\$msg.html("Conectado como usuario $email...");
+      setTimeout(function(){document.location="$urlref";},0);
+    }
+}
+</script>
+V;
+
 }
 else
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

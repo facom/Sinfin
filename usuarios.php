@@ -1,4 +1,4 @@
-<html>
+<html lang="es">
 <?php
 ////////////////////////////////////////////////////////////////////////
 //LOAD LIBRARY
@@ -260,12 +260,55 @@ M;
 //MODOS
 ////////////////////////////////////////////////////////////////////////
 if(!isset($mode)){
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //PRINCIPAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //SECRET CLIENT: 83XiXrTqnjruh_3-Bg5vtx--
 $content.=<<<C
 $FORM
-<h3>Usuario existentes</h3>
+
+<center>
+
+<div class="usuariomsg">
+Para conectarte con $SINFIN puedes usar tu cuenta de Google:
+</div>
+
+<div class="g-signin2" 
+     data-onsuccess="onSignIn" 
+     data-theme="dark"
+     data-width="400"
+     data-height="60"
+     data-longtitle="True"
+     >
+</div>
+
+<script>
+function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    var id=profile.getId();
+    var fullname=profile.getName();
+    var email=profile.getEmail();
+
+    console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+    console.log('Full Name: ' + profile.getName());
+    console.log('Given Name: ' + profile.getGivenName());
+    console.log('Family Name: ' + profile.getFamilyName());
+    console.log("Image URL: " + profile.getImageUrl());
+    console.log("Email: " + profile.getEmail());
+    var id_token = googleUser.getAuthResponse().id_token;
+    console.log("ID Token: " + id_token);
+
+    document.location.href="$SITEURL/ajax.php?action=login&params=id:"+id+";fullname:"+fullname+";email:"+email+";token:"+id_token;
+};
+</script>
+
+<div class="usuariomsg">
+O puedes usar una cuenta previamente creada:
+
+</div>
+
+<div style="background:lightgray;width:360;padding:10px;display:table-cell">
 <input type="hidden" name="urlref" value="$urlref">
 <table>
 <tr>
@@ -277,17 +320,28 @@ $FORM
   <td><input type="password" name="password" placeholder="Contraseña"></td>
 </tr>
 <tr>
-  <td colspan=2>
+  <td colspan=2 style="text-align:center">
     <input type="submit" name="action" value="Entrar">
   </td>
 </tr>
+</table>
+</div>
+
+<div class="usuariomsg">
+Si no has creado una cuenta o no recuerdas tu contraseña
+</div>
+
+<table>
 <tr>
-  <td colspan=2>
-    <a href=?mode=nuevo>Nuevo usuario</a> |
-    <a href=?mode=recupera>Recuperar contraseña</a>
+  <td>
+    <a href=?mode=nuevo>Crear un nuevo usuario</a> |
+    <a href=?mode=recupera>Recuperar la contraseña</a>
   </td>
 </tr>
 </table>
+
+</center>
+
 </form>
 C;
 }else{
@@ -296,6 +350,11 @@ C;
   //NUEVO USUARIO
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if($mode=="nuevo"){
+
+      if(isset($new)){
+	statusMsg("Antes de continuar debes crear el usuario en nuestra bases de datos");
+      }
+
 $content.=<<<C
 <form>
 <center>
