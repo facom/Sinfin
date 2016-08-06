@@ -662,7 +662,7 @@ function statusMsg($msg)
   $STATUS.="".$msg."<br/>";
 }
 
-function getHeaders($diagonal=true)
+function getHeaders($diagonal=true,$script="")
 {
   global $PERMCSS,$QPERMISO,$VERSION;
   
@@ -770,6 +770,7 @@ $header=<<<H
   $style
   
   <script>
+  $script
   </script>
 </head>
 <body>
@@ -788,7 +789,6 @@ $header.=<<<H
 H;
 
  }
-  
 
  return $header;
 }
