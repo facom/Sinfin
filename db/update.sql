@@ -1,9 +1,19 @@
 use Sinfin;
 
+drop table if exists Resoluciones,Institutos,Comisiones,Empleados;
+create table Sinfin.Resoluciones select * from Comisiones.Resoluciones;
+alter table Resoluciones add primary key (resolucionid);
+create table Sinfin.Institutos select * from Comisiones.Institutos;
+alter table Institutos add primary key (institutoid);
+create table Sinfin.Comisiones select * from Comisiones.Comisiones;
+alter table Comisiones add primary key (comisionid);
+create table Sinfin.Empleados select * from Comisiones.Profesores;
+alter table Empleados add primary key (cedula);
+
+/*
 alter table Boletas add column tarde varchar(2);
 alter table Boletas add column semestre varchar(255);
 alter table Boletas add column IP varchar(255);
-/*
 alter table Actividades add column encargado varchar(255);
 alter table Actividades drop column intituto;
 alter table Actividades add column instituto varchar(50);

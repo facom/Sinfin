@@ -140,8 +140,58 @@ $ESTADOS_COLOR=array("nueva"=>"white",
 		     "rechazada"=>"#ff6666",
 		     "terminada"=>"#99ff99");
 
+$COMISIONES_COLOR=array(
+			"solicitada"=>"#FFFF99",
+			"solicitada_noremunerada"=>"#FFCC99",
+			"vistobueno"=>"#99CCFF",
+			"vistobueno_noremunerada"=>"#99CCFF",
+			"devuelta"=>"#FF99FF",
+			"devuelta_noremunerada"=>"#FF99FF",
+			"aprobada"=>"#00CC99",
+			"aprobada_noremunerada"=>"#33CCCC",
+			"cumplida"=>"lightgray"
+			);
+
 $BOOLEAN=array("0"=>"No",
 	       "1"=>"Si");
+
+//COMISIONES
+$TIPOS=array("Vinculado"=>"Docente de Tiempo Completo",
+	     "Ocasional"=>"Docente Ocasional de Tiempo Completo",
+	     "Visitante"=>"Profesor Visitante",
+	     "Secretaria"=>"Secretaria",
+	     "Empleado"=>"Empleado");
+
+$TIPOSCOM=array("servicios"=>"Comisión de Servicios",
+		"estudio"=>"Comisión de Estudios",	
+		"noremunerada"=>"Permiso"
+		);
+
+$INSTITUTOS=array("fisica"=>"Instituto de Física",
+		  "biologia"=>"Instituto de Biología",
+		  "quimica"=>"Instituto de Química",
+		  "matematicas"=>"Instituto de Matemáticas",
+		  "decanatura"=>"Decanatura"
+		  );
+
+$CAMPOSHELP=array("tipoid"=>"cedula,ce,pasaporte (todo en minusculas)",
+		  "nombre"=>"NOMBRES APELLIDOS (mayúscula sostenida)",
+		  "tipo"=>"Vinculado, Ocasional, Visitante, Empleado (mayúscula inicial)",
+		  "institutoid"=>"fisica, quimica, biologia, matematicas, decanatura (todo en minuscula)",
+		  "dedicacion"=>"Si, No (mayúscula inicial)"
+		  );
+
+$ESTADOS=array("solicitada"=>"Solicitada",
+	       "devuelta"=>"Devuelta",
+	       "vistobueno"=>"Visto Bueno Director",
+	       "aprobada"=>"Aprobada por Decano",
+	       "cumplida"=>"Cumplido entregado");
+
+$TIPOSID=array("cedula"=>"Cédula de Ciudadanía",
+	       "extranjeria"=>"Cédula de Extranjería",
+	       "pasaporte"=>"Pasaporte");
+
+$SINO=array("No"=>"No","Si"=>"Si");
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -746,6 +796,15 @@ $style.=<<<S
     }    
 S;
 
+    if($QTEST){
+$internet=<<<I
+<meta name="google-signin-scope" content="profile email">
+<meta name="google-signin-client_id" content="182980586400-sp8ds3i2bkpgjia6pn8fhjdnncs9rb7l.apps.googleusercontent.com">
+<script src="https://apis.google.com/js/platform.js"></script>
+I;
+}else{
+$internet="";
+}
 
     $style.="</style>\n";
 
@@ -758,15 +817,13 @@ $header=<<<H
   <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
   <link href="lib/daterangepicker/jquery.comiseo.daterangepicker.css" rel="stylesheet">
   <link rel="stylesheet" href="css/sinfin.css" />
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id" content="182980586400-sp8ds3i2bkpgjia6pn8fhjdnncs9rb7l.apps.googleusercontent.com">
+  $internet
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery.min.js"></script>
   <script src="lib/jquery-ui/jquery-ui.min.js"></script>
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="lib/daterangepicker/jquery.comiseo.daterangepicker.js"></script>
   <script src="js/sinfin.js"></script>
-  <script src="https://apis.google.com/js/platform.js"></script>
   $style
   
   <script>
@@ -1043,6 +1100,26 @@ function get_client_ip() {
   return $ipaddress;
 }
 
+function getComisionInfo($comisionid)
+{
+  global $FIELDS_COMISIONES,$FIELDS_PROFESORES;
+  $results=mysqlCmd("select * from Comisiones where comisionid='$comisionid'");
+  $comision=array();
+  foreach($FIELDS_COMISIONES as $field){
+    if($field=="extra1"){$field="diaspermiso";}
+    $comision["$field"]=$results[$field];
+  }
+  $cedula=$comision["cedula"];
+  $profesor=mysqlCmd("select * from Empleados where cedula='$cedula';");
+  foreach($FIELDS_PROFESORES as $field){
+    $comision["$field"]=$profesor[$field];
+  }
+  $institutoid=$comision["institutoid"];
+  $instituto=mysqlCmd("select * from Institutos where institutoid='$institutoid';");
+  $comision["instituto"]=$instituto["instituto"];
+  return $comision;
+}
+
 ////////////////////////////////////////////////////////////////////////
 //CONNECT TO DATABASE
 ////////////////////////////////////////////////////////////////////////
@@ -1083,4 +1160,36 @@ foreach($results as $field){
   $fieldname=$field[0];
   $BOLETAS_FIELDS["$fieldname"]=$fieldname;
 }
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//COMISIONES
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$columns=mysqlCmd("show columns from Comisiones;",$qout=1,$qlog=0);
+$ncolumns=count($columns);
+$FIELDS_COMISIONES=array();
+for($i=0;$i<$ncolumns;$i++){
+  $column=$columns[$i];
+  array_push($FIELDS_COMISIONES,$column["Field"]);
+}
+
+$columns=mysqlCmd("show columns from Empleados;",$qout=1,$qlog=0);
+$ncolumns=count($columns);
+$FIELDS_PROFESORES=array();
+for($i=0;$i<$ncolumns;$i++){
+  $column=$columns[$i];
+  array_push($FIELDS_PROFESORES,$column["Field"]);
+}
+
+$out=mysqlCmd("select cedulajefe,institutoid from Institutos",$qout=1);
+$DIRECTORS=array();
+foreach($out as $instituto){
+  $DIRECTORS[$instituto["institutoid"]]=$instituto["cedulajefe"];
+}
+$out=mysqlCmd("select cedula,institutoid from Empleados where tipo='Secretaria'",$qout=1);
+$SECRETARIAS=array();
+foreach($out as $instituto){
+  $SECRETARIAS[$instituto["institutoid"]]=$instituto["cedula"];
+}
+
+$RANDOMMODE=generateRandomString(100);
 ?>
