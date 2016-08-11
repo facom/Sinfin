@@ -722,8 +722,8 @@ function statusMsg($msg)
 
 function getHeaders($diagonal=true,$script="")
 {
-  global $PERMCSS,$QPERMISO,$VERSION,$QTEST;
-  
+  global $PERMCSS,$QPERMISO,$VERSION,$QTEST; 
+ 
   //STYLES
   $style="<style>\n";
 
@@ -804,7 +804,7 @@ $style.=<<<S
     }    
 S;
 
-    if($QTEST){
+    if(!$QTEST){
 $internet=<<<I
 <meta name="google-signin-scope" content="profile email">
 <meta name="google-signin-client_id" content="182980586400-sp8ds3i2bkpgjia6pn8fhjdnncs9rb7l.apps.googleusercontent.com">
