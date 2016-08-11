@@ -156,7 +156,7 @@ $BOOLEAN=array("0"=>"No",
 	       "1"=>"Si");
 
 //COMISIONES
-$TIPOS=array("Vinculado"=>"Docente de Tiempo Completo",
+$TIPOSEMP=array("Vinculado"=>"Docente de Tiempo Completo",
 	     "Ocasional"=>"Docente Ocasional de Tiempo Completo",
 	     "Visitante"=>"Profesor Visitante",
 	     "Secretaria"=>"Secretaria",
@@ -192,6 +192,14 @@ $TIPOSID=array("cedula"=>"Cédula de Ciudadanía",
 	       "pasaporte"=>"Pasaporte");
 
 $SINO=array("No"=>"No","Si"=>"Si");
+
+//%%%%%%%%%%%%%%%%%%%%
+//TEST SITE
+//%%%%%%%%%%%%%%%%%%%%
+//CHECK IF THIS IS THE MAIN SITE OR THE TEST SITE
+$QTEST=0;
+if($HOST=="localhost"){$QTEST=1;}
+//$QTEST=0; //Decomente para obligar que sea servidor
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -714,7 +722,7 @@ function statusMsg($msg)
 
 function getHeaders($diagonal=true,$script="")
 {
-  global $PERMCSS,$QPERMISO,$VERSION;
+  global $PERMCSS,$QPERMISO,$VERSION,$QTEST;
   
   //STYLES
   $style="<style>\n";

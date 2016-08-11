@@ -2,8 +2,10 @@
 ////////////////////////////////////////////////////////////////////////
 //LOAD LIBRARY
 ////////////////////////////////////////////////////////////////////////
+$HOST=$_SERVER["HTTP_HOST"];
+$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
+$ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
 require("etc/library.php");
-$html=getHeaders(false);
 
 ////////////////////////////////////////////////////////////////////////
 //ACTIONS
@@ -15,9 +17,10 @@ if($action=="test"){
 }
 else
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//UPDATE COURSE
+//LOGIN
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if($action=="login"){
+  $html=getHeaders(false);
   $ps=parseParams($params);
   $email=$ps["email"];
   $nombre=$ps["fullname"];

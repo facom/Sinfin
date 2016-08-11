@@ -76,9 +76,9 @@ function ajaxDo(action,params,onsuc,onerr)
     if(typeof(onerr)=='undefined'){onerr=defaultError;}
 
     var ajax='ajax.php';
-    
+    var url='ajax.php?action='+action+'&params='+params;
     jQuery.ajax({
-	url:'ajax.php?action='+action+'&params='+params,
+	url:url,
 	success:onsuc,
 	error:onerr,
     });
