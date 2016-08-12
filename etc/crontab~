@@ -1,0 +1,1 @@
+55 * * * * * /var/www/html/principal/Sinfin/etc/crontab.sh
