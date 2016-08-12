@@ -140,6 +140,9 @@ $ESTADOS_COLOR=array("nueva"=>"white",
 		     "rechazada"=>"#ff6666",
 		     "terminada"=>"#99ff99");
 
+////////////////////////////////////////////////////////////////////////
+//COMISIONES
+////////////////////////////////////////////////////////////////////////
 $COMISIONES_COLOR=array(
 			"solicitada"=>"#FFFF99",
 			"solicitada_noremunerada"=>"#FFCC99",
@@ -200,6 +203,18 @@ $SINO=array("No"=>"No","Si"=>"Si");
 $QTEST=0;
 if($HOST=="localhost"){$QTEST=1;}
 //$QTEST=0; //Decomente para obligar que sea servidor
+
+////////////////////////////////////////////////////////////////////////
+//ACTIVIDADES
+////////////////////////////////////////////////////////////////////////
+
+$TIPOS_ACTIVIDAD=array(
+   "seminario"=>"Seminario",
+   "divulgacion"=>"Actividad divulgativa",
+   "reunion"=>"Reunión comunidad",
+   "clubrevistas"=>"Club de Revistas"
+		       );
+
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES

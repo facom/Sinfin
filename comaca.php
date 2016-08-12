@@ -78,6 +78,127 @@ if(isset($action)){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //SALIR DE LA EDICION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Suscribirse" or 
+     $action=="Desuscribirse"){
+    $mode="agenda";
+
+    if($subaction=="confirmar"){
+      $confirma="1";
+      $fecha=$DATE;
+      if($action=="Suscribirse"){
+	insertSql("Suscripciones",array("email"=>"emailsubscribe",
+					"confirma"=>"",
+					"fecha"=>""));
+	statusMsg("Su suscripción ha sido confirmada.");	
+	goto endaction;
+      }
+      else{
+	mysqlCmd("delete from Suscripciones where email='$emailsubscribe'");
+	statusMsg("Su suscripción ha sido cancelada.");
+	goto endaction;
+      }
+      goto endaction;
+    }
+
+    if(!isset($emailsubscribe)){
+      errorMsg("Debe proveer un correo valido.");
+      goto endaction;
+    }
+    if(!preg_match("/@/",$emailsubscribe) or
+       !preg_match("/\./",$emailsubscribe) or
+       preg_match("/\,/",$emailsubscribe)
+       ){
+      errorMsg("El correo electrónico provisto esta malo");
+      goto endaction;
+    }
+    $qmsg=0;
+    if($action=="Suscribirse"){
+      $email=$emailsubscribe;
+      if(!($result=mysqlCmd("select * from Suscripciones where email='$email'"))){
+	$suscripcion="comaca";
+	$confirma="0";
+	$fecha=$DATE;
+	insertSql("Suscripciones",
+		  array("email"=>"",
+			"suscripcion"=>"",
+			"confirma"=>"",
+			"fecha"=>"")
+		  );
+	$qmsg=1;
+      }else{
+	if($result["confirma"]==0){
+	  errorMsg("Su correo ya ha sido suscrito pero no ha sido confirmado.");
+	  $qmsg=1;
+	}else{
+	  errorMsg("Su correo ya ha sido suscrito y esta confirmado.");
+	}
+      }
+
+      if($qmsg){
+	$subject="[SInfIn] Suscripción a la lista de correos de Comunidad Académica";
+$message.=<<<M
+<p>
+  Señor(a) usuario,
+</p>
+<p>
+  Usted ha solicitado la suscripción de su correo electrónico a la
+  lista de anuncios de las actividades de la Comunidad Académica de la
+  Facultad de Ciencias Exactas y Naturales.
+</p>
+<p>
+  Si esta de acuerdo confirme su deseo 
+  haciendo click en el siguiente enlace:
+  <center>
+  <a href="$SITEURL/comaca.php?mode=agenda&action=Suscribirse&emailsubscribe=$email&subaction=confirmar">Suscribirme a la lista de anuncios</a>.
+  </center>
+</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+M;
+        sendMail($email,$subject,$message,$EHEADERS);
+	statusMsg("Hemos enviado un correo a su dirección para que confirme la suscripción");
+      }
+
+      goto endaction;
+    }
+
+    if($action=="Desuscribirse"){
+      $email=$emailsubscribe;
+      if($result=mysqlCmd("select * from Suscripciones where email='$email'")){
+	$subject="[SInfIn] Desuscripción a la lista de correos de Comunidad Académica";
+$message.=<<<M
+<p>
+  Señor(a) usuario,
+</p>
+<p>
+  Usted ha solicitado la desuscripción de su correo electrónico a la
+  lista de anuncios de las actividades de la Comunidad Académica de la
+  Facultad de Ciencias Exactas y Naturales.
+</p>
+<p>
+  Si esta de acuerdo confirme su deseo 
+  haciendo click en el siguiente enlace:
+  <center>
+  <a href="$SITEURL/comaca.php?mode=agenda&action=Desuscribirse&emailsubscribe=$email&subaction=confirmar">Desuscribirme a la lista de anuncios</a>.
+  </center>
+</p>
+<p>
+  <b>Comité de Currículo</b><br/>FCEN
+</p>
+M;
+        sendMail($email,$subject,$message,$EHEADERS);
+	statusMsg("Hemos enviado un correo a su dirección para que confirme la desuscripción");
+      }else{
+	errorMsg("Su correo no ha sido suscrito todavía.");
+      }
+    }
+    goto endaction;
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //SALIR DE LA EDICION
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Salir"){
     $mode="agenda";
     goto endaction;
@@ -742,6 +863,9 @@ $table_pasadas.=<<<T
 </center>
 T;
 
+ $emailsubscripe="";
+ if(isset($EMAIL)){$emailsubscribe=$EMAIL;}
+
 $content.=<<<C
 <h4>Agenda de actividades</h4>
 <p>
@@ -750,6 +874,18 @@ Esta es la agenda de actividades de la <b>Comunidad Académica</b>.  Haga click 
 <p>
 Puede ver la agenda también en Google Calendar: <a href=http://bit.ly/fcen-comaca-calendario target=_blank>http://bit.ly/fcen-comaca-calendario</a>
 </p>
+<p>
+Puede suscribir su correo electrónico para recibir notificaciones cada
+vez que se aproxime una actividad.  También puede desuscribirse evitando que le sigan llegando notificaciones indeseadas.
+</p>
+
+<p>
+<form>
+<input type="hidden" name="mode" value="agenda">
+  Correo electrónico: <input type="text" name="emailsubscribe" placeholder="nombre@mail.com" value="$emailsubscribe" size="40"> <input type="submit" name="action" value="Suscribirse"> <input type="submit" name="action" value="Desuscribirse">
+</form>
+</p>
+
 $table
 
 <h4>Actividades pasadas</h4>
@@ -758,6 +894,7 @@ Estas son las actividades pasadas:
 </p>
 $table_pasadas
 C;
+
     goto end;
   }
 

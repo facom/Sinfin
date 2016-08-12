@@ -1,5 +1,19 @@
 use Sinfin;
 
+drop table if exists Suscripciones;
+create table Suscripciones (
+       email varchar(50),
+       suscripcion varchar(255),
+       fecha varchar(50),
+       confirma varchar(2),
+       -- Extras
+       extra1 varchar(255),
+       extra2 varchar(255),
+       extra3 varchar(255),
+       primary key (email)       
+);
+
+/*
 drop table if exists Resoluciones,Institutos,Comisiones,Empleados;
 create table Sinfin.Resoluciones select * from Comisiones.Resoluciones;
 alter table Resoluciones add primary key (resolucionid);
@@ -9,7 +23,7 @@ create table Sinfin.Comisiones select * from Comisiones.Comisiones;
 alter table Comisiones add primary key (comisionid);
 create table Sinfin.Empleados select * from Comisiones.Profesores;
 alter table Empleados add primary key (cedula);
-
+*/
 /*
 alter table Boletas add column tarde varchar(2);
 alter table Boletas add column semestre varchar(255);
