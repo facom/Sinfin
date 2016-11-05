@@ -15,9 +15,18 @@ if(0){}
 else
 if($action=="comaca"){
 
-  $actividades=mysqlCmd("select * from Actividades where fechaini=curdate()",$qout=1);
+  if(isset($daily)){
+    $actividades=mysqlCmd("select * from Actividades where fechaini=curdate()",$qout=1);
+    $tiempo="hoy";
+    $transcurso="del día de hoy";
+  }else{
+    $actividades=mysqlCmd("select * from Actividades where (UNIX_TIMESTAMP(fechaini)-UNIX_TIMESTAMP(curdate()))>0 and (UNIX_TIMESTAMP(fechaini)-UNIX_TIMESTAMP(curdate()))<7*86400;",$qout=1);
+    $tiempo="la semana";
+    $transcurso="de la próxima semana";
+  }
+
   $suscritos=mysqlCmd("select email from Suscripciones where suscripcion='comaca' and confirma+0>0",$qout=1);
-  $subject="[ComAca] Actividades de la Comunidad Académica para hoy";
+  $subject="[ComAca] Actividades de la Comunidad Académica para $tiempo";
 
 $message=<<<M
 <p>
@@ -26,7 +35,7 @@ $message=<<<M
 <p>
   Estas son las actividades de la Comunidad Académica de la Facultad
   de Ciencias Exactas y Naturales que se desarrollaran durante el
-  transcurso del día de hoy.
+  transcurso $transcurso.
 </p>
 M;
 
@@ -61,6 +70,13 @@ M;
 
   print_r($message);
   echo "<br/>";
+
+  if(isset($daily)){$fcron="cron-daily";}
+  else{$fcron="cron-weekly";}
+  $fl=fopen("/tmp/$fcron.msg","w");
+  fwrite($fl,$message);
+  fclose($fl);
+
   if($nact>0){
     foreach($suscritos as $suscrito){
       $email=$suscrito["email"];

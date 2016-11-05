@@ -212,6 +212,13 @@ $message=<<<M
   un monto total de <b>$monto</b>.
 </p>
 <p>
+  <b>Para proceder con el desembolso del dinero deberá dirigirse al
+  Centro de Extensión de la Facultad, Oficina 6-111. Es su
+  responsabilidad realizar este trámite. <i style=color:red>La
+  Universidad no desembolsa dinero después de iniciada la fecha del
+  evento o pasantía</i>.</b>
+</p>
+<p>
   Le recordamos al terminar la actividad, cumplir con
   las <b>obligaciones adquiridas</b> al recibir este apoyo en un plazo
   no mayor a un mes. Estas obligaciones deberán ser legalizadas usando
@@ -389,6 +396,95 @@ if(isset($action)){
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //INFORME
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if($action=="Informe"){
+    $mode="lista";
+
+    $infecharango=str2Array($infecharango);
+    $infechaini=$infecharango["start"];
+    $infechafin=$infecharango["end"];
+
+    //TOTALES
+    $rangofechap="fechapresenta>='$infechaini' and fechapresenta<='$infechafin'";
+    $sql="select count(movilid) from Movilidad where $rangofechap";
+    $numtotal=mysqlCmd($sql)[0];
+    $sql="select count(movilid) from Movilidad where $rangofechap and estado='rechazada'";
+    $numrechazadas=mysqlCmd($sql)[0];
+    $sql="select count(movilid) from Movilidad where $rangofechap and estado='devuelta'";
+    $numdevueltas=mysqlCmd($sql)[0];
+    $sql="select count(movilid) from Movilidad where $rangofechap and estado='aprobada'";
+    $numaprobadas=mysqlCmd($sql)[0];
+
+    $rangofecha="fechaini>='$infechaini' and fechafin<='$infechafin'";
+    $sql="select count(movilid) from Movilidad where $rangofecha and estado='realizada'";
+    $numrealizadas=mysqlCmd($sql)[0];
+    $sql="select count(movilid) from Movilidad where $rangofecha and estado='terminada'";
+    $numterminadas=mysqlCmd($sql)[0];
+
+    //TOTALES DINERO
+    $totalvalor=0;
+
+    $sql="select sum(replace(replace(monto,'$',''),',','')) from Movilidad where $rangofecha and (estado='realizada' or estado='terminada')";
+    $valortotal=mysqlCmd($sql)[0];
+    $totalvalor+=$valortotal;
+    $valortotal="$".number_format($valortotal);
+
+    $sql="select sum(replace(replace(monto,'$',''),',','')) from Movilidad where $rangofechap and estado='aprobada'";
+    $valorpend=mysqlCmd($sql)[0];
+    $totalvalor+=$valorpend;
+    $valorpend="$".number_format($valorpend);
+
+    $sql="select sum(replace(replace(valor,'$',''),',','')) from Movilidad where $rangofechap and (estado='realizada' or estado='terminada' or estado='aprobada')";
+    $valorsol=mysqlCmd($sql)[0];
+    $valorsol="$".number_format($valorsol);
+
+    $totalvalor="$".number_format($totalvalor);
+
+    $file="scratch/informe-movilidad.csv";
+    $fl=fopen($file,"w");
+    $solicitudes=mysqlCmd("select * from Movilidad where $rangofechap",$qout=1);
+    $fields=array();
+    $fields_txt="";
+    foreach(array_keys($solicitudes[0]) as $field){
+      if(preg_match("/^\d+$/",$field)){continue;}
+      if($field=="observaciones" or $field=="observacionesadmin"){continue;}
+      array_push($fields,$field);
+      $fields_txt.="$field;";
+    }
+    fwrite($fl,utf8_decode(trim($fields_txt,";")."\n"));
+    $values="";
+    foreach($solicitudes as $solicitud){
+      $values="";
+      foreach($fields as $field){
+	$value=$solicitud[$field];
+	$values.="\"$value\";";
+      }
+      fwrite($fl,utf8_decode(trim($values,";")."\n"));
+    }
+    fclose($file);
+
+$resultados=<<<R
+<h3>Resultados</h3>
+  Tabla completa: <a href=$file>$file</a>
+<ul>
+  <li>Solicitudes presentadas: $numtotal</li>
+  <li>Solicitudes rechazadas: $numrechazadas<br/>
+  <li>Solicitudes aprobadas sin finalizar: $numaprobadas<br/>
+  <li>Solicitudes devueltas: $numdevueltas<br/>
+  <li>Realizadas: $numrealizadas<br/>
+  <li>Cumplidas: $numterminadas<br/>
+  <li style=color:red>Total solicitado: $valorsol<br/>
+  <li>Total entregado: $valortotal<br/>
+  <li>Pendiente de ser entregado: $valorpend<br/>
+  <li style=color:blue>Total aprobado: $totalvalor<br/>
+</ul>
+R;
+
+    goto endaction;
+  }
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //CONFIRMAR APOYO
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="apoyo"){
@@ -529,14 +625,23 @@ C;
       goto endaction;
     }
     $anticipacion=(strtotime($fechaini)-strtotime($DATE))/86400.0;
-    if($anticipacion<30.0){
-      errorMsg("Las solicitudes deben presentarse con mas de 30 días de anticipación");
-      /*
+    if($anticipacion<=30.0 and 
+       !preg_match("/realizada/",$estado) and 
+       !preg_match("/devuelta/",$estado) and 
+       $QPERMISO<3){
+      errorMsg("Su solicitud es presentada con menos de 30 días de anticipación. Esta condición puede producir el rechazo de la solicitud o el no cumplimiento de los plazos adminsitrativos necesarios para el desembolso. Se recibe la solicitud pero no se garantiza un resultado positivo.");
+    }
+    if($anticipacion<=15.0 and 
+       !preg_match("/realizada/",$estado) and 
+       !preg_match("/devuelta/",$estado) and 
+       $QPERMISO<3){
+      //*
+      errorMsg("Las solicitudes deben presentarse con mas de 15 días de anticipación");
       $mode="editar";
       unset($fechapresenta);
       unset($loadmovil);
       goto endaction;
-      */
+      //*/
     }
     if(isBlank($documento_profesor)){
       errorMsg("No se ha provisto un profesor de apoyo");
@@ -573,17 +678,20 @@ C;
       unset($loadmovil);
       goto endaction;
     }
-    if($estado=="nueva"){
-      $file_historia=$_FILES["historia"];
-      if($file_historia["size"]==0){
+    //echo "Archivos:".print_r($_FILES,true)."<br/>";
+    $file_historia=$_FILES["historia"];
+    if($file_historia["size"]==0){
+      if($estado=="nueva"){
 	errorMsg("No se ha provisto un archivo de historia académica");
 	$mode="editar";
 	unset($fechapresenta);
 	unset($loadmovil);
 	goto endaction;
       }
-      $file_carta=$_FILES["carta"];
-      if($file_carta["size"]==0){
+    }
+    $file_carta=$_FILES["carta"];
+    if($file_carta["size"]==0){
+      if($estado=="nueva"){
 	errorMsg("No se ha provisto una carta de invitación");
 	$mode="editar";
 	unset($fechapresenta);
@@ -615,12 +723,12 @@ C;
     }
     $file_compromiso=$_FILES["compromiso"];
     if($file_compromiso["size"]>0){
-      $name=$file__compromiso["name"];
-      $tmp=$file__compromiso["tmp_name"];
+      $name=$file_compromiso["name"];
+      $tmp=$file_compromiso["tmp_name"];
       $filename="Compromiso_${suffix}_$name";
       shell_exec("cp $tmp $movildir/'$filename'");
       $compromiso=$filename;
-      if($estado=="aprobada" or $estado=="cumplida"){
+      if($estado=="aprobada" or $estado=="cumplida" or $estado=="realizada"){
 	$estado="terminada";
       }
     }
@@ -664,6 +772,8 @@ C;
     if($estado=="devuelta" and $movil){
       if($movil["estado"]!="devuelta"){
 	$estado=cambiaEstado($movilid,"devuelta");
+      }else{
+	$estado=cambiaEstado($movilid,"pendiente_aprobacion");
       }
     }
     if($estado=="rechazada" and $movil){
@@ -741,7 +851,7 @@ hacer seguimiento a las solicitudes presentadas.
 
 <a name="terminos"></a>
 <h3>Términos de la bolsa</h3>
-<p  style=" margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block;">   <a title="View Terminos Bolsa Movilidad on Scribd" href="https://es.scribd.com/doc/300665984/Terminos-Bolsa-Movilidad"  style="text-decoration: underline;" >Terminos Bolsa Movilidad</a> by <a title="View CienciasExactas's profile on Scribd" href="https://www.scribd.com/user/263978519/CienciasExactas"  style="text-decoration: underline;" >CienciasExactas</a></p><iframe class="scribd_iframe_embed" src="https://www.scribd.com/embeds/300665984/content?start_page=1&view_mode=scroll&access_key=key-8fciFithk7iPfeOmRapd&show_recommendations=true" data-auto-height="false" data-aspect-ratio="0.7729220222793488" scrolling="no" id="doc_59161" width="100%" height="600" frameborder="0"></iframe>
+  <p  style=" margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block;">   <a title="View Terminos Bolsa Movilidad on Scribd" href="https://es.scribd.com/doc/300665984/Terminos-Bolsa-Movilidad"  style="text-decoration: underline;" >Terminos Bolsa Movilidad</a> by <a title="View CienciasExactas's profile on Scribd" href="https://www.scribd.com/user/263978519/CienciasExactas"  style="text-decoration: underline;" >CienciasExactas</a></p><iframe class="scribd_iframe_embed" src="https://www.scribd.com/embeds/322568452/content?start_page=1&view_mode=scroll&access_key=key-8fciFithk7iPfeOmRapd&show_recommendations=true" data-auto-height="false" data-aspect-ratio="0.7729220222793488" scrolling="no" id="doc_59161" width="100%" height="600" frameborder="0"></iframe>
 
 <a name="videotutorial"></a>
 <h3>Videotutorial</h3>
@@ -776,7 +886,7 @@ C;
 	$value=$movil["$field"];
 	if(isBlank($value)){continue;}
 	if(file_exists("$movildir/$value")){
-	  $value="<a href=$movildir/$value target=_blank>$value</a>";
+	  $value="<a href='$movildir/$value' target=_blank>$value</a>";
 	}
 	if(isBlank($value)){continue;}
 	$content.="<tr><td style='background:lightgray;padding:10px'><b>$field</b>:</td><td>$value</td></tr>";
@@ -802,6 +912,48 @@ C;
     if(!isset($search)){$search="where movilid<>'' ";}
     if($QPERMISO<=3){$search.="and email='$EMAIL' ";}
 
+    $table="";
+    ////////////////////////////////////////////////////
+    //INFORMES
+    ////////////////////////////////////////////////////
+    if($QPERMISO>=3){
+
+      if(!isset($resultados)){$resultados="";}
+      if(!isset($infechaini)){
+	$infechafin=$DATE;
+	$infechaini=addDays($infechafin,"-180");
+      }
+      $infecharango=fechaRango("infecharango",$infechaini,$infechafin);
+
+$table.=<<<T
+<div style="background:lightgray;padding:10px;margin:auto;width:90%">
+<form>
+<input type="hidden" name="mode" value="lista">
+<h3>Informes</h3>
+<p style="font-size:12px">
+  Rango de fechas: $infecharango<br/>
+  <input type="submit" name="action" value="Informe">
+</p>
+$resultados
+</form>
+</div>
+T;
+    }
+
+    if(!isset($action)){
+    if($QPERMISO>=3){
+      //$sql="update Movilidad set estado='realizada' where estado='aprobada' and fechafin<'$DATE'";
+      $sql="select count(email) from Movilidad where estado='aprobada' and fechafin<'$DATE'";
+      $nrealizada=mysqlCmd($sql)[0];
+      if($nrealizada>0){
+	statusMsg("Lista de solicitudes realizadas actualizada...");
+	$sql="update Movilidad set estado='realizada' where estado='aprobada' and fechafin<'$DATE'";
+	mysqlCmd($sql);
+      }else{
+	statusMsg("No hay solicitudes realizadas para actualizar...");
+      }
+
+    }
     ////////////////////////////////////////////////////
     //RECOVER INFO
     ////////////////////////////////////////////////////
@@ -817,7 +969,7 @@ C;
     ////////////////////////////////////////////////////
     //COLORES
     ////////////////////////////////////////////////////
-    $table="<center><table border=0px style='font-size:0.8em' cellspacing:0px><caption>Posibles estados de las solicitudes</caption><tr>";
+    $table.="<center><table border=0px style='font-size:0.8em' cellspacing:0px><caption>Posibles estados de las solicitudes</caption><tr>";
     foreach(array_keys($ESTADOS_COLOR) as $estado){
       $table.="<td style='background:".$ESTADOS_COLOR["$estado"]."'>".$ESTADOS["$estado"]."</td>";
     }
@@ -857,7 +1009,7 @@ T;
       //Estado
       $table.="<td class='listacampo'>";
       $table.=$ESTADOS["$estado"];
-      $table.="</td>";
+      $table.="<br/>Solicitado:$valor<br/>Aprobado: $monto</td>";
 
       //Fecha
       $table.="<td class='listacampo'>";
@@ -909,6 +1061,21 @@ T;
 
     $content.=$table;
     
+    //CHECK STUDENTS ALREADY REALIZADA
+    if($QPERMISO>=3){
+      $sql="select GROUP_CONCAT(email) from Movilidad where fechafin<'$DATE' and estado='realizada'";
+      $out=mysqlCmd($sql)[0];
+
+$content.=<<<CON
+<h2>Estudiantes</h2>
+<p>
+  Estudiantes pendientes: <pre style='width:100%'>$out</pre>
+</p>
+CON;
+    }
+    }else{
+      $content.=$table;
+    }
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

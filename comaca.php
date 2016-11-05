@@ -19,13 +19,6 @@ $content.=getMainMenu();
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////
-$TIPOS_ACTIVIDAD=array(
-   "seminario"=>"Seminario",
-   "divulgacion"=>"Actividad divulgativa",
-   "reunion"=>"Reunión comunidad",
-   "clubrevistas"=>"Club de Revistas"
-		       );
-
 $UMBRALES_ACTIVIDAD=array(
    "seminario"=>3,
    "divulgacion"=>3,
@@ -342,6 +335,7 @@ M;
 
     //SPLIT DOCUMENTOS
     $documentos=preg_split("/\s*,\s*/",$documentos);
+    sort($documentos);
     $asistencias=array();
     $numasistencias=array();
 
@@ -598,7 +592,7 @@ C;
     $sql="select * from Actividades $search order by $sort $order";
     if(!($results=mysqlCmd($sql,$qout=1))){
       $content.="<i>No hay actividades con el criterio de búsqueda provisto.</i>";
-      goto end;
+      //goto end;
     }
     if($order=="asc"){$order="desc";}
     else{$order="asc";}
@@ -866,6 +860,13 @@ T;
  $emailsubscripe="";
  if(isset($EMAIL)){$emailsubscribe=$EMAIL;}
 
+ if($QPERMISO>3){
+   $resultados=mysqlCmd("select count(email) from Suscripciones");
+   $numsubscribed="(Número de suscritos: ".$resultados[0].")<br/>";
+ }else{
+   $numsubscribed="";
+ }
+
 $content.=<<<C
 <h4>Agenda de actividades</h4>
 <p>
@@ -882,7 +883,7 @@ vez que se aproxime una actividad.  También puede desuscribirse evitando que le
 <p>
 <form>
 <input type="hidden" name="mode" value="agenda">
-  Correo electrónico: <input type="text" name="emailsubscribe" placeholder="nombre@mail.com" value="$emailsubscribe" size="40"> <input type="submit" name="action" value="Suscribirse"> <input type="submit" name="action" value="Desuscribirse">
+  Correo electrónico: <input type="text" name="emailsubscribe" placeholder="nombre@mail.com" value="$emailsubscribe" size="40"> <input type="submit" name="action" value="Suscribirse"> <input type="submit" name="action" value="Desuscribirse"><br/>$numsubscribed
 </form>
 </p>
 
@@ -1074,12 +1075,20 @@ C;
     }
     if($mode=="consultado"){
 
+      if(isset($curso)){
+	$cursounhash=preg_replace("/_/"," ",$curso);
+	$cursotxt="<h5>Curso $cursounhash</h5>";
+      }else{
+	$cursotxt="";
+      }
 $content.=<<<C
   <h5>Semestre $semestre</h5>
+  $cursotxt
   <table border=1px cellspacing=0>
     <thead>
       <tr>
 	<td>Documento</td>
+	<td>Nombre</td>
 C;
 
        foreach($TIPOS_ACTIVIDAD as $Tipo){
@@ -1095,19 +1104,24 @@ $content.=<<<C
     </tr></thead>
 C;
 
+       $csvcontent="documento;nombre;nota\n";
        foreach($documentos as $documento){
     
          //GENERATE DETAILS
-	 $detalles="";
+	 $result=mysqlCmd("select nombre from Usuarios where documento='$documento'");
+	 $nombre=$result["nombre"];
+	 $detalles="$nombre:<br/>";
 	 foreach($asistencias["$documento"] as $asistencia){
 	   $actid=$asistencia["Actividades_actid"];
 	   $actividad=$actividades["$actid"];
 	   if($asistencia["tarde"]>0){$tardetxt="(reportada tarde)";}
 	   else{$tardetxt="";}
-	   $info=$actividad["fechafin"].",".$actividad["horafin"].": ".$actividad["tipo"]." '".$actividad["nombre"]."' ".$tardetxt;
+	   $info=$actividad["fechaini"].",".$actividad["horaini"].": ".$actividad["tipo"]." '".$actividad["nombre"]."' ".$tardetxt;
 	   $detalles.=$info."<br/>";
 	 }
 
+
+	 $csvcontent.="$documento;$nombre;";
 $content.=<<<C
     <tr>
       <td>
@@ -1117,6 +1131,9 @@ $content.=<<<C
 	<div id="detalles_$documento" style="display:none">
 	  $detalles
 	</div>
+      </td>
+      <td>
+         $nombre
       </td>
 C;
 
@@ -1136,6 +1153,7 @@ C;
 	     }
 
              $nota=($numbrales/4)*5;
+	     $csvcontent.="$nota\n";
       
 $content.=<<<C
       <td>$tot</td>
@@ -1145,11 +1163,15 @@ $content.=<<<C
 C;
        }
 
+       $filecsv="reporte-$curso.csv";
 $content.=<<<C
   </table>
+  <b>Reporte</b>:<a href="tmp/$filecsv">$filecsv</a>
 C;
     }
-
+    $fl=fopen("tmp/$filecsv","w");
+    fwrite($fl,$csvcontent);
+    fclose($fl);
     goto end;
   }
 

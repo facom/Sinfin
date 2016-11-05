@@ -170,7 +170,7 @@ $TIPOSCOM=array("servicios"=>"Comisión de Servicios",
 		"noremunerada"=>"Permiso"
 		);
 
-$INSTITUTOS=array("fisica"=>"Instituto de Física",
+$INSTITUTOS_COMISIONES=array("fisica"=>"Instituto de Física",
 		  "biologia"=>"Instituto de Biología",
 		  "quimica"=>"Instituto de Química",
 		  "matematicas"=>"Instituto de Matemáticas",
@@ -184,7 +184,7 @@ $CAMPOSHELP=array("tipoid"=>"cedula,ce,pasaporte (todo en minusculas)",
 		  "dedicacion"=>"Si, No (mayúscula inicial)"
 		  );
 
-$ESTADOS=array("solicitada"=>"Solicitada",
+$ESTADOSCOMISION=array("solicitada"=>"Solicitada",
 	       "devuelta"=>"Devuelta",
 	       "vistobueno"=>"Visto Bueno Director",
 	       "aprobada"=>"Aprobada por Decano",
@@ -310,7 +310,7 @@ function generateSelection($values,$name,$value,$options="",$readonly=0)
     $show=$parts[$part];
     $selected="";
     if($part==$value){$selected="selected";}
-    $selection.="<option value='$part' $selected>$show";
+    $selection.="<option value='$part' $selected>$show</option>";
   }
   $selection.="</select>";
   return $selection;
@@ -1143,6 +1143,11 @@ function getComisionInfo($comisionid)
   return $comision;
 }
 
+function addDays($date,$days){
+  $date = strtotime($days." days",strtotime($date));
+  return  date("Y-m-d", $date);
+}
+
 ////////////////////////////////////////////////////////////////////////
 //CONNECT TO DATABASE
 ////////////////////////////////////////////////////////////////////////
@@ -1205,13 +1210,13 @@ for($i=0;$i<$ncolumns;$i++){
 
 $out=mysqlCmd("select cedulajefe,institutoid from Institutos",$qout=1);
 $DIRECTORS=array();
-foreach($out as $instituto){
-  $DIRECTORS[$instituto["institutoid"]]=$instituto["cedulajefe"];
+foreach($out as $institutov){
+  $DIRECTORS[$institutov["institutoid"]]=$institutov["cedulajefe"];
 }
 $out=mysqlCmd("select cedula,institutoid from Empleados where tipo='Secretaria'",$qout=1);
 $SECRETARIAS=array();
-foreach($out as $instituto){
-  $SECRETARIAS[$instituto["institutoid"]]=$instituto["cedula"];
+foreach($out as $institutov){
+  $SECRETARIAS[$institutov["institutoid"]]=$institutov["cedula"];
 }
 
 $RANDOMMODE=generateRandomString(100);

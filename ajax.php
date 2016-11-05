@@ -37,7 +37,7 @@ if($action=="login"){
   //IF USER DOES NOT EXIST
   else{
     $html.="<div id='msg'>El usuario no ha sido creado en nuestra base de datos...</div>";
-    $urlref="$SITEURL/usuarios2.php?mode=nuevo&nombre=$nombre&email=$email&new";
+    $urlref="$SITEURL/usuarios.php?mode=nuevo&nombre=$nombre&email=$email&new";
   }
 
 $html.=<<<V
