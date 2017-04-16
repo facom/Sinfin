@@ -372,7 +372,7 @@ $format.=<<<F
 	  </tr>
 	  <tr>
 	    <td class=content style="$border;font-size:1.0em;">$programa</td>
-	    <td class=content style="$border;font-size:1.0em;">$signature</td>
+	    <td class=content style="$border;font-size:1.0em;"><!--$signature--></td>
 	  </tr>
 	</table>
       </td>

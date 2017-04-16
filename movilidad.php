@@ -631,7 +631,7 @@ C;
        $QPERMISO<3){
       errorMsg("Su solicitud es presentada con menos de 30 días de anticipación. Esta condición puede producir el rechazo de la solicitud o el no cumplimiento de los plazos adminsitrativos necesarios para el desembolso. Se recibe la solicitud pero no se garantiza un resultado positivo.");
     }
-    if($anticipacion<=15.0 and 
+    if($anticipacion<=0.0 and 
        !preg_match("/realizada/",$estado) and 
        !preg_match("/devuelta/",$estado) and 
        $QPERMISO<3){
@@ -1461,6 +1461,7 @@ $botones
   <td class="campo" id="documento">Documento profesor$helpicon:</td>
   <td class="form">
     <input $perm1 type="text" size=30 name="documento_profesor" placeholder="Documento de dentidad" value="$documento_profesor" onchange="fillProfesor(this)">
+    <a href="JavaScript:void(null)">Buscar</a>
   </td>
 </tr>
 <tr class="ayuda" id="documento_help">
