@@ -38,7 +38,7 @@
     <div class="caja movil-50 derecha-contenido" style="color:#376133">
 
       <h3 style="font-weight:bold;">SInfIn</h3>
-
+      <span>Sistema de Información Curricular Integrada</span>
     </div>
     
   </div>
