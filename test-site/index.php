@@ -27,12 +27,14 @@
       </div>
     </div>
 
+    <!--
     <div class="caja movil-50 derecha-contenido" style="color:#376133">
 
       <h3 style="font-weight:bold;">SInfIn</h3>
       <span style="font-family:Times New Roman;font-size:1.5em">Sistema de Información Curricular Integrada</span>
 
     </div>
+    -->
   </div>
 
   <div class="grupo">
