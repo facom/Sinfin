@@ -53,7 +53,6 @@
 
       
       <div class="caja web-100 movil-100"> 
-	<div id="toggle-menu" class="icon-align-justify centrar-texto">Módulo</div>
         <div class="menu_ppal2">
           <ul class="nav">
 	    <li><a href="http://extension.medicinaudea.co/index.php">Nuevo</a></li>
