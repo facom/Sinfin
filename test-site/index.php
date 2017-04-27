@@ -28,14 +28,6 @@
       </div>
     </div>
 
-    <!--
-    <div class="caja movil-50 derecha-contenido" style="color:#376133">
-
-      <h3 style="font-weight:bold;">SInfIn</h3>
-      <span style="font-family:Times New Roman;font-size:1.5em">Sistema de Información Curricular Integrada</span>
-
-    </div>    
-    -->
     <div class="caja movil-50 derecha-contenido" style="color:#376133">
 
       <h3 style="font-weight:bold;">SInfIn</h3>
@@ -46,20 +38,32 @@
 
   <div class="grupo">
       <div class="caja web-100 movil-100"> 
-        
 	<div id="toggle-menu" class="icon-align-justify centrar-texto">Menú Principal</div>
         <div class="menu_ppal">
           <ul class="nav ">
-	    <li class="item-200"><a href="http://extension.medicinaudea.co/index.php">Inicio</a></li>
-	    <li class="item-256"><a href="http://extension.medicinaudea.co/index.php/quienes-somos">Ayuda</a></li>
-	    <li class="item-257 current active parent"><a href="http://extension.medicinaudea.co/index.php/programas">Conectarse</a></li>
-	    <li class="item-299"><a href="http://extension.medicinaudea.co/index.php/servicios">Comisiones</a></li>
-	    <li class="item-259"><a href="http://extension.medicinaudea.co/index.php/educacion-a-la-medida">Movilidad</a></li>
-	    <li class="item-260"><a href="http://extension.medicinaudea.co/index.php/videos">Microcurrículos</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php">Inicio</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/quienes-somos">Ayuda</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/programas">Conectarse</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/servicios">Comisiones</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/educacion-a-la-medida">Movilidad</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/videos">Microcurrículos</a></li>
 	  </ul>
         </div>
       </div>
+
+      
+      <div class="caja web-100 movil-100"> 
+	<div id="toggle-menu" class="icon-align-justify centrar-texto">Módulo</div>
+        <div class="menu_ppal2">
+          <ul class="nav">
+	    <li><a href="http://extension.medicinaudea.co/index.php">Nuevo</a></li>
+	    <li><a href="http://extension.medicinaudea.co/index.php/quienes-somos">Lista</a></li>
+	  </ul>
+        </div>
+      </div>
+      
   </div>
+
 </header>
 
 <section id="componente">
@@ -84,10 +88,16 @@
       <div class="custom">
 	<div class="caja tablet-100">
 	  <div class="homecopyright" dir="ltr">
-	    <div class="homecopyright-texto" style="text-align: center;"><img src="./Programas_files/logo.png" alt="logo"></div>
+	    <div class="homecopyright-texto" style="text-align: center;">
+	      <img src="./Programas_files/logo.png" alt="logo">
+	    </div>
 	    <div>&nbsp;</div>
-	    <div class="homecopyright-texto" style="text-align: center;">Dirección: Clle 67 No. 53-108<br>
-	      <div class="homecopyright-texto" style="text-align: center;">Conmutador: [57+4] 219 6940<br> <a href="http://extension.medicinaudea.co/cemedicina@udea.edu.co">vicedecacen@udea.edu.co</a> <br> Medellín - Colombia | Todos los Derechos Reservados © 2017</div>
+	    <div class="homecopyright-texto" style="text-align: center;">
+	      Dirección: Clle 67 No. 53-108<br>
+	      <div class="homecopyright-texto" style="text-align: center;">Conmutador: [57+4] 219 6940<br> 
+		<a href="http://extension.medicinaudea.co/cemedicina@udea.edu.co">vicedecacen@udea.edu.co</a><br> 
+		Medellín - Colombia | Todos los Derechos Reservados © 2017
+	      </div>
 	    </div>
 	  </div>
 	</div>
@@ -106,54 +116,10 @@
       Desarrollado por Jorge I. Zuluaga (C) 2016
     </div>
   </section>
-
-  <!--
-  <section id="footer_top">
-    <div class="grupo tablet-tabla">
-      <div class="caja tablet-35">
-	<div class="custom">
-	  <h5>Ayuda</h5>
-	  <ul>
-	    <li><a href="http://" target="_blank">Pregrado</a></li>
-	  </ul>
-	</div>
-      </div>
-
-      <div class="caja tablet-35">
-	<div class="custom">
-	  <h5>Módulos</h5>
-	  <ul>
-	    <li><a href="http://" target="_blank">Comisiones</a></li>
-	    <li><a href="http://" target="_blank">Movilidad</a></li>
-	    <li><a href="http://" target="_blank">Microcurriculos</a></li>
-	  </ul>
-	</div>
-      </div>
-
-      <div class="caja tablet-30">
-	<div class="custom">
-	  <h5>Institucional</h5>
-	  <ul>
-	    <li><a href="http://www.udea.edu.co/wps/portal/udea/web/inicio/estudiar-udea/pregrado/oferta/" target="_blank">Pregrado</a></li>
-	  </ul>
-	</div>
-      </div>
-
-    </div>
-  </section>
-
-  <section id="footer_bottom">
-    <div class="grupo tablet-tabla">
-      <div class="caja total">
-      </div>
-    </div>
-  </section>
-  -->
-  
 </footer>
 
 <script src="./Programas_files/jquery.min(1).js"></script>
 <script type="text/javascript" src="./Programas_files/template.js"></script>
 
-<style id="service-icons-0"></style> 
-</body></html>
+</body>
+</html>
