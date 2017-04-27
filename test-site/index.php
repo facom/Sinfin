@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./Programas_files/normalize.css">
     <link rel="stylesheet" href="./Programas_files/template.css">
     <link rel="stylesheet" href="./Programas_files/custom.css">
+    <link href="./Programas_files/icons.css" rel="stylesheet">
   </head>
 
 <body>
