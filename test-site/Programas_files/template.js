@@ -28,6 +28,12 @@ jQuery(function($){
             $menu.css({'width':'100%','margin-top':'0'});
         }
     })
+
+    var hD=$('#componente').height();
+    var hw=$(window).height();
+    if(hD<hw){
+	$('#blank').css("height",0.2*hw);
+    }
 });
 
 function movimiento(index,l){
