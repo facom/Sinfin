@@ -1,0 +1,20 @@
+.tp-caption.excerpt {
+font-size:36px;
+line-height:36px;
+font-weight:700;
+font-family:Arial;
+color:#ffffff;
+text-decoration:none;
+background-color:rgb(0, 0, 0);
+background-color:rgba(0, 0, 0, 1);
+text-shadow:none;
+margin:0px;
+letter-spacing:-1.5px;
+padding:1px 4px 0px 4px;
+white-space:normal !important;
+height:auto;
+border-width:0px;
+border-color:rgb(255, 255, 255);
+border-style:none;
+}
+
