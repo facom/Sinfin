@@ -6,7 +6,7 @@
 $HOST=$_SERVER["HTTP_HOST"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
-require("$ROOTDIR/etc/library.php");
+require("$ROOTDIR/etc/library2.php");
 $SESSID=$_COOKIE["PHPSESSID"];
 
 ////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ if(isset($action)){
   //CERRAR SESSION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($action=="Cerrar"){
-    $urlref="$SITEURL/index.php";
+    $urlref="$SITEURL/index$VER.php";
 
     $content=getHeaders(false);
 $content.=<<<C
@@ -73,7 +73,7 @@ C;
     echo "<center style='font-size:1em;color:gray'>Esta ventana se cerrará automáticamente en 3 segundos</center>";
     echo "<script type='text/javascript'>setTimeout(function(){window.close();},3000);</script>";
     /*
-      http://astronomia-udea.co/principal/Sinfin/actions.php?action=quickans&respuesta=Si&params=pregunta:¿tuviste+problemas+con+la+matr%C3%ADcula+2017-1%3F;tipo:sino;opciones:Si,No
+      http://astronomia-udea.co/principal/Sinfin/actions$VER.php?action=quickans&respuesta=Si&params=pregunta:¿tuviste+problemas+con+la+matr%C3%ADcula+2017-1%3F;tipo:sino;opciones:Si,No
      */
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -5,7 +5,7 @@
 $HOST=$_SERVER["HTTP_HOST"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
-require("etc/library.php");
+require("etc/library2.php");
 
 ////////////////////////////////////////////////////////////////////////
 //ACTIONS
@@ -32,12 +32,12 @@ if($action=="login"){
 	  if(preg_match("/^\d$/",$key)){continue;}
 	  $_SESSION["$key"]=$results[$key];
       }
-      $urlref="$SITEURL?yes";
+      $urlref="$SITEURL/index$VER.php?yes";
   }
   //IF USER DOES NOT EXIST
   else{
     $html.="<div id='msg'>El usuario no ha sido creado en nuestra base de datos...</div>";
-    $urlref="$SITEURL/usuarios.php?mode=nuevo&nombre=$nombre&email=$email&new";
+    $urlref="$SITEURL/usuarios$VER.php?mode=nuevo&nombre=$nombre&email=$email&new";
   }
 
 $html.=<<<V
@@ -51,7 +51,7 @@ function onVerify(googleUser) {
     var \$msg=$("#msg");
     if(email!="$email"){
 	\$msg.html("El usuario no es reconocido...");
-	setTimeout(function(){document.location="$SITEURL/actions.php?action=Cerrar";},1000);
+	setTimeout(function(){document.location="$SITEURL/actions$VER.php?action=Cerrar";},1000);
     }else{
       //\$msg.html("Conectado como usuario $email...");
       setTimeout(function(){document.location="$urlref";},0);
