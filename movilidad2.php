@@ -1168,7 +1168,7 @@ CON;
     }else{
       $perm2="";
       $backcumplido="background:pink;";
-      $botoncumplir="<input type='submit' name='action' value='Cumplir' class='boton'>";
+      $botoncumplir="<input type='submit' name='action' value='Cumplir' class='botonsin'>";
     }
     if($QPERMISO<=3){
       if($estado=="terminada" or $estado=="rechazada"){
@@ -1226,17 +1226,17 @@ FORM;
     //BOTON DE ENVIAR
     ////////////////////////////////////////////////////
     if($estado=="guardada" or $estado=="nueva"){
-      $enviar="<input $bperm1 type='submit' name='action' value='Enviar' class='boton nonueva'>";
+      $enviar="<input $bperm1 type='submit' name='action' value='Enviar' class='botonsin nonueva'>";
     }
 
 $botones=<<<B
 <tr class="field">
   <td colspan=2 class="botones">
     $botoncumplir
-    <input $bperm1 type="submit" name="action" value="Guardar" class="boton">
+    <input $bperm1 type="submit" name="action" value="Guardar" class="botonsin">
     $enviar
-    <input $bperm1 type="submit" name="action" value="Salir" class="boton">
-    <input $bperm1 type="submit" name="action" value="Borrar" class="boton nonueva">
+    <input $bperm1 type="submit" name="action" value="Salir" class="botonsin">
+    <input $bperm1 type="submit" name="action" value="Borrar" class="botonsin nonueva">
   </td>
 </tr>
 B;
@@ -1680,7 +1680,7 @@ FORM;
 //LATERAL CONTENT
 ////////////////////////////////////////////////////////////////////////
 $content.=endBody();
-$content.=getLateral(40);
+$content.=getLateral(0);
 $content.=<<<C
 C;
 $content.=endLateral();

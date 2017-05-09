@@ -743,7 +743,7 @@ function statusMsg($msg)
 
 function getHeaders($diagonal=true,$script="")
 {
-  global $PERMCSS,$QPERMISO,$VERSION,$QTEST; 
+  global $PERMCSS,$QPERMISO,$VERSION,$QTEST,$VER; 
  
   //STYLES
   $style="<style>\n";
@@ -854,7 +854,7 @@ $header=<<<H
   <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
   <link href="lib/daterangepicker/jquery.comiseo.daterangepicker.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/sinfin.css" />
+  <link rel="stylesheet" href="css/sinfin$VER.css" />
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/template.css">
   <link rel="stylesheet" href="css/custom.css">
@@ -932,8 +932,10 @@ $menu=<<<M
 	    <li><a href="ayuda$VER.php">Ayuda</a></li>
 	    <li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
 	    <li class="level1"><a href="actions$VER.php?action=Cerrar">Cerrar</a></li>
-	    <li class="level1"><a href="reconoce$VER.php">Reconoce</a></li>
-	    <li class="level1"><a href="movilidad$VER.php">Movilidad</a></li>
+	    <li><a href="reconoce$VER.php">Reconoce</a></li>
+	    <li><a href="movilidad$VER.php">Movilidad</a></li>
+	    <li><a href="microcurriculos$VER.php">Cursos</a></li>
+	    <li><a href="comisiones$VER.php">Comisiones</a></li>
 
 	  </ul>
         </div>
@@ -1002,7 +1004,6 @@ function getFooter()
 $filetime=date(DATE_RFC2822,filemtime($_SERVER["SCRIPT_FILENAME"]));
 $footer=<<<M
 <div id="blank"></div>
-
 <footer id="footer">
   <section id="footer_bottom">
     <div class="grupo tablet-tabla" style="font-size:0.8em;font-style:italic;padding:20px">

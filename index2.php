@@ -30,7 +30,7 @@ $content.=getSubMenu($submenu);
 $content.=getBody(60);
 $content.=<<<C
 
-<h3 class="catItemTitle">Bienvenidos a SInfIn</h3>
+<h3>Bienvenidos a SInfIn</h3>
 
 <p>
 El <b>Sistema de Información Curricular Integrada (SInfIn)</b> es una
