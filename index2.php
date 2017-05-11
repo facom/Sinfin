@@ -21,6 +21,8 @@ $content.=getMainMenu();
 //SUBMENU
 ////////////////////////////////////////////////////////////////////////
 $submenu=<<<M
+<li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
+<li class="level1"><a href="usuarios$VER.php?action=Cerrar">Desconectarse</a></li>
 M;
 $content.=getSubMenu($submenu);
 
@@ -65,7 +67,7 @@ $content.=endBody();
 $content.=getLateral(40);
 $content.=<<<C
 <div style="width:100%;height:40vh;">
-<iframe width="100%" height="80%" src="https://www.youtube.com/embed/4hEmqRIitLs" frameborder="0" allowfullscreen></iframe>
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/zBa1tM4j7MI" frameborder="0" allowfullscreen></iframe>
 </div>
 C;
 $content.=endLateral();

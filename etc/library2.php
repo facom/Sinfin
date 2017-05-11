@@ -1,48 +1,89 @@
 <?php
-////////////////////////////////////////////////////////////////////////
-//EXTERNAL LIBRARIES
-////////////////////////////////////////////////////////////////////////
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//BIBLIOTECAS EXTERNAS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 require "lib/PHPMailer/PHPMailerAutoload.php";
 session_start();
 header("Content-Type: text/html;charset=UTF-8");
+
+////////////////////////////////////////////////////////////////////////
+//CONFIGURACION
+////////////////////////////////////////////////////////////////////////
+require "etc/configuration.php";
 //echo "Usuario:".$_SESSION["nombre"];
 
-////////////////////////////////////////////////////////////////////////
-//CONFIGURATION
-////////////////////////////////////////////////////////////////////////
-$USER="sinfin";
-$PASSWORD="123";
-$DATABASE="Sinfin";
-$EMAIL_USERNAME="pregradofisica@udea.edu.co";
-$EMAIL_PASSWORD="Gmunu-Tmunu=0";
-//$VERSION="Alpha 1.0";
-//$VERSION="Beta 1.0";
-$VERSION="Beta 2.0";
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//CONFIGURACION BASICA
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-//COLOQUE AQUÍ EL E-MAIL DEL VICEDECANATO
-$EMAIL_ADMIN="vicedecacen@udea.edu.co";
-//$EMAIL_ADMIN="pregradofisica@udea.edu.co";
+////////////////////////////////////////////////////////////////////////
+//VARIABLES UTILES
+////////////////////////////////////////////////////////////////////////
+$SINFIN="<b>SInfIn</b>";
+$TBORDER=0;
+$TWIDTH=800;
+$TCOLD=$TWIDTH/2;
+$ERRORS="";
+$STATUS="";
+$WIDTHVID=400;
+$HEIGHTVID=$WIDTHVID/1.4;
+$WIDTHVID2=$WIDTHVID*2;
+$HEIGHTVID2=$WIDTHVID2/1.4;
+$EHEADERS="";
+$EHEADERS.="From: noreply@udea.edu.co\r\n";
+$EHEADERS.="Reply-to: noreply@udea.edu.co\r\n";
+$EHEADERS.="MIME-Version: 1.0\r\n";
+$EHEADERS.="MIME-Version: 1.0\r\n";
+$EHEADERS.="Content-type: text/html\r\n";
+$FORM="<form method='post' enctype='multipart/form-data' accept-charset='utf-8'>";
 
+////////////////////////////////////////////////////////////////////////
+//HOST 
+////////////////////////////////////////////////////////////////////////
+$HOST=$_SERVER["HTTP_HOST"];
+$FILENAME=$_SERVER["SCRIPT_NAME"];
+$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
+$BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
+$SITEURL="http://$HOST$BASEDIR/";
+$URL=$SITEURL;
+if(isset($_SERVER["HTTP_REFERER"])){
+  $REFERER=$_SERVER["HTTP_REFERER"];
+}else{
+  $REFERER=$SITEURL;
+}
+
+////////////////////////////////////////////////////////////////////////
+//GLOBAL VARIABLES
+////////////////////////////////////////////////////////////////////////
+foreach(array_keys($_GET) as $field){
+    $$field=$_GET[$field];
+}
+foreach(array_keys($_POST) as $field){
+    $$field=$_POST[$field];
+}
+
+////////////////////////////////////////////////////////////////////////
+//PDF CONVERTER
+////////////////////////////////////////////////////////////////////////
 if(!file_exists(".arch")){
     $out=shell_exec("uname -a");
     if(preg_match("/86_64/",$out)){$arch="64";}
     else{$arch="32";}
 }else{$arch=shell_exec("cat .arch");}
-
 //HTML 2 PDF CONVERTER
 if($arch==32){$H2PDF="$ROOTDIR/lib/wkhtmltopdf-i386";}
 else{$H2PDF="$ROOTDIR/lib/wkhtmltopdf-amd64";}
 
 ////////////////////////////////////////////////////////////////////////
-//PAGINAS
-////////////////////////////////////////////////////////////////////////
-$VER=2;
-
-////////////////////////////////////////////////////////////////////////
 //VERIFY IDENTITY
 ////////////////////////////////////////////////////////////////////////
 $QPERMISO=0;
-$NOMBRE="Anynymous";
+$NOMBRE="Anónimo";
 if(isset($_SESSION["permisos"])){
   $QPERMISO=$_SESSION["permisos"];
   $NOMBRE=$_SESSION["nombre"];
@@ -52,6 +93,11 @@ if(isset($_SESSION["permisos"])){
   $EMAIL=$_SESSION["email"];
   $TIPO=$_SESSION["tipo"];
 }
+
+
+////////////////////////////////////////////////////////////////////////
+//CREA PERMISOS AL NIVEL DEL CSS 
+////////////////////////////////////////////////////////////////////////
 $PERMCSS="";
 $type="inline";
 $perm="$type";
@@ -68,63 +114,156 @@ for($i=1;$i<=4;$i++){
   $PERMCSS.=".level$i{display:$perm;}\n.nolevel$i{display:$nperm;}\n";
 }
 $PERMCSS.=".level5{display:none;}\n.nolevel5{display:$type;}\n";
-//echo "PERMS:<pre>$PERMCSS</pre><br/>";
-/*
-  Permisos
- */
-$PERMISOS=array("0"=>"Anónimo",
-		"1"=>"Consulta",
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//LISTAS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+////////////////////////////////////////////////////////////////////////
+//GENERALES
+////////////////////////////////////////////////////////////////////////
+$PERMISOS=array(
+		"0"=>"Visitante",
+		"1"=>"Estudiante",
 		"2"=>"Profesor",
 		"3"=>"Coordinador",
-		"4"=>"Administrador");
+		"4"=>"Administrador",
+		);
 
-$INSTITUTOS=array("fisica"=>"Instituto de Física",
-		  "biologia"=>"Instituto de Biología",
-		  "quimica"=>"Instituto de Química",
-		  "matematicas"=>"Instituto de Matemáticas",
-		  "facultad"=>"Toda la Facultad");
+$SINO=array("No"=>"No","Si"=>"Si");
+$BOOLEAN=array("0"=>"No",
+	       "1"=>"Si");
 
-$TIPOS=array("visitante"=>"Visitante",
-	     "estudiante"=>"Estudiante activo",
-	     "profesor"=>"Profesor",
-	     "administrativo"=>"Usuario administrativo");
+////////////////////////////////////////////////////////////////////////
+//TIPOS DE USUARIOS
+////////////////////////////////////////////////////////////////////////
+//Tipos de usuario
+$TIPOS=array(
+	     "VINCULADO"=>"Docente de Tiempo Completo",
+	     "OCASIONAL"=>"Docente Ocasional de Tiempo Completo",
+	     "VISITANTE"=>"Profesor Visitante",
+	     "SECRETARIA"=>"Secretaria",
+	     "EMPLEADO"=>"Empleado",
+	     "ESTUDIANTE"=>"Estudiante"
+	     );
+
+//Tipos de documento de identidad
+$TIPOSID=array(
+	       "cedula"=>"Cédula de Ciudadanía",
+	       "extranjeria"=>"Cédula de Extranjería",
+	       "pasaporte"=>"Pasaporte",
+	       "tarjeta"=>"Tarjeta"
+	       );
+
+////////////////////////////////////////////////////////////////////////
+//COMISIONES
+////////////////////////////////////////////////////////////////////////
+$COM_TIPOS=array(
+		 "servicios"=>"Comisión de Servicios",
+		 "estudio"=>"Comisión de Estudios",	
+		 "noremunerada"=>"Permiso",
+		 );
+
+$COM_HELP=array(
+		"tipoid"=>"cedula,ce,pasaporte",
+		"nombre"=>"NOMBRES APELLIDOS",
+		"tipo"=>"Vinculado, Ocasional, Visitante, Empleado",
+		"institutoid"=>"fisica, quimica, biologia, matematicas, decanatura",
+		"dedicacion"=>"Si, No",
+		);
+
+$COM_ESTADOS=array(
+		   "solicitada"=>"Solicitada",
+		   "devuelta"=>"Devuelta",
+		   "vistobueno"=>"Visto Bueno Director",
+		   "aprobada"=>"Aprobada por Decano"
+		   );
+
+$COM_COLORS=array(
+		  "solicitada"=>"#FFFF99",
+		  "solicitada_noremunerada"=>"#FFCC99",
+		  "vistobueno"=>"#99CCFF",
+		  "vistobueno_noremunerada"=>"#99CCFF",
+		  "devuelta"=>"#FF99FF",
+		  "devuelta_noremunerada"=>"#FF99FF",
+		  "aprobada"=>"#00CC99",
+		  "aprobada_noremunerada"=>"#33CCCC"	
+		  );
+
+$COM_TEXTS=array(
+		 "presentacion","respuesta",
+		 );
+
+$COM_COLOR=array(
+		 "solicitada"=>"#FFFF99",
+		 "solicitada_noremunerada"=>"#FFCC99",
+		 "vistobueno"=>"#99CCFF",
+		 "vistobueno_noremunerada"=>"#99CCFF",
+		 "devuelta"=>"#FF99FF",
+		 "devuelta_noremunerada"=>"#FF99FF",
+		 "aprobada"=>"#00CC99",
+		 "aprobada_noremunerada"=>"#33CCCC",
+		 "cumplida"=>"lightgray",
+		 );
+
+$COM_DIR="data/comisiones";
+
+////////////////////////////////////////////////////////////////////////
+//MICROCURRICULOS
+////////////////////////////////////////////////////////////////////////
+$MIC_DIR="data/microcurriculos";
+
+////////////////////////////////////////////////////////////////////////
+//RECONOCIMIENTOS
+////////////////////////////////////////////////////////////////////////
+$RECON_ESTADO=array(
+		    "Solicitado",
+		    "Revisado",
+		    "Aprobado",
+		    "Editado",
+		    "Rechazado",
+		    "Entregado",
+		    "Confirmado",
+		    );
+
+$RECON_DIR="data/recon";
+
 
 ////////////////////////////////////////////////////////////////////////
 //MOVILIDAD
 ////////////////////////////////////////////////////////////////////////
-$TIPO_EVENTO=array("pasantia"=>"Pasantía",
-		   "evento"=>"Evento académico");
+$MOV_TIPO=array(
+		"pasantia"=>"Pasantía",
+		"evento"=>"Evento académico",
+		);
 
-$DURACION_EVENTO=array("corto"=>"Corta duración (1 a 7 días)",
-		       "largo"=>"Larga duración (8 a 35 días)",
-		       "prolongado"=>"Prolongado (mayor o igual a 35 días)");
+$MOV_DURACION=array(
+		    "corto"=>"Corta duración (1 a 7 días)",
+		    "largo"=>"Larga duración (8 a 35 días)",
+		    "prolongado"=>"Prolongado (mayor o igual a 35 días)",
+		    );
 
-$LUGAR_EVENTO=array("colombia"=>"Colombia",
-		    "andino"=>"Pacto andino, centro américa o el Caribe",
-		    "resto"=>"Resto del mundo incluyendo México");
+$MOV_LUGAR=array(
+		 "colombia"=>"Colombia",
+		 "andino"=>"Pacto andino, centro américa o el Caribe",
+		 "resto"=>"Resto del mundo incluyendo México",
+		 );
 
-$PROGRAMAS_FCEN=array("astronomia"=>"Astronomía",
-		      "biologia"=>"Biología",
-		      "estadística"=>"Estadística",
-		      "fisica"=>"Física",
-		      "matematicas"=>"Matemáticas",
-		      "quimica"=>"Química",
-		      "tecnoquimica"=>"Tecnología Química",
-		      "ninguno"=>"Ninguno escogido"
-		      );
+$MOV_APOYOS=array(
+		  "nalcorto"=>"Nacional Corto",
+		  "nallargo"=>"Nacional Largo",
+		  "nalprolongado"=>"Nacional Prolongado",
+		  "andinocorto"=>"Andino Corto",
+		  "andinolargo"=>"Andino Largo",
+		  "andinoprolongado"=>"Andino Prolongado",
+		  "internalcorto"=>"Internacional Corto",
+		  "internallargo"=>"Internacional Largo",
+		  "internalprolongado"=>"Internacional Prolongado",
+		  );
 
-$APOYOS=array("nalcorto"=>"Nacional Corto",
-	      "nallargo"=>"Nacional Largo",
-	      "nalprolongado"=>"Nacional Prolongado",
-	      "andinocorto"=>"Andino Corto",
-	      "andinolargo"=>"Andino Largo",
-	      "andinoprolongado"=>"Andino Prolongado",
-	      "internalcorto"=>"Internacional Corto",
-	      "internallargo"=>"Internacional Largo",
-	      "internalprolongado"=>"Internacional Prolongado"
-	      );
-
-$ESTADOS=array("nueva"=>"Nueva solicitud",
+$MOV_ESTADOS=array("nueva"=>"Nueva solicitud",
 	       "guardada"=>"Guardada",
 	       "pendiente_apoyo"=>"Pendiente confirmación profesor",
 	       "pendiente_aprobacion"=>"Pendiente aprobación FCEN",
@@ -135,7 +274,7 @@ $ESTADOS=array("nueva"=>"Nueva solicitud",
 	       "rechazada"=>"Rechazada",
 	       "terminada"=>"Terminada");
 
-$ESTADOS_COLOR=array("nueva"=>"white",
+$MOV_ESTADOS_COLOR=array("nueva"=>"white",
 		     "guardada"=>"#ffffcc",
 		     "pendiente_apoyo"=>"#ccffff",
 		     "pendiente_aprobacion"=>"#99ccff",
@@ -146,61 +285,11 @@ $ESTADOS_COLOR=array("nueva"=>"white",
 		     "rechazada"=>"#ff6666",
 		     "terminada"=>"#99ff99");
 
-////////////////////////////////////////////////////////////////////////
-//COMISIONES
-////////////////////////////////////////////////////////////////////////
-$COMISIONES_COLOR=array(
-			"solicitada"=>"#FFFF99",
-			"solicitada_noremunerada"=>"#FFCC99",
-			"vistobueno"=>"#99CCFF",
-			"vistobueno_noremunerada"=>"#99CCFF",
-			"devuelta"=>"#FF99FF",
-			"devuelta_noremunerada"=>"#FF99FF",
-			"aprobada"=>"#00CC99",
-			"aprobada_noremunerada"=>"#33CCCC",
-			"cumplida"=>"lightgray"
-			);
-
-$BOOLEAN=array("0"=>"No",
-	       "1"=>"Si");
-
-//COMISIONES
-$TIPOSEMP=array("Vinculado"=>"Docente de Tiempo Completo",
-	     "Ocasional"=>"Docente Ocasional de Tiempo Completo",
-	     "Visitante"=>"Profesor Visitante",
-	     "Secretaria"=>"Secretaria",
-	     "Empleado"=>"Empleado");
-
-$TIPOSCOM=array("servicios"=>"Comisión de Servicios",
-		"estudio"=>"Comisión de Estudios",	
-		"noremunerada"=>"Permiso"
-		);
-
-$INSTITUTOS_COMISIONES=array("fisica"=>"Instituto de Física",
-		  "biologia"=>"Instituto de Biología",
-		  "quimica"=>"Instituto de Química",
-		  "matematicas"=>"Instituto de Matemáticas",
-		  "decanatura"=>"Decanatura"
-		  );
-
-$CAMPOSHELP=array("tipoid"=>"cedula,ce,pasaporte (todo en minusculas)",
-		  "nombre"=>"NOMBRES APELLIDOS (mayúscula sostenida)",
-		  "tipo"=>"Vinculado, Ocasional, Visitante, Empleado (mayúscula inicial)",
-		  "institutoid"=>"fisica, quimica, biologia, matematicas, decanatura (todo en minuscula)",
-		  "dedicacion"=>"Si, No (mayúscula inicial)"
-		  );
-
-$ESTADOSCOMISION=array("solicitada"=>"Solicitada",
-	       "devuelta"=>"Devuelta",
-	       "vistobueno"=>"Visto Bueno Director",
-	       "aprobada"=>"Aprobada por Decano",
-	       "cumplida"=>"Cumplido entregado");
-
-$TIPOSID=array("cedula"=>"Cédula de Ciudadanía",
-	       "extranjeria"=>"Cédula de Extranjería",
-	       "pasaporte"=>"Pasaporte");
-
-$SINO=array("No"=>"No","Si"=>"Si");
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//LISTAS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 //%%%%%%%%%%%%%%%%%%%%
 //TEST SITE
@@ -208,12 +297,14 @@ $SINO=array("No"=>"No","Si"=>"Si");
 //CHECK IF THIS IS THE MAIN SITE OR THE TEST SITE
 $QTEST=0;
 if($HOST=="localhost"){$QTEST=1;}
-//$QTEST=0; //Decomente para obligar que sea servidor
+//$QTEST=0; //Descomente para obligar que sea servidor
+
+//MAIL MODE
+$QOVER=0; //1 para obligar a enviar correo cuando esta en test
 
 ////////////////////////////////////////////////////////////////////////
 //ACTIVIDADES
 ////////////////////////////////////////////////////////////////////////
-
 $TIPOS_ACTIVIDAD=array(
    "seminario"=>"Seminario",
    "divulgacion"=>"Actividad divulgativa",
@@ -225,55 +316,10 @@ $TIPOS_ACTIVIDAD=array(
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////
-foreach(array_keys($_GET) as $field){
-    $$field=$_GET[$field];
-}
-foreach(array_keys($_POST) as $field){
-    $$field=$_POST[$field];
-}
-$TBORDER=0;
-$TWIDTH=800;
-$TCOLD=$TWIDTH/2;
-$ERRORS="";
-$STATUS="";
-$RECONDIR="data/recon";
-//		   0		1	   2		3	4		5	6
-$RECONSTATUS=array("Solicitado","Revisado","Aprobado","Editado","Rechazado","Entregado","Confirmado");
-$SINFIN="<b>SInfIn</b>";
 
-$HOST=$_SERVER["HTTP_HOST"];
-$FILENAME=$_SERVER["SCRIPT_NAME"];
-$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
-$BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
-$SITEURL="http://$HOST$BASEDIR/";
-if(isset($_SERVER["HTTP_REFERER"])){
-  $REFERER=$_SERVER["HTTP_REFERER"];
-}else{
-  $REFERER=$SITEURL;
-}
 
-$WIDTHVID=400;
-$HEIGHTVID=$WIDTHVID/1.4;
-$WIDTHVID2=$WIDTHVID*2;
-$HEIGHTVID2=$WIDTHVID2/1.4;
 
-/*
-echo "COOKIES:";
-print_r($_COOKIES);
-echo "<br/>SESSION:";
-print_r($_SESSION);
-//*/
-//phpinfo();
 
-$EHEADERS="";
-$EHEADERS.="From: noreply@udea.edu.co\r\n";
-$EHEADERS.="Reply-to: noreply@udea.edu.co\r\n";
-$EHEADERS.="MIME-Version: 1.0\r\n";
-$EHEADERS.="MIME-Version: 1.0\r\n";
-$EHEADERS.="Content-type: text/html\r\n";
-
-$FORM="<form method='post' enctype='multipart/form-data' accept-charset='utf-8'>";
-$MANATWORK="<p><center><img src=img/manatwork.png width=10%></center></p>";
 
 ////////////////////////////////////////////////////////////////////////
 //ROUTINES
@@ -928,14 +974,14 @@ $menu=<<<M
         <div class="menu_ppal">
           <ul class="nav">
 
-	    <li><a href="index$VER.php">Inicio</a></li>
+	    <li><a href="index$VER.php">Principal</a></li>
 	    <li><a href="ayuda$VER.php">Ayuda</a></li>
 	    <li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
-	    <li class="level1"><a href="actions$VER.php?action=Cerrar">Cerrar</a></li>
 	    <li><a href="reconoce$VER.php">Reconoce</a></li>
 	    <li><a href="movilidad$VER.php">Movilidad</a></li>
-	    <li><a href="microcurriculos$VER.php">Cursos</a></li>
 	    <li><a href="comisiones$VER.php">Comisiones</a></li>
+	    <li><a href="microcurriculos$VER.php">Cursos</a></li>
+            <li><a href="usuarios$VER.php?urlref=$urlref">Usuario</a></li>
 
 	  </ul>
         </div>
@@ -1001,6 +1047,8 @@ function getFooter()
 {
   global $_SERVER,$NOMBRE,$QPERMISO,$PERMISOS;
   $permiso=$PERMISOS["$QPERMISO"];
+  $cerrar="<a href='actions$VER.php?action=Cerrar'>Cerrar sesión</a>";
+
 $filetime=date(DATE_RFC2822,filemtime($_SERVER["SCRIPT_FILENAME"]));
 $footer=<<<M
 <div id="blank"></div>
@@ -1008,10 +1056,10 @@ $footer=<<<M
   <section id="footer_bottom">
     <div class="grupo tablet-tabla" style="font-size:0.8em;font-style:italic;padding:20px">
       <span class="level1">
-	Esta conectado como <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso)<br/>
+  Esta conectado como <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso), $cerrar<br/>
       </span>
       Última actualización: $filetime - 
-      Desarrollado por <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2016
+      Desarrollado por <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2017
     </div>
   </section>
 </footer>
@@ -1327,4 +1375,141 @@ foreach($out as $institutov){
 }
 
 $RANDOMMODE=generateRandomString(100);
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//TRAIDO DEL LIBRARY DE COMISIONES
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if(preg_match("/comisiones/",$SCRIPTNAME)){
+if(!$QTEST){
+$DESTINATARIOS_CUMPLIDOS=array(
+   array("Secretaria del Decanato","Luz Mary Castro","luz.castro@udea.edu.co"),
+   array("Secretaria del CIEN","Ana Catalina Fernández","ana.fernandez@udea.edu.co"),
+   array("Programa de Extensión","Natalia López","njlopez76@gmail.com"),
+   array("Fondo de Pasajes Internacionales","Mauricio Toro","fondosinvestigacion@udea.edu.co"),
+   array("Vicerrectoria de Investigación","Mauricio Toro","tramitesinvestigacion@udea.edu.co"),
+   array("Centro de Investigaciones SIU","Ana Eugenia","aeugenia.restrepo@udea.edu.co"),
+   array("Fondos de Vicerrectoría de Docencia","Sandra Monsalve","programacionacademica@udea.edu.co")
+);
+}else{
+$DESTINATARIOS_CUMPLIDOS=array(
+   array("Secretaria del Decanato","Luz Mary Castro","pregradofisica@udea.edu.co"),
+   array("Secretaria del CIEN","Maricela Botero","zuluagajorge@gmail.com"),
+   array("Programa de Extensión","Natalia López","astronomia.udea@gmail.com"),
+   array("Fondo de Pasajes Internacionales","Mauricio Toro","jorge.zuluaga@udea.edu.co"),
+   array("Vicerrectoria de Investigación","Mauricio Toro","newton@udea.edu.co"),
+   array("Centro de Investigaciones SIU","Ana Eugenia","newton@udea.edu.co"),
+   array("Fondos de Vicerrectoría de Docencia","Sandra Perez","newton@udea.edu.co")
+);
+}
+
+////////////////////////////////////////////////////////////////////////
+//BASIC VARIABLES
+////////////////////////////////////////////////////////////////////////
+$qerror=0;
+$inputform=1;
+$qinfousuario=1;
+$qblocksite=0;
+$bodycolor="white";
+$error="";
+$foot="";
+
+//BASIC PERMISSION
+$qperm=0;
+$qmant=0;
+
+//CHECK MAINTAINANCE
+$out=array_search($usercedula,$MAINTAINANCE);
+if(!isBlank($out)){
+  $qmant=1;
+}
+//CHECK DIRECTOR
+$out=array_search($usercedula,$DIRECTORS);
+if(!isBlank($out)){
+  $qperm=1;
+}
+//CHECK SECRETARIA
+$out=array_search($usercedula,$SECRETARIAS);
+if(!isBlank($out)){
+  $qperm=-1;
+  if($usercedula==$SECRETARIAS["decanatura"]){
+    $qperm=-2;
+  }
+}
+//CHECK DEAN
+if($usercedula==$DIRECTORS["decanatura"] or
+   $qmant){
+  $qperm=2;
+  if($qmant){
+    $bodycolor="#ccffcc";
+  }
+}
+if($QMAINTAINANCE and $qperm<2){
+  $qblocksite=1;
+}
+//$qblocksite=1;//Uncomment to force maintainance mode
+
+if($qperm==1 and $bodycolor=="white"){$bodycolor="#6699CC";}
+if($qperm==2 and $bodycolor=="white"){$bodycolor="#CCFF99";}
+if($qperm==-2 and $bodycolor=="white"){$bodycolor="#ffe6cc";}
+
+if(!$QTEST){
+  $bodycolor="white"; //Decomente para codificar con color
+}
+
+////////////////////////////////////////////////////////////////////////
+//GLOBAL ACTIONS
+////////////////////////////////////////////////////////////////////////
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//DATABASE CONNECTION
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$DB=mysqli_connect("localhost",$USER,$PASSWORD,$DATABASE);
+$result=mysqlCmd("select now();",$qout=0,$qlog=0);
+$DATE=$result[0];
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//FIELDS OF COMISIONES
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$columns=mysqlCmd("show columns from Comisiones;",$qout=1,$qlog=0);
+$ncolumns=count($columns);
+$FIELDS_COMISIONES=array();
+for($i=0;$i<$ncolumns;$i++){
+  $column=$columns[$i];
+  array_push($FIELDS_COMISIONES,$column["Field"]);
+}
+//print_r($FIELDS_COMISIONES);echo "<br/>";
+
+$columns=mysqlCmd("show columns from Profesores;",$qout=1,$qlog=0);
+$ncolumns=count($columns);
+$FIELDS_PROFESORES=array();
+for($i=0;$i<$ncolumns;$i++){
+  $column=$columns[$i];
+  array_push($FIELDS_PROFESORES,$column["Field"]);
+}
+//print_r($FIELDS_PROFESORES);echo "<br/>";
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//CEDULA DECANO
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$out=mysqlCmd("select cedulajefe,institutoid from Institutos",$qout=1);
+$DIRECTORS=array();
+foreach($out as $instituto){
+  $DIRECTORS[$instituto["institutoid"]]=$instituto["cedulajefe"];
+}
+$out=mysqlCmd("select cedula,institutoid from Profesores where tipo='Secretaria'",$qout=1);
+$SECRETARIAS=array();
+foreach($out as $instituto){
+  $SECRETARIAS[$instituto["institutoid"]]=$instituto["cedula"];
+}
+
+////////////////////////////////////////////////////////////////////////
+//BROWSING LINKS
+////////////////////////////////////////////////////////////////////////
+$browsing_help=<<<H
+H;
+
+//FIN DE CONTENIDO SI ES COMISIONES
+}
+setlocale(LC_TIME,"es_ES.UTF-8");
 ?>
