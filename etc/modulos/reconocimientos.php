@@ -1,0 +1,16 @@
+<?php
+////////////////////////////////////////////////////////////////////////
+//RECONOCIMIENTOS
+////////////////////////////////////////////////////////////////////////
+$RECON_ESTADO=array(
+		    "Solicitado",
+		    "Revisado",
+		    "Aprobado",
+		    "Editado",
+		    "Rechazado",
+		    "Entregado",
+		    "Confirmado",
+		    );
+
+$RECON_DIR="data/recon";
+?>
