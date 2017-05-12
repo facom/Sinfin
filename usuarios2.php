@@ -8,6 +8,7 @@ $HOST=$_SERVER["HTTP_HOST"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
 require("$ROOTDIR/etc/library2.php");
+require("$ROOTDIR/etc/modulos/usuarios.php");
 
 ////////////////////////////////////////////////////////////////////////
 //INITIALIZATION
@@ -22,6 +23,7 @@ $content.=getMainMenu();
 ////////////////////////////////////////////////////////////////////////
 $submenu.=<<<M
   <li><a href="usuarios$VER.php?">Inicio</a></li>
+  <li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
   <li><a href="usuarios$VER.php?mode=nuevo">Nuevo</a></li>
 M;
 $content.=getSubMenu($submenu);
@@ -51,24 +53,40 @@ if(isset($action)){
 	goto endaction;
       }
     }
+
     $results=mysqlCmd("select * from Usuarios where email='$email'");
     $spass=$results["password"];
-    $mpass=md5($pass);
-    if($mpass!=$spass and $pass=!$spass){
+    if($pass!=$spass){
       errorMsg("Fallo en la autenticación");
       goto endaction;
     }
 
     //CHANGE
     if(strlen($ERRORS)==0){
-      if(!isBlank($pass1)){$npass=md5($pass1);}
+      $qpass=0;
+      if(!isBlank($pass1)){
+	$qpass=1;
+	$npass=md5($pass1);
+      }
       else{$npass=$spass;}
-      $sql="update Usuarios set password='$npass',email='$email',nombre='$nombre',tipo='$tipo',documento='$documento' where email='$email'";
-      //echo "SQL:$sql<br/>";
-      mysqlCmd($sql);
-      statusMsg("Información modificada. Conéctese de nuevo.");
-      unset($mode);
-      header("Refresh:1;url=$SITEURL/actions$VER.php?action=Cerrar");
+      insertSql("Usuarios",array("documento"=>"",
+				 "email"=>"",
+				 "password"=>"npass",
+				 "tipo"=>"",
+				 "permisos"=>"",
+				 "dependenciaid"=>"",
+				 "cargo"=>"",
+				 "dedicacion"=>""
+				 )
+		);
+      statusMsg("Información modificada.");
+      if($qpass){
+	unset($mode);
+	$urlpass="$SITEURL/actions$VER.php?action=Cerrar";
+      }else{
+	$urlpass="$SITEURL/index$VER.php";
+      }
+      header("Refresh:1;url=$urlpass");
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -354,28 +372,29 @@ C;
 
 $content.=<<<C
 <form>
-<center>
-<h3>Nuevo usuario</h3>
+<h4>Nuevo usuario</h4>
 <input type="hidden" name="mode" value="nuevo">
 <style>
 td{
 padding:10px;
 }
 </style>
-<table width="30%">
+<table>
 <tr>
   <td>Nombre:</td>
   <td><input type="text" name="nombre" placeholder="Nombre completo" value="$nombre"></td>
 </tr>
+<tr><td colspan=2><i style="color:green">Ponga sus dos nombres y apellidos.  Use mayúsculas sostenidas</i></td></tr>
 <tr>
   <td>Documento:</td>
   <td><input type="text" name="documento" placeholder="66666666" value="$documento"></td>
 </tr>
+<tr><td colspan=2><i style="color:green">Evite el uso de puntos o comas</i></td></tr>
 <tr>
   <td>E-mail:</td>
   <td><input type="text" name="email" placeholder="Su e-mail" value="$email"></td>
 </tr>
-<tr><td colspan=2><i style="color:red;font-size:0.8em">Algunos servicios pueden estar solo disponibles para usuarios con correo institucional (udea.edu.co)</i></td></tr>
+<tr><td colspan=2><i style="color:red;font-size:0.8em">No puede modificarse después de creada la cuenta.  Algunos servicios pueden estar solo disponibles para usuarios con correo institucional (udea.edu.co)</i></td></tr>
 <tr>
   <td>Password:</td>
   <td><input type="password" name="password" placeholder="Su password"></td>
@@ -386,7 +405,6 @@ padding:10px;
   </td>
 </tr>
 </table>
-</center>
 </form>
 C;
   }
@@ -424,34 +442,81 @@ C;
     $nombre=$results["nombre"];
     $documento=$results["documento"];
     $tipo=$results["tipo"];
-    $spass=$results["password"];
-    $tiposel=generateSelection($TIPOS,"tipo",$tipo);
+    $dependenciaid=$results["dependenciaid"];
+    $cargo=$results["cargo"];
+    $permisos=$results["permisos"];
+    $dedicacion=$results["dedicacion"];
+    $DEPURACION.="<p>Tipo:$tipo</p>";
+
+    if($QPERMISO<5){
+      $tiposel=$TIPOS["$tipo"]."<input type=hidden name='tipo' value='$tipo'";
+      $dependenciasel=$DEPENDENCIAS["$dependenciaid"]."<input type='hidden' name='dependenciaid' value='$dependenciaid'>";
+      $cargotxt=$cargo;
+      if(isBlank($cargo)) $cargotxt="(no asignado)";
+      $cargosel="$cargotxt<input type=hidden name=cargo value='$cargo'>";
+      $permisosel=$PERMISOS["$permisos"]."<input type=hidden name='permisos' value='$permisos'>";
+      $dedicacionsel="$dedicacion<input type=hidden name='dedicacion' value='$dedicacion'>";
+    }else{
+      $tiposel=generateSelection($TIPOS,"tipo",$tipo);
+      $dependenciasel=generateSelection($DEPENDENCIAS,"dependenciaid",$dependenciaid);
+      $cargosel="<input type=text name=cargo value='$cargo'>";
+      $permisosel=generateSelection($PERMISOS,"permisos",$permisos);
+      $dedicacionsel=generateSelection($SINO,"dedicacion",$dedicacion);
+    }
 
     if($pass==$spass){
 $content.=<<<C
 $FORM
-<h3>Cambio de Información para $nombre</h3>
-<table>
+<h4>Cambio de Información para $nombre</h4>
+<input type="hidden" name="pass" value="$pass">
+<input type="hidden" name="spass" value="$spass">
+<style>
+td{
+padding:10px;
+}
+tr.help{
+ color:green;
+  font-size:0.8em;
+}
+</style>
+<table width="50%">
 <tr>
   <td>Nombre:</td>
   <td><input name="nombre" value="$nombre"></td>
 </tr>
+<tr class="help"><td colspan=2><i>Ponga sus dos nombres y apellidos.  Use mayúsculas sostenidas</i></td></tr>
 <tr>
   <td>Documento:</td>
   <td><input name="documento" value="$documento"></td>
 </tr>
+<tr class="help"><td colspan=2><i>Evite el uso de puntos o comas</i></td></tr>
 <tr>
   <td>Tipo:</td>
   <td>$tiposel</td>
 </tr>
 <tr>
+  <td>Dependencia:</td>
+  <td>$dependenciasel</td>
+</tr>
+<tr>
+  <td>Cargo:</td>
+  <td>$cargosel</td>
+</tr>
+<tr class="help"><td colspan=2><i>Minúscula sostenidas. Formado por dos partes: responsabilidad dependencia. responsabilidad es decano, vicedecano, director, coordinador, secretario</i></td></tr>
+<tr>
+    <td>Dedicación exclusiva:</td>
+  <td>$dedicacionsel</td>
+</tr>
+<tr class="help"><td colspan=2><i>Solo aplica en el caso de profesores vinculados</i></td></tr>
+<tr>
+  <td>Permisos:</td>
+  <td>$permisosel</td>
+</tr>
+<tr>
   <td>E-mail:</td>
   <td><input name="email" value="$email" readonly></td>
 </tr>
-<tr>
-  <td>Contraseña actual:</td>
-  <td><input type="password" name="pass" placeholder="Su contraseña actual" value="$pass"></td>
-</tr>
+<tr class="help"><td colspan=2><i style="color:red">No puede modificarse después de creada la cuenta</i></td></tr>
 <tr>
 <td colspan=2>
 <a href="JavaScript:void(null)" onclick="$('.newpass').toggle()">Click para cambiar también su contraseña</a>

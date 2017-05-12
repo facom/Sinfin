@@ -358,11 +358,13 @@ M;
 //SUBMENU
 ////////////////////////////////////////////////////////////////////////
 $submenu.=<<<M
-  <li><a href="movilidad$VER.php?">Inicio</a></li>
-  <li><a href="movilidad$VER.php#terminos">Términos</a></li>
-  <li><a href="movilidad$VER.php#videotutorial">Videotutorial</a></li>
-  <li class="level1"><a href="movilidad$VER.php?mode=editar">Nueva Solicitud</a></li>
-  <li class="level1"><a href="movilidad$VER.php?mode=lista">Seguimiento a Solicitudes</a></li>
+<li><a href="movilidad$VER.php?">Inicio</a></li>
+<li><a href="movilidad$VER.php#terminos">Términos</a></li>
+<li><a href="movilidad$VER.php#videotutorial">Videotutorial</a></li>
+<li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
+<li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
+<li class="level1"><a href="movilidad$VER.php?mode=editar">Nueva Solicitud</a></li>
+<li class="level1"><a href="movilidad$VER.php?mode=lista">Seguimiento a Solicitudes</a></li>
 M;
 $content.=getSubMenu($submenu);
 $content.=getBody(100);
@@ -835,6 +837,7 @@ if(!isset($mode)){
   //PRINCIPAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
+<h3>Bolsa de Movilidad Estudiantil</h3>
 <p>
 El Consejo de la Facultad de Ciencias Exactas y Naturales en
 su <b>Acta 01 del 20 de enero de 2016</b>, aprobó la creación de una
@@ -844,7 +847,7 @@ hacer seguimiento a las solicitudes presentadas.
 </p>
 
 <a name="terminos"></a>
-<h3>Términos de la bolsa</h3>
+<h4>Términos de la bolsa</h4>
   <p  style=" margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-style: normal; font-variant: normal; font-weight: normal; font-size: 14px; line-height: normal; font-size-adjust: none; font-stretch: normal; -x-system-font: none; display: block;">   <a title="View Terminos Bolsa Movilidad on Scribd" href="https://es.scribd.com/doc/300665984/Terminos-Bolsa-Movilidad"  style="text-decoration: underline;" >Terminos Bolsa Movilidad</a> by <a title="View CienciasExactas's profile on Scribd" href="https://www.scribd.com/user/263978519/CienciasExactas"  style="text-decoration: underline;" >CienciasExactas</a></p><iframe class="scribd_iframe_embed" src="https://www.scribd.com/embeds/322568452/content?start_page=1&view_mode=scroll&access_key=key-8fciFithk7iPfeOmRapd&show_recommendations=true" data-auto-height="false" data-aspect-ratio="0.7729220222793488" scrolling="no" id="doc_59161" width="100%" height="600" frameborder="0"></iframe>
 
 <a name="videotutorial"></a>

@@ -21,6 +21,8 @@ $content.=getMainMenu();
 //SUBMENU
 ////////////////////////////////////////////////////////////////////////
 $submenu.=<<<M
+<li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
+<li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
 M;
 $content.=getSubMenu($submenu);
 
@@ -29,11 +31,13 @@ $content.=getSubMenu($submenu);
 ////////////////////////////////////////////////////////////////////////
 $content.=getBody(100);
 $content.=<<<C
+<h3>Ayuda</h3>
+
 <p>
 Encuentre aquí ayuda (guías básicas, manuales, videotutoriales) sobre
 el uso de la información y servicios de $SINFIN.
 </p>
-<h3>Video tutoriales</h3>
+<h4>Video tutoriales</h4>
 
 <p>
 A continuación encontrará guías en video al uso de la plataforma

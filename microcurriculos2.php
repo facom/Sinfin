@@ -21,6 +21,7 @@ $content.=getMainMenu();
 //SUBMENU
 ////////////////////////////////////////////////////////////////////////
 $submenu=<<<M
+<li class="level0"><a href="microcurriculos$VER.php?">Inicio</a></li>
 <li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
 <li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
 M;
@@ -29,35 +30,15 @@ $content.=getSubMenu($submenu);
 ////////////////////////////////////////////////////////////////////////
 //BODY
 ////////////////////////////////////////////////////////////////////////
-$content.=getBody(60);
+$content.=getBody(100);
 $content.=<<<C
 
-<h3>Bienvenidos a SInfIn</h3>
+<h3>Planes de Asignatura</h3>
 
 <p>
-El <b>Sistema de Información Curricular Integrada (SInfIn)</b> es una
-plataforma de información y servicios de la <b>Facultad de
-Ciencias Exactas y Naturales</b> (FCEN) desarrollada con el propósito
-de complementar los sistemas de información y aplicaciones de la
-Universidad.
+Este es el módulo de consulta y edición de planes de asignatura.
 </p>
 
-<p>
-La información más importante que reposa en $SINFIN tiene que ver con
-los programas académicos que ofrece la FCEN, planes de estudio, planes
-de asignatura, programación académica, entre otras.
-</p>
-
-<p>
-Adicionalmente $SINFIN ofrece acceso a información y aplicaciones de
-especialmente dirigidos a los estudiantes, profesores y empleados de
-la Facultad.
-</p>
-
-<p class="level0" style="color:blue">
-Para acceder debe registrarse y crear una cuenta de usuario o usar una
-cuenta existente.
-</p>
 C;
 $content.=endBody();
 
@@ -66,9 +47,6 @@ $content.=endBody();
 ////////////////////////////////////////////////////////////////////////
 $content.=getLateral(40);
 $content.=<<<C
-<div style="width:100%;height:40vh;">
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/zBa1tM4j7MI" frameborder="0" allowfullscreen></iframe>
-</div>
 C;
 $content.=endLateral();
 

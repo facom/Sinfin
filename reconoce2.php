@@ -21,6 +21,8 @@ $content.=getMainMenu();
 ////////////////////////////////////////////////////////////////////////
 $submenu.=<<<M
 <li><a href="reconoce$VER.php?">Inicio</a></li>
+<li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
+<li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
 <li class="level1"><a href="reconoce$VER.php?mode=lista">Lista</a></li>
 <li class="level1"><a href="reconoce$VER.php?mode=edit&action=common">Nuevo</a></li>
 M;
@@ -539,6 +541,7 @@ if(!isset($mode)){
   //PRINCIPAL
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $content.=<<<C
+<h3>Solicitud de Reconocimientos</h3>
   <p>Este es el módulo de reconocimientos de $SINFIN.  Por
   reconocimiento entendemos el procedimiento en el que una o varias
   asignaturas que fueron matriculadas o aprobadas por un estudiante en

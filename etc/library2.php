@@ -4,16 +4,36 @@
 //BIBLIOTECAS EXTERNAS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 require "lib/PHPMailer/PHPMailerAutoload.php";
 session_start();
 header("Content-Type: text/html;charset=UTF-8");
+$DEPURACION="";
+
+////////////////////////////////////////////////////////////////////////
+//HOST 
+////////////////////////////////////////////////////////////////////////
+$HOST=$_SERVER["HTTP_HOST"];
+$FILENAME=$_SERVER["SCRIPT_NAME"];
+$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
+$BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
+$SITEURL="http://$HOST$BASEDIR/";
+$URL=$SITEURL;
+if(isset($_SERVER["HTTP_REFERER"])){
+  $REFERER=$_SERVER["HTTP_REFERER"];
+}else{
+  $REFERER=$SITEURL;
+}
+$QTEST=0;
+if($HOST=="localhost"){$QTEST=1;}
+//MODO DE CORREO
+$QOVER=0; //1 para obligar a enviar correo cuando esta en test
+setlocale(LC_TIME,"es_ES.UTF-8");
+$urlref=urlencode($_SERVER["REQUEST_URI"]);
 
 ////////////////////////////////////////////////////////////////////////
 //CONFIGURACION
 ////////////////////////////////////////////////////////////////////////
 require "etc/configuration.php";
-//echo "Usuario:".$_SESSION["nombre"];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,21 +61,6 @@ $EHEADERS.="MIME-Version: 1.0\r\n";
 $EHEADERS.="MIME-Version: 1.0\r\n";
 $EHEADERS.="Content-type: text/html\r\n";
 $FORM="<form method='post' enctype='multipart/form-data' accept-charset='utf-8'>";
-
-////////////////////////////////////////////////////////////////////////
-//HOST 
-////////////////////////////////////////////////////////////////////////
-$HOST=$_SERVER["HTTP_HOST"];
-$FILENAME=$_SERVER["SCRIPT_NAME"];
-$SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
-$BASEDIR=rtrim(shell_exec("dirname $FILENAME"));
-$SITEURL="http://$HOST$BASEDIR/";
-$URL=$SITEURL;
-if(isset($_SERVER["HTTP_REFERER"])){
-  $REFERER=$_SERVER["HTTP_REFERER"];
-}else{
-  $REFERER=$SITEURL;
-}
 
 ////////////////////////////////////////////////////////////////////////
 //GLOBAL VARIABLES
@@ -115,6 +120,19 @@ for($i=1;$i<=4;$i++){
 }
 $PERMCSS.=".level5{display:none;}\n.nolevel5{display:$type;}\n";
 
+////////////////////////////////////////////////////////////////////////
+//DEPURACION
+////////////////////////////////////////////////////////////////////////
+$DEPURACION="";
+$DEPURACION.="<p>Session:".print_r($_SESSION,true)."</p>";
+$DEPURACION.="<p>Usuario:".$_SESSION["nombre"]."</p>";
+$DEPURACION.=<<<D
+  <p>
+  Permiso: $QPERMISO<br/>
+  Parametros: $PARAMETROS
+  </p>
+D;
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //LISTAS
@@ -125,11 +143,13 @@ $PERMCSS.=".level5{display:none;}\n.nolevel5{display:$type;}\n";
 //GENERALES
 ////////////////////////////////////////////////////////////////////////
 $PERMISOS=array(
-		"0"=>"Visitante",
-		"1"=>"Estudiante",
-		"2"=>"Profesor",
-		"3"=>"Coordinador",
-		"4"=>"Administrador",
+		"0"=>"Anonimo",
+		"1"=>"Visitante",
+		"2"=>"Estudiante",
+		"3"=>"Catedra",
+		"4"=>"Profesor/Empleado",
+		"5"=>"Coordinador/Secretaria",
+		"6"=>"Superusuario",
 		);
 
 $SINO=array("No"=>"No","Si"=>"Si");
@@ -146,7 +166,9 @@ $TIPOS=array(
 	     "VISITANTE"=>"Profesor Visitante",
 	     "SECRETARIA"=>"Secretaria",
 	     "EMPLEADO"=>"Empleado",
-	     "ESTUDIANTE"=>"Estudiante"
+	     "ESTUDIANTE"=>"Estudiante",
+	     "COORDINADOR"=>"Coordinador",
+	     "EXTERNO"=>"Usuario externo"
 	     );
 
 //Tipos de documento de identidad
@@ -157,173 +179,11 @@ $TIPOSID=array(
 	       "tarjeta"=>"Tarjeta"
 	       );
 
-////////////////////////////////////////////////////////////////////////
-//COMISIONES
-////////////////////////////////////////////////////////////////////////
-$COM_TIPOS=array(
-		 "servicios"=>"Comisión de Servicios",
-		 "estudio"=>"Comisión de Estudios",	
-		 "noremunerada"=>"Permiso",
-		 );
-
-$COM_HELP=array(
-		"tipoid"=>"cedula,ce,pasaporte",
-		"nombre"=>"NOMBRES APELLIDOS",
-		"tipo"=>"Vinculado, Ocasional, Visitante, Empleado",
-		"institutoid"=>"fisica, quimica, biologia, matematicas, decanatura",
-		"dedicacion"=>"Si, No",
-		);
-
-$COM_ESTADOS=array(
-		   "solicitada"=>"Solicitada",
-		   "devuelta"=>"Devuelta",
-		   "vistobueno"=>"Visto Bueno Director",
-		   "aprobada"=>"Aprobada por Decano"
-		   );
-
-$COM_COLORS=array(
-		  "solicitada"=>"#FFFF99",
-		  "solicitada_noremunerada"=>"#FFCC99",
-		  "vistobueno"=>"#99CCFF",
-		  "vistobueno_noremunerada"=>"#99CCFF",
-		  "devuelta"=>"#FF99FF",
-		  "devuelta_noremunerada"=>"#FF99FF",
-		  "aprobada"=>"#00CC99",
-		  "aprobada_noremunerada"=>"#33CCCC"	
-		  );
-
-$COM_TEXTS=array(
-		 "presentacion","respuesta",
-		 );
-
-$COM_COLOR=array(
-		 "solicitada"=>"#FFFF99",
-		 "solicitada_noremunerada"=>"#FFCC99",
-		 "vistobueno"=>"#99CCFF",
-		 "vistobueno_noremunerada"=>"#99CCFF",
-		 "devuelta"=>"#FF99FF",
-		 "devuelta_noremunerada"=>"#FF99FF",
-		 "aprobada"=>"#00CC99",
-		 "aprobada_noremunerada"=>"#33CCCC",
-		 "cumplida"=>"lightgray",
-		 );
-
-$COM_DIR="data/comisiones";
-
-////////////////////////////////////////////////////////////////////////
-//MICROCURRICULOS
-////////////////////////////////////////////////////////////////////////
-$MIC_DIR="data/microcurriculos";
-
-////////////////////////////////////////////////////////////////////////
-//RECONOCIMIENTOS
-////////////////////////////////////////////////////////////////////////
-$RECON_ESTADO=array(
-		    "Solicitado",
-		    "Revisado",
-		    "Aprobado",
-		    "Editado",
-		    "Rechazado",
-		    "Entregado",
-		    "Confirmado",
-		    );
-
-$RECON_DIR="data/recon";
-
-
-////////////////////////////////////////////////////////////////////////
-//MOVILIDAD
-////////////////////////////////////////////////////////////////////////
-$MOV_TIPO=array(
-		"pasantia"=>"Pasantía",
-		"evento"=>"Evento académico",
-		);
-
-$MOV_DURACION=array(
-		    "corto"=>"Corta duración (1 a 7 días)",
-		    "largo"=>"Larga duración (8 a 35 días)",
-		    "prolongado"=>"Prolongado (mayor o igual a 35 días)",
-		    );
-
-$MOV_LUGAR=array(
-		 "colombia"=>"Colombia",
-		 "andino"=>"Pacto andino, centro américa o el Caribe",
-		 "resto"=>"Resto del mundo incluyendo México",
-		 );
-
-$MOV_APOYOS=array(
-		  "nalcorto"=>"Nacional Corto",
-		  "nallargo"=>"Nacional Largo",
-		  "nalprolongado"=>"Nacional Prolongado",
-		  "andinocorto"=>"Andino Corto",
-		  "andinolargo"=>"Andino Largo",
-		  "andinoprolongado"=>"Andino Prolongado",
-		  "internalcorto"=>"Internacional Corto",
-		  "internallargo"=>"Internacional Largo",
-		  "internalprolongado"=>"Internacional Prolongado",
-		  );
-
-$MOV_ESTADOS=array("nueva"=>"Nueva solicitud",
-	       "guardada"=>"Guardada",
-	       "pendiente_apoyo"=>"Pendiente confirmación profesor",
-	       "pendiente_aprobacion"=>"Pendiente aprobación FCEN",
-	       "aprobada"=>"Aprobada",
-	       "devuelta"=>"Devuelta",
-	       "realizada"=>"Realizada",
-	       "cumplida"=>"Cumplida",
-	       "rechazada"=>"Rechazada",
-	       "terminada"=>"Terminada");
-
-$MOV_ESTADOS_COLOR=array("nueva"=>"white",
-		     "guardada"=>"#ffffcc",
-		     "pendiente_apoyo"=>"#ccffff",
-		     "pendiente_aprobacion"=>"#99ccff",
-		     "aprobada"=>"yellow",
-		     "devuelta"=>"#ffccff",
-		     "realizada"=>"#d1d1e0",
-		     "cumplida"=>"#ffcccc",
-		     "rechazada"=>"#ff6666",
-		     "terminada"=>"#99ff99");
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//LISTAS
+//RUTINAS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-//%%%%%%%%%%%%%%%%%%%%
-//TEST SITE
-//%%%%%%%%%%%%%%%%%%%%
-//CHECK IF THIS IS THE MAIN SITE OR THE TEST SITE
-$QTEST=0;
-if($HOST=="localhost"){$QTEST=1;}
-//$QTEST=0; //Descomente para obligar que sea servidor
-
-//MAIL MODE
-$QOVER=0; //1 para obligar a enviar correo cuando esta en test
-
-////////////////////////////////////////////////////////////////////////
-//ACTIVIDADES
-////////////////////////////////////////////////////////////////////////
-$TIPOS_ACTIVIDAD=array(
-   "seminario"=>"Seminario",
-   "divulgacion"=>"Actividad divulgativa",
-   "reunion"=>"Reunión comunidad",
-   "clubrevistas"=>"Club de Revistas"
-		       );
-
-
-////////////////////////////////////////////////////////////////////////
-//GLOBAL VARIABLES
-////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-//ROUTINES
-////////////////////////////////////////////////////////////////////////
 function isBlank($string)
 {
   if(!preg_match("/\w+/",$string)){return 1;}
@@ -911,7 +771,7 @@ $header=<<<H
   <script src="lib/jquery-ui/jquery-ui.min.js"></script>
   <script src="lib/jquery-ui/moment.min-locales.js"></script>
   <script src="lib/daterangepicker/jquery.comiseo.daterangepicker.js"></script>
-  <script src="js/sinfin.js"></script>
+  <script src="js/sinfin$VER.js"></script>
   $style
   
   <script>
@@ -965,8 +825,10 @@ H;
 
 function getMainMenu()
 {
-  global $VER;
+  global $VER,$GLOBALS;
   $urlref=urlencode($_SERVER["REQUEST_URI"]);
+  $urluser="email=".$GLOBALS["EMAIL"]."&pass=".$GLOBALS["PASS"];
+  
 $menu=<<<M
   <div class="grupo">
       <div class="caja web-100 movil-100"> 
@@ -976,12 +838,11 @@ $menu=<<<M
 
 	    <li><a href="index$VER.php">Principal</a></li>
 	    <li><a href="ayuda$VER.php">Ayuda</a></li>
-	    <li class="level0"><a href="usuarios$VER.php?urlref=$urlref">Conectarse</a></li>
-	    <li><a href="reconoce$VER.php">Reconoce</a></li>
+	    <li><a href="reconoce$VER.php">Reconocimientos</a></li>
 	    <li><a href="movilidad$VER.php">Movilidad</a></li>
 	    <li><a href="comisiones$VER.php">Comisiones</a></li>
 	    <li><a href="microcurriculos$VER.php">Cursos</a></li>
-            <li><a href="usuarios$VER.php?urlref=$urlref">Usuario</a></li>
+            <li class="level1"><a href="usuarios$VER.php?mode=cambiar&$urluser">Usuario</a></li>
 
 	  </ul>
         </div>
@@ -1043,11 +904,29 @@ E;
   return $end;
 }
 
+function getDepuracion()
+{
+  global $QDEPURACION,$QPERMISO,$DEPURACION;
+  if(!$QDEPURACION or $QPERMISO<4) return "";
+$depuracion=<<<D
+<div style="background:lightgray;padding:10px;">
+  <div style="background:black;color:white;padding:10px;">
+    Depuracion
+  </div>
+  <p>
+  $DEPURACION
+  </p>
+</div>
+D;
+ return $depuracion;
+}
+
 function getFooter()
 {
-  global $_SERVER,$NOMBRE,$QPERMISO,$PERMISOS;
+  global $_SERVER,$NOMBRE,$QPERMISO,$PERMISOS,$DEPURACION,$VER;
   $permiso=$PERMISOS["$QPERMISO"];
   $cerrar="<a href='actions$VER.php?action=Cerrar'>Cerrar sesión</a>";
+  $depuracion=getDepuracion();
 
 $filetime=date(DATE_RFC2822,filemtime($_SERVER["SCRIPT_FILENAME"]));
 $footer=<<<M
@@ -1056,7 +935,7 @@ $footer=<<<M
   <section id="footer_bottom">
     <div class="grupo tablet-tabla" style="font-size:0.8em;font-style:italic;padding:20px">
       <span class="level1">
-  Esta conectado como <a href="usuarios.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso), $cerrar<br/>
+  Esta conectado como <a href="usuarios$VER.php?mode=cambiar"><b>$NOMBRE</b></a> ($permiso), $cerrar<br/>
       </span>
       Última actualización: $filetime - 
       Desarrollado por <a href=mailto:jorge.zuluaga@udea.edu.co>Jorge I. Zuluaga</a> (C) 2017
@@ -1086,7 +965,7 @@ $footer=<<<M
     </div>
   </div>
 </section>
-
+$depuracion
 <script src="lib/jquery-ui/jquery.min.js"></script>
 <script type="text/javascript" src="js/template.js"></script>
 
@@ -1128,13 +1007,14 @@ function readRecon($recfile){
 
 function insertSql($table,$mapfields)
 {
-  global $GLOBALS;
+  global $GLOBALS,$DEPURACION;
   foreach(array_keys($GLOBALS) as $var){$$var=$GLOBALS["$var"];}
   
   $fields="(";
   $values="(";
   $udpate="";
   $i=0;
+  $DEPURACION.="<p>PASS:$password</p>";
   foreach(array_keys($mapfields) as $field){
     $nvalue=$mapfields["$field"];
     if($nvalue==""){$nvalue=$field;}
@@ -1148,7 +1028,7 @@ function insertSql($table,$mapfields)
   $values=rtrim($values,",").")";
   $update=rtrim($update,",");
   $sql="insert into $table $fields values $values on duplicate key update $update";
-  //echo "SQL: $sql<br/>";
+  $DEPURACION.="<p>SQL: $sql</p>";
   $result=mysqlCmd($sql);
   return $result;
 }
@@ -1303,6 +1183,12 @@ function expandHomeDirectory($path) {
   return str_replace('~', realpath($homeDirectory), $path);
 }
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//ACCIONES GLOBALES
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 ////////////////////////////////////////////////////////////////////////
 //CONNECT TO DATABASE
 ////////////////////////////////////////////////////////////////////////
@@ -1314,202 +1200,7 @@ $DATE=$result[0];
 $DATE_ARRAY=preg_split("/ /",$DATE);
 
 ////////////////////////////////////////////////////////////////////////
-//TABLE FIELDS
+//RANDOM
 ////////////////////////////////////////////////////////////////////////
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//MOVILIDAD
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$results=mysqlCmd("describe Movilidad;",$qout=1);
-$MOVILIDAD_FIELDS=array();
-foreach($results as $field){
-  $fieldname=$field[0];
-  $MOVILIDAD_FIELDS["$fieldname"]=$fieldname;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//COMACA
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$results=mysqlCmd("describe Actividades;",$qout=1);
-$ACTIVIDADES_FIELDS=array();
-foreach($results as $field){
-  $fieldname=$field[0];
-  $ACTIVIDADES_FIELDS["$fieldname"]=$fieldname;
-}
-
-$results=mysqlCmd("describe Boletas;",$qout=1);
-$BOLETAS_FIELDS=array();
-foreach($results as $field){
-  $fieldname=$field[0];
-  $BOLETAS_FIELDS["$fieldname"]=$fieldname;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//COMISIONES
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$columns=mysqlCmd("show columns from Comisiones;",$qout=1,$qlog=0);
-$ncolumns=count($columns);
-$FIELDS_COMISIONES=array();
-for($i=0;$i<$ncolumns;$i++){
-  $column=$columns[$i];
-  array_push($FIELDS_COMISIONES,$column["Field"]);
-}
-
-$columns=mysqlCmd("show columns from Empleados;",$qout=1,$qlog=0);
-$ncolumns=count($columns);
-$FIELDS_PROFESORES=array();
-for($i=0;$i<$ncolumns;$i++){
-  $column=$columns[$i];
-  array_push($FIELDS_PROFESORES,$column["Field"]);
-}
-
-$out=mysqlCmd("select cedulajefe,institutoid from Institutos",$qout=1);
-$DIRECTORS=array();
-foreach($out as $institutov){
-  $DIRECTORS[$institutov["institutoid"]]=$institutov["cedulajefe"];
-}
-$out=mysqlCmd("select cedula,institutoid from Empleados where tipo='Secretaria'",$qout=1);
-$SECRETARIAS=array();
-foreach($out as $institutov){
-  $SECRETARIAS[$institutov["institutoid"]]=$institutov["cedula"];
-}
-
 $RANDOMMODE=generateRandomString(100);
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//TRAIDO DEL LIBRARY DE COMISIONES
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if(preg_match("/comisiones/",$SCRIPTNAME)){
-if(!$QTEST){
-$DESTINATARIOS_CUMPLIDOS=array(
-   array("Secretaria del Decanato","Luz Mary Castro","luz.castro@udea.edu.co"),
-   array("Secretaria del CIEN","Ana Catalina Fernández","ana.fernandez@udea.edu.co"),
-   array("Programa de Extensión","Natalia López","njlopez76@gmail.com"),
-   array("Fondo de Pasajes Internacionales","Mauricio Toro","fondosinvestigacion@udea.edu.co"),
-   array("Vicerrectoria de Investigación","Mauricio Toro","tramitesinvestigacion@udea.edu.co"),
-   array("Centro de Investigaciones SIU","Ana Eugenia","aeugenia.restrepo@udea.edu.co"),
-   array("Fondos de Vicerrectoría de Docencia","Sandra Monsalve","programacionacademica@udea.edu.co")
-);
-}else{
-$DESTINATARIOS_CUMPLIDOS=array(
-   array("Secretaria del Decanato","Luz Mary Castro","pregradofisica@udea.edu.co"),
-   array("Secretaria del CIEN","Maricela Botero","zuluagajorge@gmail.com"),
-   array("Programa de Extensión","Natalia López","astronomia.udea@gmail.com"),
-   array("Fondo de Pasajes Internacionales","Mauricio Toro","jorge.zuluaga@udea.edu.co"),
-   array("Vicerrectoria de Investigación","Mauricio Toro","newton@udea.edu.co"),
-   array("Centro de Investigaciones SIU","Ana Eugenia","newton@udea.edu.co"),
-   array("Fondos de Vicerrectoría de Docencia","Sandra Perez","newton@udea.edu.co")
-);
-}
-
-////////////////////////////////////////////////////////////////////////
-//BASIC VARIABLES
-////////////////////////////////////////////////////////////////////////
-$qerror=0;
-$inputform=1;
-$qinfousuario=1;
-$qblocksite=0;
-$bodycolor="white";
-$error="";
-$foot="";
-
-//BASIC PERMISSION
-$qperm=0;
-$qmant=0;
-
-//CHECK MAINTAINANCE
-$out=array_search($usercedula,$MAINTAINANCE);
-if(!isBlank($out)){
-  $qmant=1;
-}
-//CHECK DIRECTOR
-$out=array_search($usercedula,$DIRECTORS);
-if(!isBlank($out)){
-  $qperm=1;
-}
-//CHECK SECRETARIA
-$out=array_search($usercedula,$SECRETARIAS);
-if(!isBlank($out)){
-  $qperm=-1;
-  if($usercedula==$SECRETARIAS["decanatura"]){
-    $qperm=-2;
-  }
-}
-//CHECK DEAN
-if($usercedula==$DIRECTORS["decanatura"] or
-   $qmant){
-  $qperm=2;
-  if($qmant){
-    $bodycolor="#ccffcc";
-  }
-}
-if($QMAINTAINANCE and $qperm<2){
-  $qblocksite=1;
-}
-//$qblocksite=1;//Uncomment to force maintainance mode
-
-if($qperm==1 and $bodycolor=="white"){$bodycolor="#6699CC";}
-if($qperm==2 and $bodycolor=="white"){$bodycolor="#CCFF99";}
-if($qperm==-2 and $bodycolor=="white"){$bodycolor="#ffe6cc";}
-
-if(!$QTEST){
-  $bodycolor="white"; //Decomente para codificar con color
-}
-
-////////////////////////////////////////////////////////////////////////
-//GLOBAL ACTIONS
-////////////////////////////////////////////////////////////////////////
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//DATABASE CONNECTION
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$DB=mysqli_connect("localhost",$USER,$PASSWORD,$DATABASE);
-$result=mysqlCmd("select now();",$qout=0,$qlog=0);
-$DATE=$result[0];
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//FIELDS OF COMISIONES
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$columns=mysqlCmd("show columns from Comisiones;",$qout=1,$qlog=0);
-$ncolumns=count($columns);
-$FIELDS_COMISIONES=array();
-for($i=0;$i<$ncolumns;$i++){
-  $column=$columns[$i];
-  array_push($FIELDS_COMISIONES,$column["Field"]);
-}
-//print_r($FIELDS_COMISIONES);echo "<br/>";
-
-$columns=mysqlCmd("show columns from Profesores;",$qout=1,$qlog=0);
-$ncolumns=count($columns);
-$FIELDS_PROFESORES=array();
-for($i=0;$i<$ncolumns;$i++){
-  $column=$columns[$i];
-  array_push($FIELDS_PROFESORES,$column["Field"]);
-}
-//print_r($FIELDS_PROFESORES);echo "<br/>";
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//CEDULA DECANO
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$out=mysqlCmd("select cedulajefe,institutoid from Institutos",$qout=1);
-$DIRECTORS=array();
-foreach($out as $instituto){
-  $DIRECTORS[$instituto["institutoid"]]=$instituto["cedulajefe"];
-}
-$out=mysqlCmd("select cedula,institutoid from Profesores where tipo='Secretaria'",$qout=1);
-$SECRETARIAS=array();
-foreach($out as $instituto){
-  $SECRETARIAS[$instituto["institutoid"]]=$instituto["cedula"];
-}
-
-////////////////////////////////////////////////////////////////////////
-//BROWSING LINKS
-////////////////////////////////////////////////////////////////////////
-$browsing_help=<<<H
-H;
-
-//FIN DE CONTENIDO SI ES COMISIONES
-}
-setlocale(LC_TIME,"es_ES.UTF-8");
 ?>
