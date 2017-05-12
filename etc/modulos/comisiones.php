@@ -6,6 +6,7 @@ $COM_TIPOS=array(
 		 "servicios"=>"Comisión de Servicios",
 		 "estudio"=>"Comisión de Estudios",	
 		 "noremunerada"=>"Permiso",
+		 "calamidad"=>"Calamidad"
 		 );
 
 $COM_HELP=array(
@@ -20,7 +21,8 @@ $COM_ESTADOS=array(
 		   "solicitada"=>"Solicitada",
 		   "devuelta"=>"Devuelta",
 		   "vistobueno"=>"Visto Bueno Director",
-		   "aprobada"=>"Aprobada por Decano"
+		   "aprobada"=>"Aprobada por Decano",
+		   "cumplida"=>"Cumplido entregado",
 		   );
 
 $COM_COLORS=array(
@@ -31,7 +33,8 @@ $COM_COLORS=array(
 		  "devuelta"=>"#FF99FF",
 		  "devuelta_noremunerada"=>"#FF99FF",
 		  "aprobada"=>"#00CC99",
-		  "aprobada_noremunerada"=>"#33CCCC"	
+		  "aprobada_noremunerada"=>"#33CCCC",
+		  "cumplida"=>"lightgray"
 		  );
 
 $COM_TEXTS=array(

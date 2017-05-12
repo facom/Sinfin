@@ -61,17 +61,17 @@ create table Sinfin2.Usuarios (
        documento varchar(255),
 
        -- Tipos: Anonimo, Visitante, Estudiante, Empleado, Vinculado, Ocasional, Secretario, Coordinador
-       tipo varchar(255),
+       tipo varchar(255) default 'EXTERNO',
 
        -- Dependencia a la que esta adscrito o matriculado o que tiene su plaza
        -- Dependencias: fisica, biologia, quimica, matematicas, decanato, vicedecanato, facultad
-       dependenciaid varchar(20),
+       dependenciaid varchar(20) default 'facultad',
 
        -- <cargo> <dependenciaid>
        -- Cargos: director,coordinador,secretario 
        -- Ej. director decanato (decano), director vicedecanato (vicedecano), secretario fisica
-       cargo varchar(255),
-       dedicacion varchar(10),
+       cargo varchar(255) default '',
+       dedicacion varchar(10) default 'No',
 
        -- Nivel de permisos:
        -- Basicos: 0-Visitante/Anonimo, 1-Estudiante/Usuario, 2-Profesor/Empleado, 

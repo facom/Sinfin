@@ -26,7 +26,7 @@ $content.=<<<C
 <div class="g-signin2" data-theme="dark" data-width="0" data-height="0"></div>
 <div style="display:table;width:100%;height:100%">
 <div style="display:table-cell;vertical-align:middle;text-align:center">
-  <a href="$urlref" onclick="signOut($urlref);" style="font-size:1.5em">Presione aquí para desonectar también $SINFIN de su cuenta de google</a>
+  <a href="#" onclick="signOut($urlref);" style="font-size:1.5em">Presione aquí para desonectar también $SINFIN de su cuenta de google</a>
 </div>
 </div>
 C;

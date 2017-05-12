@@ -148,7 +148,7 @@ $PERMISOS=array(
 		"2"=>"Estudiante",
 		"3"=>"Catedra",
 		"4"=>"Profesor/Empleado",
-		"5"=>"Coordinador/Secretaria",
+		"5"=>"Director/Coordinador/Secretaria",
 		"6"=>"Superusuario",
 		);
 
@@ -1148,20 +1148,20 @@ function get_client_ip() {
 function getComisionInfo($comisionid)
 {
   global $FIELDS_COMISIONES,$FIELDS_PROFESORES;
-  $results=mysqlCmd("select * from Comisiones where comisionid='$comisionid'");
+  $results=mysqlCmd("select * from Comisiones_Solicitudes where comisionid='$comisionid'");
   $comision=array();
   foreach($FIELDS_COMISIONES as $field){
     if($field=="extra1"){$field="diaspermiso";}
     $comision["$field"]=$results[$field];
   }
   $cedula=$comision["cedula"];
-  $profesor=mysqlCmd("select * from Empleados where cedula='$cedula';");
-  foreach($FIELDS_PROFESORES as $field){
+  $profesor=mysqlCmd("select * from Usuarios where documento='$cedula';");
+  foreach($FIELDS_USUARIOS as $field){
     $comision["$field"]=$profesor[$field];
   }
   $institutoid=$comision["institutoid"];
-  $instituto=mysqlCmd("select * from Institutos where institutoid='$institutoid';");
-  $comision["instituto"]=$instituto["instituto"];
+  $instituto=mysqlCmd("select * from Dependencias where dependenciaid='$dependenciaid';");
+  $comision["instituto"]=$instituto["dependencia"];
   return $comision;
 }
 
@@ -1181,6 +1181,15 @@ function expandHomeDirectory($path) {
     $homeDirectory = getenv('HOMEDRIVE') . getenv('HOMEPATH');
   }
   return str_replace('~', realpath($homeDirectory), $path);
+}
+
+function fullStrtoupper($cadena)
+{
+  $cadena=strtoupper(htmlentities($cadena,null,"UTF-8"));
+  $pattern="/&([A-Z]+);/";
+  $cadena=preg_replace_callback($pattern,"ucfirstHTMLentity",$cadena);
+  $cadena=html_entity_decode($cadena);
+  return $cadena;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

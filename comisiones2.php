@@ -8,6 +8,7 @@ $HOST=$_SERVER["HTTP_HOST"];
 $SCRIPTNAME=$_SERVER["SCRIPT_FILENAME"];
 $ROOTDIR=rtrim(shell_exec("dirname $SCRIPTNAME"));
 require("$ROOTDIR/etc/library2.php");
+require("$ROOTDIR/etc/modulos/comisiones.php");
 
 ////////////////////////////////////////////////////////////////////////
 //SCRIPT
@@ -41,7 +42,6 @@ $submenu=<<<M
 <li class="level1"><a href="actions$VER.php?action=Cerrar">Desconectarse</a></li>
 <li class="level1"><a href="comisiones$VER.php?action=Solicitar">Nueva Solicitud</a></li>
 <li class="level1"><a href="comisiones$VER.php?action=Consultar">Lista de Solicitudes</a></li>
-<li class="level1"><a href="comisiones$VER.php?action=Profesores">Lista de Empleados</a></li>
 <li class="level1"><a href="comisiones$VER.php?action=Consultar&qtrash=1">Eliminados</a></li>
 M;
 $content.=getSubMenu($submenu);
@@ -89,7 +89,7 @@ if(isset($operation)){
     //UPDATE DATABASE
     $now=mysqlCmd("select now();")[0];
     if(!preg_match("/$emailconfirma/",$confirmacumplido)){
-      $sql="update Comisiones set confirmacumplido='$emailconfirma::$now;$confirmacumplido' where comisionid='$comisionid';";
+      $sql="update Comisiones_Solicitudes set confirmacumplido='$emailconfirma::$now;$confirmacumplido' where comisionid='$comisionid';";
       mysqlCmd($sql);
     }
 
@@ -162,7 +162,7 @@ M;
       }
       $update.="qcumplido='$qcumplido',infocumplido='$infocumplido',$estado";
       $update=trim($update,",");
-      $sql="update Comisiones $update where comisionid='$comisionid';";
+      $sql="update Comisiones_Solicitudes $update where comisionid='$comisionid';";
       //echo "SQL:$sql<br/>";
       mysqlCmd($sql);
       $comision["qcumplido"]=1;
@@ -172,7 +172,7 @@ M;
       if(isset($envia)){
 	$qcumplido=1;
 	$estado="estado='cumplida'";
-	$sql="update Comisiones set qcumplido='$qcumplido',$estado where comisionid='$comisionid';";
+	$sql="update Comisiones_Solicitudes set qcumplido='$qcumplido',$estado where comisionid='$comisionid';";
 	mysqlCmd($sql);
 	$comision["qcumplido"]=1;
 	$error.=errorMessage("<b>Felicitaciones. Su comisión se ha cumplido con exito.</b>");
@@ -227,7 +227,7 @@ M;
     }
     $destintxt.="'";
     //echo "Destinos: $destintxt";
-    $sql="update Comisiones set $destintxt where comisionid='$comisionid';";
+    $sql="update Comisiones_Solicitudes set $destintxt where comisionid='$comisionid';";
     mysqlCmd($sql);
 
     //CHECK CONFIRMATION E-MAIL
@@ -379,7 +379,7 @@ M;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //DISPONIBLE
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if(abs($qperm)==1 and $vistobueno=="Si" and ($tipocom=="noremunerada" or $tipocom=="calamidad")){
+    if(abs($QPERMISO)==$PERMISO_DIRECTOR and $vistobueno=="Si" and ($tipocom=="noremunerada" or $tipocom=="calamidad")){
       $parts=preg_split("/-/",$DATE);
       $year=$parts[0];
       if($year!=$ano){
@@ -429,7 +429,7 @@ M;
 	$estado="solicitada";
       }
     }
-    if(abs($qperm)==0 and $estado=="devuelta"){$estado="solicitada";}
+    if(abs($QPERMISO)==$PERMISO_PROFESOR and $estado=="devuelta"){$estado="solicitada";}
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //GRABAR DATOS EN BASE DE DATOS
@@ -488,10 +488,10 @@ M;
     $fval_profesores=trim($fval_profesores,",");
     fclose($fl);
 
-    $sql="insert into Comisiones ($fields_comisiones) values ($values_comisiones) on duplicate key update $fval_comisiones";
+    $sql="insert into Comisiones_Solicitudes ($fields_comisiones) values ($values_comisiones) on duplicate key update $fval_comisiones";
     mysqlCmd($sql);
 
-    $sql="insert into Profesores ($fields_profesores) values ($values_profesores) on duplicate key update $fval_profesores";
+    $sql="insert into Usuarios ($fields_profesores) values ($values_profesores) on duplicate key update $fval_profesores";
     mysqlCmd($sql);
     $error=errorMessage("Comisión '$comisionid' guardada.");
     $inputform=0;
@@ -524,7 +524,7 @@ M;
 
 	$qcopy=1;
 	
-	$out=mysqlCmd("select email from Profesores where cedula='$cedulajefe'");
+	$out=mysqlCmd("select email from Usuarios where cedula='$cedulajefe'");
 	$emailjefe=$out[0];
 	$ttipocom=$TIPOSCOM[$tipocom];
 	$destino="Director";
@@ -560,7 +560,7 @@ M;
       $emailcopia=$out[1];
 
       $qcopy=1;
-      $out=mysqlCmd("select email from Profesores where cedula='$cedulajefe'");
+      $out=mysqlCmd("select email from Usuarios where cedula='$cedulajefe'");
       $emailjefe=$out[0];
       $destino="Decano";
       
@@ -585,7 +585,7 @@ M;
 	//echo "Creating notificaction file...<br/>";
 	shell_exec("date > comisiones/$comisionid/.notified");
 
-	$out=mysqlCmd("select email from Profesores where cedula='$cedulajefeinst'");
+	$out=mysqlCmd("select email from Usuarios where cedula='$cedulajefeinst'");
 
 	$copia="Director Instituto";
 	$emailcopia=$out[0];
@@ -622,7 +622,7 @@ M;
 	$qnew=0;
       }
     }else if($estado=="devuelta"){
-      $out=mysqlCmd("select email from Profesores where cedula='$cedulajefeinst'");
+      $out=mysqlCmd("select email from Usuarios where cedula='$cedulajefeinst'");
 
       $copia="Director Instituto";
       $emailcopia=$out[0];
@@ -673,7 +673,7 @@ M;
 
       //SEND MESSAGE TO USER
       $emailuser=$email;
-      $estadoactual=$ESTADOS[$estado];
+      $estadoactual=$COM_ESTADOS[$estado];
       $subjectactual="[Comisiones] Actualización de Solicitud de Comisión/Permiso $comisionid";
 $messageactual=<<<M
   Se&ntilde;or(a) Empleado(a),
@@ -717,17 +717,17 @@ M;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //GET RESOLUCION DATA
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    $solicitud=mysqlCmd("select * from Comisiones where comisionid='$comisionid';",$qout=1);
+    $solicitud=mysqlCmd("select * from Comisiones_Solicitudes where comisionid='$comisionid';",$qout=1);
     foreach($FIELDS_COMISIONES as $field){
       $value=$solicitud[0][$field];
       $$field=$value;
     }
-    $profesor=mysqlCmd("select * from Profesores where cedula='$cedula';",$qout=1);
+    $profesor=mysqlCmd("select * from Usuarios where cedula='$cedula';",$qout=1);
     foreach($FIELDS_PROFESORES as $field){
       $value=$profesor[0][$field];
       $$field=$value;
     }
-    $instituto=mysqlCmd("select * from Institutos where institutoid='$institutoid';",$qout=1);
+    $instituto=mysqlCmd("select * from Dependencias where dependenciaid='$dependenciaid';",$qout=1);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //PREPROCESS DATA
@@ -1122,11 +1122,11 @@ R;
   //BORRAR SOLICITUD
   //////////////////////////////////////////////////////////////
   if($operation=="Borrar"){
-    mysqlCmd("update Comisiones set qtrash='1' where comisionid='$comisionid'");
+    mysqlCmd("update Comisiones_Solicitudes set qtrash='1' where comisionid='$comisionid'");
     $error=errorMessage("Comisión '$comisionid' enviada a la papelera de reciclaje.");
   }
   if($operation=="BorrarDefinitivamente"){
-    mysqlCmd("delete from Comisiones where comisionid='$comisionid'");
+    mysqlCmd("delete from Comisiones_Solicitudes where comisionid='$comisionid'");
     shell_exec("rm -r comisiones/$comisionid");
     $error=errorMessage("Comisión '$comisionid' borrada definitivamente.");
   }
@@ -1163,7 +1163,7 @@ $content.=$body;
 //CHECK USER
 ////////////////////////////////////////////////////////////////////////
 if(isset($usercedula) and isset($userpass)){
-  $sql="select * from Profesores where cedula='$usercedula'";
+  $sql="select * from Usuarios where cedula='$usercedula'";
   if(!($out=mysqli_query($DB,$sql))){
     die("Error:".mysqli_error($DB));
   }
@@ -1201,14 +1201,14 @@ if($action=="Solicitar"){
   //LOAD COMISION
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if(isset($loadcomision)){
-    $results=mysqlCmd("select * from Comisiones where comisionid='$comisionid'");
+    $results=mysqlCmd("select * from Comisiones_Solicitudes where comisionid='$comisionid'");
     foreach($FIELDS_COMISIONES as $field){
       //$$field=utf8_encode($results[$field]);
       $fieldn=$field;
       if($field=="extra1"){$field="diaspermiso";}
       $$field=$results[$fieldn];
     }
-    $results=mysqlCmd("select * from Profesores where cedula='$cedula'");
+    $results=mysqlCmd("select * from Usuarios where cedula='$cedula'");
     foreach($FIELDS_PROFESORES as $field){
       //$$field=utf8_encode($results[$field]);
       $fieldn=$field;
@@ -1224,7 +1224,7 @@ if($action=="Solicitar"){
   }  
   $today=preg_split("/-/",$DATE);
   $year=$today[0];
-  $cresults=mysqlCmd("select sum(extra1) from Comisiones where cedula='$cedula' and (tipocom='noremunerada' or tipocom='calamidad') and actualizacion like '$year%' and qtrash+0<1 and (estado='aprobada' or estado='cumplida')");
+  $cresults=mysqlCmd("select sum(extra1) from Comisiones_Solicitudes where cedula='$cedula' and (tipocom='noremunerada' or tipocom='calamidad') and actualizacion like '$year%' and qtrash+0<1 and (estado='aprobada' or estado='cumplida')");
   $diasdisponible=6-$cresults[0];
   $comment="";
   if($diasdisponible==0){
@@ -1269,7 +1269,7 @@ if($action=="Solicitar"){
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //CHECK CUMPLIDOS PENDIENTES
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  $result=mysqlCmd("select comisionid from Comisiones where (tipocom<>'noremunerada' and tipocom<>'calamidad') and cedula='$cedula' and fechafin<now() and qcumplido+0=0;");
+  $result=mysqlCmd("select comisionid from Comisiones_Solicitudes where (tipocom<>'noremunerada' and tipocom<>'calamidad') and cedula='$cedula' and fechafin<now() and qcumplido+0=0;");
   if($result!=0){
     $foot="<script>alert('Señor(a) Empleado(a), usted tiene Comisiones que ya concluyeron y que están a la espera de cumplido.')</script>";
     $faltacumplido="";
@@ -1295,7 +1295,7 @@ $reslink=<<<R
 R;
  
  $extrares="";
- if(abs($qperm)==2){
+ if(abs($QPERMISO)==$PERMISO_SUPERUSUARIO){
    $extrares="<!-- -------------------------------------------------- -->
     <a href=comisiones/$comisionid/resolucion-blank-$comisionid.html target='_blank'>
       Resolución imprimible</a>
@@ -1317,26 +1317,26 @@ R;
   $disp4="";
   $disp5="";//READONLY FOR PROFESOR
   $tabcolor="white";
-  if(abs($qperm)==0){
+  if(abs($QPERMISO)==$PERMISO_PROFESOR){
     $disp1="style='display:none'";
     $disp4="style='display:none'";
     $disp5="readonly";
   }
-  if(abs($qperm)==1){
+  if(abs($QPERMISO)==$PERMISO_DIRECTOR){
     $disp2="style='display:none'";
   }
 
   if($vistobueno=="Si"){
     $notification="<i style='color:blue'>Esta solicitud ya ha recibido visto bueno del director.</i>";
     $tabcolor="lightblue";
-    if(abs($qperm)<=1){
+    if(abs($QPERMISO)<=$PERMISO_DIRECTOR){
       $disp3="disabled";
     }
   }
   if($aprobacion=="Si"){
     $notification="<i style='color:blue'>Esta solicitud ya ha sido aprobada</i>";
     $tabcolor="lightgreen";
-    if(abs($qperm)<=1){
+    if(abs($QPERMISO)<=$PERMISO_DIRECTOR){
       $disp3="disabled";
     }
   }
@@ -1351,7 +1351,7 @@ R;
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //GENERATE TIPO
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  $estadosel=generateSelection($ESTADOS,"estado",$estado,$disabled="");
+  $estadosel=generateSelection($COM_ESTADOS,"estado",$estado,$disabled="");
   //echo "TIPO:$tipo<br/>";
   $tiposel=generateSelection($TIPOS,"tipo",$tipo,$disabled="$disp3",$readonly=1);
   $tipoidsel=generateSelection($TIPOSID,"tipoid",$tipoid,$disabled="$disp3");
@@ -1896,9 +1896,9 @@ if($action=="Consultar"){
   }
 
   $generar="";
-  if(abs($qperm)==0){
+  if(abs($QPERMISO)==$PERMISO_PROFESOR){
     $where.="and cedula='$usercedula'";
-  }else if(abs($qperm)==1){
+  }else if(abs($QPERMISO)==$PERMISO_PROFESOR){
     $where.="and institutoid='$userinstituto'";
   }
 
@@ -1915,12 +1915,13 @@ if($action=="Consultar"){
     $order="$orderby $direction";
   }
 
-  $solicitudes=mysqlCmd("select $fields,TIMESTAMP(radicacion) as radicacion from Comisiones $where order by $order;",$qout=1);
+  $sql="select $fields,TIMESTAMP(radicacion) as radicacion from Comisiones_Solicitudes $where order by $order;";
+  $solicitudes=mysqlCmd($sql,$qout=1);
   if($solicitudes==0){$nsolicitudes=0;}
   else{$nsolicitudes=count($solicitudes);}
   
 $table=<<<T
-<table width=100% border=0px style='font-size:14px'>
+<table width=100% border=0px>
 <tr>
   <td width=5% style=background:lightgray>
     <a href="comisiones$VER.php?$USERSTRING&action=Consultar&orderby=comisionid&direction=$direction">Comisión</a>
@@ -1969,18 +1970,18 @@ T;
     $tanexo3=$comision['anexo3'];
 
     $testadox=$comision['estado'];
-    $testado=$ESTADOS["$testadox"];
+    $testado=$COM_ESTADOS["$testadox"];
     $ttipocomx=$comision['tipocom'];
-    $ttipocom=$TIPOSCOM[$ttipocomx];
+    $ttipocom=$COM_TIPOS[$ttipocomx];
     $tfechaini=$comision['fechaini'];
     $tfechafin=$comision['fechafin'];
     
     //CALCULA EL TIEMPO DESPUES DE FINALIZADA DE LA COMISION
-    $tafter=mysqlCmd("select UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(fechafin) from Comisiones where comisionid='$tcomisionid'")[0];
+    $tafter=mysqlCmd("select UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(fechafin) from Comisiones_Solicitudes where comisionid='$tcomisionid'")[0];
 
-    $estadocolor=$COLORS[$testadox];
+    $estadocolor=$COM_COLORS[$testadox];
     if($ttipocomx=="noremunerada"  or $ttipocomx=="calamidad"){
-      $estadocolor=$COLORS[$testadox."_noremunerada"];
+      $estadocolor=$COM_COLORS[$testadox."_noremunerada"];
     }
 
     if($tafter>0 and 
@@ -1990,19 +1991,19 @@ T;
     }
 
     $tradicacion=$comision['radicacion'];
-    $tinstituto=$INSTITUTOS[$comision['institutoid']];
+    $tinstituto=$DEPENDENCIAS[$comision['institutoid']];
     $tactualiza=$comision['actualiza'];
     $tactualizacion=$comision['actualizacion'];
     $taprobacion=$comision['aprobacion'];
     $tvistobueno=$comision['vistobueno'];
 
-    $results=mysqlCmd("select nombre from Profesores where cedula='$tcedula'");
+    $results=mysqlCmd("select nombre from Usuarios where documento='$tcedula'");
     $tnombre=$results[0];
     $generar="";
     $reslink="";
     $extrares="";
     
-    if(abs($qperm)==2 and $taprobacion=="Si" /*and ($ttipocomx!="noremunerada" and $ttipocomx!="calamidad")*/){
+    if(abs($QPERMISO)==$PERMISO_SUPERUSUARIO and $taprobacion=="Si" /*and ($ttipocomx!="noremunerada" and $ttipocomx!="calamidad")*/){
 
       $generar="<!-- -------------------------------------------------- -->
     <a href=comisiones$VER.php?$USERSTRING&comisionid=$tcomisionid&operation=Resolucion&action=Consultar>
@@ -2014,19 +2015,19 @@ T;
       $doctype="Oficio";
     }
 
-    if(file_exists("comisiones/$tcomisionid/resolucion-$tcomisionid.html") and
-       !file_exists("comisiones/$tcomisionid/.nogen")){
+    if(file_exists("data/comisiones/$tcomisionid/resolucion-$tcomisionid.html") and
+       !file_exists("data/comisiones/$tcomisionid/.nogen")){
       $reslink="<!-- -------------------------------------------------- -->
-    <a href=comisiones/$tcomisionid/resolucion-$tcomisionid.html target='_blank'>
+    <a href=data/comisiones/$tcomisionid/resolucion-$tcomisionid.html target='_blank'>
       $doctype</a>
-  (<a href=comisiones/$tcomisionid/resolucion-$tcomisionid.pdf target='_blank'>pdf</a>)<br/>
+  (<a href=data/comisiones/$tcomisionid/resolucion-$tcomisionid.pdf target='_blank'>pdf</a>)<br/>
 ";
       $extrares="";
-      if(abs($qperm)==2){
+      if(abs($QPERMISO)==$PERMISO_SUPERUSUARIO){
 	$extrares="<!-- -------------------------------------------------- -->
-    <a href=comisiones/$tcomisionid/resolucion-blank-$tcomisionid.html target='_blank'>
+    <a href=data/comisiones/$tcomisionid/resolucion-blank-$tcomisionid.html target='_blank'>
       Imprimible</a>
-  (<a href=comisiones/$tcomisionid/resolucion-blank-$tcomisionid.pdf target='_blank'>pdf</a>)<br/>
+  (<a href=data/comisiones/$tcomisionid/resolucion-blank-$tcomisionid.pdf target='_blank'>pdf</a>)<br/>
 ";
       }
       
@@ -2037,24 +2038,24 @@ T;
     //ARCHIVOS
     $tarchivos="";
     if(!isBlank($tanexo1)){
-      $tarchivos.="<a href='comisiones/$tcomisionid/$tanexo1' target='_blank'>Anexo 1</a><br/>";
+      $tarchivos.="<a href='data/comisiones/$tcomisionid/$tanexo1' target='_blank'>Anexo 1</a><br/>";
     }
     if(!isBlank($tanexo2)){
-      $tarchivos.="<a href='comisiones/$tcomisionid/$tanexo2' target='_blank'>Anexo 2</a><br/>";
+      $tarchivos.="<a href='data/comisiones/$tcomisionid/$tanexo2' target='_blank'>Anexo 2</a><br/>";
     }
     if(!isBlank($tanexo3)){
-      $tarchivos.="<a href='comisiones/$tcomisionid/$tanexo3' target='_blank'>Anexo 3</a><br/>";
+      $tarchivos.="<a href='data/comisiones/$tcomisionid/$tanexo3' target='_blank'>Anexo 3</a><br/>";
     }
 
     $tarchivoscump="";
     if(!isBlank($tcumplido1) and $tcumplido1!='None'){
-      $tarchivoscump.="<a href='comisiones/$tcomisionid/Cumplido1_${tcedula}_${tcomisionid}_$tcumplido1' target='_blank'>Cumplido 1</a><br/>";
+      $tarchivoscump.="<a href='data/comisiones/$tcomisionid/Cumplido1_${tcedula}_${tcomisionid}_$tcumplido1' target='_blank'>Cumplido 1</a><br/>";
     }
     if(!isBlank($tcumplido2) and $tcumplido2!='None'){
-      $tarchivoscump.="<a href='comisiones/$tcomisionid/Cumplido2_${tcedula}_${tcomisionid}_$tcumplido2' target='_blank'>Cumplido 2</a><br/>";
+      $tarchivoscump.="<a href='data/comisiones/$tcomisionid/Cumplido2_${tcedula}_${tcomisionid}_$tcumplido2' target='_blank'>Cumplido 2</a><br/>";
     }
     if(!isBlank($tcumplido3) and $tcumplido3!='None'){
-      $tarchivoscump.="<a href='comisiones/$tcomisionid/Cumplido3_${tcedula}_${tcomisionid}_$tcumplido3' target='_blank'>Cumplido 3</a><br/>";
+      $tarchivoscump.="<a href='data/comisiones/$tcomisionid/Cumplido3_${tcedula}_${tcomisionid}_$tcumplido3' target='_blank'>Cumplido 3</a><br/>";
     }
 
     //GENERANDO ACCIONES
@@ -2079,14 +2080,14 @@ T;
 
       //CUMPLIDA + DECANA
       if($tqcumplido>0 and
-	 $qperm){
+	 $QPERMISO){
 	$cumplido="<!-- -------------------------------------------------- -->
 <a href=comisiones$VER.php?$USERSTRING&comisionid=$tcomisionid&action=Cumplido>Modificar Cumplido</a><br/>";
       }
 
       //CUMPLIDA + PROFESOR
       if($tqcumplido>0 and
-	 $qperm==0){
+	 $QPERMISO==$PERMISO_PROFESOR){
 	$cumplido="<!-- -------------------------------------------------- -->
 <a href=comisiones$VER.php?$USERSTRING&comisionid=$tcomisionid&action=Cumplido>Actualizar Cumplido</a><br/>";
       }
@@ -2146,9 +2147,9 @@ T;
  }
 
  $informes="";
- if(abs($qperm)){
+ if(abs($QPERMISO)){
    $informes="<a href='comisiones$VER.php?usercedula=$cedula&userpass=$userpass&action=Informes'>Informes</a> | <a href='comisiones$VER.php?usercedula=$cedula&userpass=$userpass&operation=Backup&action=Consultar'>Hacer respaldo</a>";
-   $lprofesores="<a href='comisiones$VER.php?$USERSTRING&action=Profesores'>Lista de Empleados</a> | <a href=comisiones$VER.php?$USERSTRING&action=Consultar&qtrash=1>Reciclaje</a> | ";
+   $lprofesores="";
  }
 
  //OTROS ORDENAMIENTOS
@@ -2162,6 +2163,17 @@ $browsing_help
 <h2>Lista de solicitudes $trashtxt</h2>
   Número de solicitudes: $nsolicitudes
 <p></p>
+  
+<style>
+  td{
+  padding:5px;
+  font-size:0.8em;
+  }
+  a{
+  color:blue;
+  }
+</style>
+     
   <table border=0px><tr>
   <td>Convenciones:</td>
   </tr>
@@ -2195,18 +2207,18 @@ if($action=="EditarProfesor"){
     if($ucedula!=$ecedula){
       if($ucedula!="0000000"){
 	$error.=errorMessage("Cambiando documento del empleado");
-	$sql="delete from Profesores where cedula='$ucedula'";
+	$sql="delete from Usuarios where cedula='$ucedula'";
 	mysqlCmd($sql);
       }else{
 	$epass=md5("$ecedula");
       }
     }
-    $sql="insert into Profesores (tipoid,cedula,nombre,email,tipo,institutoid,dedicacion,pass) values ('$etipoid','$ecedula','$enombre','$eemail','$etipo','$einstitutoid','$ededicacion','$epass') on duplicate key update tipoid=VALUES(tipoid),cedula=VALUES(cedula),nombre=VALUES(nombre),email=VALUES(email),tipo=VALUES(tipo),institutoid=VALUES(institutoid),dedicacion=VALUES(dedicacion),pass=VALUES(pass)";
+    $sql="insert into Usuarios (tipoid,cedula,nombre,email,tipo,institutoid,dedicacion,pass) values ('$etipoid','$ecedula','$enombre','$eemail','$etipo','$einstitutoid','$ededicacion','$epass') on duplicate key update tipoid=VALUES(tipoid),cedula=VALUES(cedula),nombre=VALUES(nombre),email=VALUES(email),tipo=VALUES(tipo),institutoid=VALUES(institutoid),dedicacion=VALUES(dedicacion),pass=VALUES(pass)";
     mysqlCmd($sql);
     $error.=errorMessage("Información del empleado actualizada");
   }
   if(isset($ecedula)){$ucedula=$ecedula;}
-  $profesor=mysqlCmd("select * from Profesores where cedula='$ucedula'",$qout=1);
+  $profesor=mysqlCmd("select * from Usuarios where cedula='$ucedula'",$qout=1);
 
   if($subaction=="Nuevo"){
     $profesor=array(array("tipoid"=>"","cedula"=>"","nombre"=>"","email"=>"","tipo"=>"","institutoid"=>"","dedicacion"=>"","pass"=>""));
@@ -2259,7 +2271,7 @@ if($action=="Profesores"){
   //REMOVE
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if($subaction=="Remove"){
-    $sql="delete from Profesores where cedula='$ucedula'";
+    $sql="delete from Usuarios where cedula='$ucedula'";
     mysqlCmd($sql);
     $error.=errorMessage("Profesor '$ucedula' borrado...");
   }
@@ -2268,7 +2280,7 @@ if($action=="Profesores"){
   //LIST
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  $profesores=mysqlCmd("select * from Profesores order by nombre",$qout=1);
+  $profesores=mysqlCmd("select * from Usuarios order by nombre",$qout=1);
   $content.=<<<C
 
 <p>
@@ -2340,14 +2352,14 @@ C;
 ////////////////////////////////////////////////////////////////////////
 if($action=="Informes"){
 
-  if(abs($qperm)==0){
+  if(abs($QPERMISO)==$PERMISO_PROFESOR){
     $error=errorMessage("No autorizado para generar informes.");
     $content.="$error";
     goto footer;
   }
   
   if(isBlank($command)){
-    $command="* from Comisiones";
+    $command="* from Comisiones_Solicitudes";
   }
   if(preg_match("/;/",$command) or 
      preg_match("/select/i",$command)){
@@ -2418,7 +2430,7 @@ $table.=<<<T
 <td>$value</td>
 T;
      if($field=="cedula"){
-       $profesor=mysqlCmd("select nombre from Profesores where cedula='$value'",$qout=1);
+       $profesor=mysqlCmd("select nombre from Usuarios where cedula='$value'",$qout=1);
        $value=$profesor[0][0];
        $values.="\"$value\";";
        $table.="<td>$value</td>";
@@ -2456,7 +2468,7 @@ $error
     <td>
       Muestre todas las comisiones presentadas a la fecha:<br/>
       <pre>
-	* from Comisiones
+	* from Comisiones_Solicitudes
       </pre>
     </td>
   </tr>
@@ -2464,7 +2476,7 @@ $error
     <td>
       Muestre las comisiones presentadas por la cedula 71755174:<br/>
       <pre>
-	* from Comisiones where cedula='71755174'
+	* from Comisiones_Solicitudes where cedula='71755174'
       </pre>
     </td>
   </tr>
@@ -2473,7 +2485,7 @@ $error
     <td>
       Muestre todos los permisos:<br/>
       <pre>
-	* from Comisiones where (tipocom='noremunerada' and tipocom='calamidad')
+	* from Comisiones_Solicitudes where (tipocom='noremunerada' and tipocom='calamidad')
       </pre>
     </td>
   </tr>
@@ -2482,7 +2494,7 @@ $error
     <td>
       Muestre todos las comisiones en idioma inglés:<br/>
       <pre>
-	* from Comisiones where idioma like 'Ingl%'
+	* from Comisiones_Solicitudes where idioma like 'Ingl%'
       </pre>
     </td>
   </tr>
@@ -2491,7 +2503,7 @@ $error
     <td>
       Muestre todos las comisiones aprobadas después del 15 de agosto:<br/>
       <pre>
-	* from Comisiones where actualizacion>'2015-08-15'
+	* from Comisiones_Solicitudes where actualizacion>'2015-08-15'
       </pre>
     </td>
   </tr>
@@ -2503,7 +2515,7 @@ $error
       y antes del 20 de agosto:<br/>
 
       <pre>
-	* from Comisiones where actualizacion>='2015-08-15' and actualizacion<='2015-08-20'
+	* from Comisiones_Solicitudes where actualizacion>='2015-08-15' and actualizacion<='2015-08-20'
       </pre>
     </td>
   </tr>
@@ -2514,7 +2526,7 @@ $error
       Todas las comisiones de biología de 2015:<br/>
 
       <pre>
-	* from Comisiones where actualizacion like '2015%' and institutoid='biologia'
+	* from Comisiones_Solicitudes where actualizacion like '2015%' and institutoid='biologia'
       </pre>
     </td>
   </tr>
@@ -2525,7 +2537,7 @@ $error
       Muestre los números de resolución y las cédulas de todas las comisiones:<br/>
 
       <pre>
-	cedula,resolucion from Comisiones order by resolucion
+	cedula,resolucion from Comisiones_Solicitudes order by resolucion
       </pre>
     </td>
   </tr>

@@ -69,8 +69,11 @@ if(isset($action)){
 	$npass=md5($pass1);
       }
       else{$npass=$spass;}
+
+      $nombre=strtoupper($nombre);
       insertSql("Usuarios",array("documento"=>"",
 				 "email"=>"",
+				 "nombre"=>"",
 				 "password"=>"npass",
 				 "tipo"=>"",
 				 "permisos"=>"",
@@ -128,6 +131,7 @@ if(isset($action)){
       //DATABASE ENTRY
       $password=md5($password);
       $permisos="1";
+      $nombre=strtoupper($nombre);
       insertSql("Usuarios",array("documento"=>"",
 				 "nombre"=>"",
 				 "email"=>"",
@@ -325,6 +329,14 @@ O puedes usar una cuenta previamente creada:
 
 <div style="background:lightgray;width:360;padding:10px;display:table-cell">
 <input type="hidden" name="urlref" value="$urlref">
+
+<style>
+td{
+padding:10px;
+}
+</style>
+
+
 <table>
 <tr>
   <td>Usuario:</td>
