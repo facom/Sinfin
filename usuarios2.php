@@ -76,6 +76,7 @@ if(isset($action)){
 				 "nombre"=>"",
 				 "password"=>"npass",
 				 "tipo"=>"",
+				 "tipoid"=>"",
 				 "permisos"=>"",
 				 "dependenciaid"=>"",
 				 "cargo"=>"",
@@ -454,6 +455,7 @@ C;
     $nombre=$results["nombre"];
     $documento=$results["documento"];
     $tipo=$results["tipo"];
+    $tipoid=$results["tipoid"];
     $dependenciaid=$results["dependenciaid"];
     $cargo=$results["cargo"];
     $permisos=$results["permisos"];
@@ -474,6 +476,7 @@ C;
       $cargosel="<input type=text name=cargo value='$cargo'>";
       $permisosel=generateSelection($PERMISOS,"permisos",$permisos);
       $dedicacionsel=generateSelection($SINO,"dedicacion",$dedicacion);
+      $docsel=generateSelection($TIPOSID,"tipoid",$tipoid);
     }
 
     if($pass==$spass){
@@ -497,6 +500,10 @@ tr.help{
   <td><input name="nombre" value="$nombre"></td>
 </tr>
 <tr class="help"><td colspan=2><i>Ponga sus dos nombres y apellidos.  Use mayúsculas sostenidas</i></td></tr>
+<tr>
+  <td>Tipo de documento:</td>
+  <td>$docsel</td>
+</tr>
 <tr>
   <td>Documento:</td>
   <td><input name="documento" value="$documento"></td>

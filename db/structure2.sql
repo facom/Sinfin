@@ -46,12 +46,12 @@ alter table Sinfin2.Comaca_Actividades add primary key (actid);
 create table Sinfin2.Comaca_Boletas select * from Sinfin.Boletas;
 alter table Sinfin2.Comaca_Boletas add primary key (boletaid);
 
-/* Dependencias */
+/* DEPENDENCIAS */
 create table Sinfin2.Dependencias select institutoid as dependenciaid,instituto as dependencia from Comisiones.Institutos;
 alter table Sinfin2.Dependencias add primary key (dependenciaid);
 
 
-/* Tabla de usuarios */
+/* TABLA DE USUARIOS */
 create table Sinfin2.Usuarios (
        -- Basicos
        email varchar(50),
@@ -60,7 +60,7 @@ create table Sinfin2.Usuarios (
        tipoid varchar(50) default 'cedula',
        documento varchar(255),
 
-       -- Tipos: Anonimo, Visitante, Estudiante, Empleado, Vinculado, Ocasional, Secretario, Coordinador
+       -- Tipos: Externo, Visitante, Estudiante, Empleado, Vinculado, Ocasional, Secretario, Coordinador
        tipo varchar(255) default 'EXTERNO',
 
        -- Dependencia a la que esta adscrito o matriculado o que tiene su plaza
@@ -92,7 +92,7 @@ create table Sinfin2.Usuarios (
        primary key (email)       
 );
 
-/* Copiar los usuarios desde la base de datos de Usuarios */
+/* COPIA DE LA INFORMACIÓN DE USUARIOS DE OTRAS BASES DE DATOS */
 insert into Sinfin2.Usuarios 
        (
        tipoid,
@@ -119,7 +119,7 @@ insert into Sinfin2.Usuarios
        '1'
        from Sinfin.Usuarios;
 
-/* Copiar los usuarios desde la base de datos de comisions */
+/* DATOS DE USUARIOS DESDE EL SISTEMA DE COMISIONES */
 insert into Sinfin2.Usuarios 
        (
        tipoid,
@@ -158,7 +158,7 @@ insert into Sinfin2.Usuarios
        dependenciaid=values(dependenciaid),
        permisos=values(permisos);
 
-/* Actualizar e insertar valores faltantes */
+/* VALORES FALTANTES */
 update Sinfin2.Dependencias
        set dependenciaid='decanato',dependencia='Decanato' 
        where dependenciaid='decanatura';
@@ -174,13 +174,12 @@ insert into Sinfin2.Dependencias
 update Sinfin2.Usuarios set tipo='EMPLEADO' where tipo='EMPLEADA';
 update Sinfin2.Usuarios set tipo='SECRETARIO' where tipo='SECRETARIA';
 
+/* SUPERUSUARIO */
 update Sinfin2.Usuarios set permisos='6' where email='pregradofisica@udea.edu.co';
 update Sinfin2.Usuarios set tipo='COORDINADOR',dependenciaid='fisica',cargo='coordinador fisica' where email='pregradofisica@udea.edu.co';
 
+/* FIJA PERMISOS*/
 update Sinfin2.Usuarios set permisos='4' where email='jorge.zuluaga@udea.edu.co';
-
-update Sinfin2.Usuarios set permisos='1' where email='zuluagajorge@gmail.com';
-update Sinfin2.Usuarios set tipo='EXTERNO' where email='zuluagajorge@gmail.com';
-
+update Sinfin2.Usuarios set permisos='1',tipo='EXTERNO' where email='zuluagajorge@gmail.com';
+update Sinfin2.Usuarios set permisos='1',tipo='EXTERNO' where email not like '%udea.edu.co';
 update Sinfin2.Usuarios set permisos='2' where email like '%udea.edu.co' and permisos+0<4;
-update Sinfin2.Usuarios set tipo='EXTERNO' where email not like '%udea.edu.co';
